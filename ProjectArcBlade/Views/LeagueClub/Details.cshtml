@@ -1,0 +1,21 @@
+@model ProjectArcBlade.Models.LeagueClub
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>LeagueClub</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        
+    </dl>
+    <label asp-for="Club" />
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>|
+    <a asp-action="Create" asp-controller="Team" asp-route-leagueClubId="@Model.Id">Create a Team</a>
+</div>
