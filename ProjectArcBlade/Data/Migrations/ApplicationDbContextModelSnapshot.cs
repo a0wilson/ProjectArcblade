@@ -382,6 +382,24 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("Category");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.CategoryRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CategoryId");
+
+                    b.Property<int?>("RuleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("RuleId");
+
+                    b.ToTable("CategoryRule");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Club", b =>
                 {
                     b.Property<int>("Id")
@@ -638,7 +656,7 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("MatchTeam");
+                    b.ToTable("HomeMatchTeam");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeamCaptain", b =>
@@ -652,7 +670,7 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.HasIndex("HomeMatchTeamGroupPlayerId");
 
-                    b.ToTable("MatchTeamCaptain");
+                    b.ToTable("HomeMatchTeamCaptain");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeamGroup", b =>
@@ -670,7 +688,7 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.HasIndex("HomeMatchTeamId");
 
-                    b.ToTable("MatchTeamGroup");
+                    b.ToTable("HomeMatchTeamGroup");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeamGroupPlayer", b =>
@@ -688,7 +706,7 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.HasIndex("HomeMatchTeamGroupId");
 
-                    b.ToTable("MatchTeamGroupPlayer");
+                    b.ToTable("HomeMatchTeamGroupPlayer");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.League", b =>
@@ -726,6 +744,24 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("LeagueClub");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.LeagueRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("LeagueId");
+
+                    b.Property<int?>("RuleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
+
+                    b.HasIndex("RuleId");
+
+                    b.ToTable("LeagueRule");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
                     b.Property<int>("Id")
@@ -733,23 +769,15 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("AddressId");
 
-                    b.Property<int?>("ResultTypeId");
-
                     b.Property<int?>("SeasonId");
 
                     b.Property<DateTime>("StartTime");
-
-                    b.Property<int?>("WinningTeamId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AddressId");
 
-                    b.HasIndex("ResultTypeId");
-
                     b.HasIndex("SeasonId");
-
-                    b.HasIndex("WinningTeamId");
 
                     b.ToTable("Match");
                 });
@@ -794,6 +822,21 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ResultType");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Rule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rule");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.ScoreStatus", b =>
@@ -843,6 +886,24 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Sport");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.SportRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("RuleId");
+
+                    b.Property<int?>("SportId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RuleId");
+
+                    b.HasIndex("SportId");
+
+                    b.ToTable("SportRule");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Team", b =>
@@ -1071,6 +1132,17 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasForeignKey("ClubUserId");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.CategoryRule", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
+                    b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
+                        .WithMany("CategoryRules")
+                        .HasForeignKey("RuleId");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Club", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Address", "Address")
@@ -1233,23 +1305,26 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasForeignKey("LeagueId");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.LeagueRule", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.League", "League")
+                        .WithMany()
+                        .HasForeignKey("LeagueId");
+
+                    b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
+                        .WithMany("LeagueRules")
+                        .HasForeignKey("RuleId");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Address", "Address")
                         .WithMany("Matches")
                         .HasForeignKey("AddressId");
 
-                    b.HasOne("ProjectArcBlade.Models.ResultType", "ResultType")
-                        .WithMany("Matches")
-                        .HasForeignKey("ResultTypeId");
-
                     b.HasOne("ProjectArcBlade.Models.Season", "Season")
                         .WithMany("Matches")
                         .HasForeignKey("SeasonId");
-
-                    b.HasOne("ProjectArcBlade.Models.Team", "WinningTeam")
-                        .WithMany()
-                        .HasForeignKey("WinningTeamId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.MatchScheduledDate", b =>
@@ -1265,6 +1340,17 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.League", "League")
                         .WithMany("Seasons")
                         .HasForeignKey("LeagueId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.SportRule", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
+                        .WithMany("SportRules")
+                        .HasForeignKey("RuleId");
+
+                    b.HasOne("ProjectArcBlade.Models.Sport", "Sport")
+                        .WithMany()
+                        .HasForeignKey("SportId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Team", b =>

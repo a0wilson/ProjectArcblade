@@ -10,11 +10,7 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public Season Season { get; set; }
-        [Display(Name = "Result")]
-        public ResultType ResultType { get; set; }
-
-        [Display(Name="Won By")]
-        public Team WinningTeam { get; set; }
+                
         [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
         [Display(Name = "Venue")]

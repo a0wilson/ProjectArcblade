@@ -19,8 +19,7 @@ namespace ProjectArcBlade.Data
         public DbSet<AvailableDay> AvailableDays { get; set; }
         public DbSet<Award> Awards { get; set; }
         public DbSet<AwardNominee> AwardNominees { get; set; }
-        public DbSet<AwayGameResult> AwayGameResults { get; set; }
-        public DbSet<AwayGameResultScore> AwayGameResultScores { get; set; }
+        
         public DbSet<Category> Categories { get; set; }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<ClubSubscriber> ClubSubscribers { get; set; }
@@ -33,16 +32,26 @@ namespace ProjectArcBlade.Data
         public DbSet<Division> Divisions { get; set; }
         public DbSet<Gender> Genders { get; set; }
         public DbSet<Group> Groups { get; set; }
-        public DbSet<HomeGameResult> HomeGameResults { get; set; }
-        public DbSet<HomeGameResultScore> HomeGameResultScores { get; set; }
+        
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueClub> LeagueClubs { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<MatchScheduledDate> MatchScheduledDates { get; set; }
-        public DbSet<HomeMatchTeam> MatchTeams { get; set; }
-        public DbSet<HomeMatchTeamCaptain> MatchTeamCaptains { get; set; }
-        public DbSet<HomeMatchTeamGroup> MatchTeamGroups { get; set; }
-        public DbSet<HomeMatchTeamGroupPlayer> MatchTeamGroupPlayers { get; set; }
+
+        public DbSet<HomeMatchTeam> HomeMatchTeams { get; set; }
+        public DbSet<HomeMatchTeamCaptain> HomeMatchTeamCaptains { get; set; }
+        public DbSet<HomeMatchTeamGroup> HomeMatchTeamGroups { get; set; }
+        public DbSet<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }
+        public DbSet<HomeGameResult> HomeGameResults { get; set; }
+        public DbSet<HomeGameResultScore> HomeGameResultScores { get; set; }
+
+        public DbSet<AwayMatchTeam> AwayMatchTeams { get; set; }
+        public DbSet<AwayMatchTeamCaptain> AwayMatchTeamCaptains { get; set; }
+        public DbSet<AwayMatchTeamGroup> AwayMatchTeamGroups { get; set; }
+        public DbSet<AwayMatchTeamGroupPlayer> AwayMatchTeamGroupPlayers { get; set; }
+        public DbSet<AwayGameResult> AwayGameResults { get; set; }
+        public DbSet<AwayGameResultScore> AwayGameResultScores { get; set; }
+
         public DbSet<MembershipType> MembershipTypes { get; set; }
         public DbSet<ResultType> ResultTypes { get; set; }
         public DbSet<ScoreStatus> ScoreStatuses { get; set; }
@@ -53,6 +62,11 @@ namespace ProjectArcBlade.Data
         public DbSet<UserDetail> UserDetails { get; set; }
         public DbSet<Sport> Sports { get; set; }
 
+        public DbSet<Rule> Rules { get; set; }
+        public DbSet<LeagueRule> LeaugeRules { get; set; }
+        public DbSet<SportRule> SportRules { get; set; }
+        public DbSet<CategoryRule> CategoryRules { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -60,12 +74,12 @@ namespace ProjectArcBlade.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);En
 
+            
             builder.Entity<Address>().ToTable("Address");
             builder.Entity<AvailableDay>().ToTable("AvailableDay");
             builder.Entity<Award>().ToTable("Award");
             builder.Entity<AwardNominee>().ToTable("AwardNominee");
-            builder.Entity<AwayGameResult>().ToTable("AwayGameResult");
-            builder.Entity<AwayGameResultScore>().ToTable("AwayGameResultScore");
+            
             builder.Entity<Category>().ToTable("Category");
             builder.Entity<Club>().ToTable("Club");
             builder.Entity<ClubSubscriber>().ToTable("ClubSubscriber");
@@ -78,16 +92,26 @@ namespace ProjectArcBlade.Data
             builder.Entity<Division>().ToTable("Division");
             builder.Entity<Gender>().ToTable("Gender");
             builder.Entity<Group>().ToTable("Group");
-            builder.Entity<HomeGameResult>().ToTable("HomeGameResult");
-            builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScore");
+            
             builder.Entity<League>().ToTable("League");
             builder.Entity<LeagueClub>().ToTable("LeagueClub");
             builder.Entity<Match>().ToTable("Match");
             builder.Entity<MatchScheduledDate>().ToTable("MatchScheduledDate");
-            builder.Entity<HomeMatchTeam>().ToTable("MatchTeam");
-            builder.Entity<HomeMatchTeamCaptain>().ToTable("MatchTeamCaptain");
-            builder.Entity<HomeMatchTeamGroup>().ToTable("MatchTeamGroup");
-            builder.Entity<HomeMatchTeamGroupPlayer>().ToTable("MatchTeamGroupPlayer");
+
+            builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");
+            builder.Entity<HomeMatchTeamCaptain>().ToTable("HomeMatchTeamCaptain");
+            builder.Entity<HomeMatchTeamGroup>().ToTable("HomeMatchTeamGroup");
+            builder.Entity<HomeMatchTeamGroupPlayer>().ToTable("HomeMatchTeamGroupPlayer");
+            builder.Entity<HomeGameResult>().ToTable("HomeGameResult");
+            builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScore");
+
+            builder.Entity<AwayMatchTeam>().ToTable("AwayMatchTeam");
+            builder.Entity<AwayMatchTeamCaptain>().ToTable("AwayMatchTeamCaptain");
+            builder.Entity<AwayMatchTeamGroup>().ToTable("AwayMatchTeamGroup");
+            builder.Entity<AwayMatchTeamGroupPlayer>().ToTable("AwayMatchTeamGroupPlayer");
+            builder.Entity<AwayGameResult>().ToTable("AwayGameResult");
+            builder.Entity<AwayGameResultScore>().ToTable("AwayGameResultScore");
+
             builder.Entity<MembershipType>().ToTable("MembershipType");
             builder.Entity<ResultType>().ToTable("ResultType");
             builder.Entity<ScoreStatus>().ToTable("ScoreStatus");
@@ -97,6 +121,12 @@ namespace ProjectArcBlade.Data
             builder.Entity<TeamPlayer>().ToTable("TeamPlayer");
             builder.Entity<UserDetail>().ToTable("UserDetail");
             builder.Entity<Sport>().ToTable("Sport");
+
+            builder.Entity<Rule>().ToTable("Rule");
+            builder.Entity<LeagueRule>().ToTable("LeagueRule");
+            builder.Entity<SportRule>().ToTable("SportRule");
+            builder.Entity<CategoryRule>().ToTable("CategoryRule");
+
         }
     }
 }

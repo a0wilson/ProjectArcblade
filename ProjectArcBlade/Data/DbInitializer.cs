@@ -225,9 +225,93 @@ namespace ProjectArcBlade.Data
                     },
                     new UserDetail
                     {
+                        FirstName ="Chris",
+                        LastName ="Allen",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Peter",
+                        LastName ="Bracegirdle",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Mike",
+                        LastName ="Constantino",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Simon",
+                        LastName ="Evans",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Huw",
+                        LastName ="John",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Daniel",
+                        LastName ="Thrift",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Peter",
+                        LastName ="Yau",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Victor",
+                        LastName ="Pang",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Oliver",
+                        LastName ="Harerty",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Thomas",
+                        LastName ="Spurrier",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Chris",
+                        LastName ="Killick",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
                         FirstName ="Karen",
                         LastName ="Sylvester",
                         Gender=context.Genders.Where(g => g.Name=="Female").FirstOrDefault(),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new UserDetail
+                    {
+                        FirstName ="Daniel",
+                        LastName ="Rhodes",
+                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
                         EmailAddress="test@yahoo.com"
                     },
                     new UserDetail
