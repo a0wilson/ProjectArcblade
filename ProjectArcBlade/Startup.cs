@@ -47,6 +47,10 @@ namespace ProjectArcBlade
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            // add services to store application data.
+            services.AddSingleton<MatchAppData>();
+            services.AddSingleton<AppData>();
+
             services.AddMvc();
 
             // Add application services.

@@ -1,24 +1,25 @@
-@model ProjectArcBlade.Models.MatchViewModels.CreateMatchViewModel
+@model ProjectArcBlade.Models.MatchViewModels.CreateStep2ViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Match - Step 2 of 3";
 }
 
-<h2>Create</h2>
+<h2>Create Match - Step 2 of 3</h2>
 
-<form asp-action="Create">
+<form asp-action="CreateStep2">
     <div class="form-horizontal">
         <h4>Match</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
-            <label asp-for="SeasonId" class="col-md-2 control-label"></label>
+            <label asp-for="HomeTeamId" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="SeasonId" asp-items="Model.Seasons" class="form-control"></select>
-                <span asp-validation-for="SeasonId" class="text-danger"></span>
+                <select asp-for="HomeTeamId" asp-items="Model.HomeTeams" class="form-control"></select>
+                <span asp-validation-for="HomeTeamId" class="text-danger"></span>
             </div>
         </div>
+
         <div class="form-group">
             <label asp-for="StartTime" class="col-md-2 control-label"></label>
             <div class="col-md-10">
@@ -26,10 +27,15 @@
                 <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
         </div>
+
+        
+
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" name="btnPrevious" value="Previous" class="btn btn-default" />
+                <input type="submit" name="btnNext" value="Next" class="btn btn-primary" />
             </div>
+
         </div>
     </div>
 </form>
@@ -38,6 +44,4 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+

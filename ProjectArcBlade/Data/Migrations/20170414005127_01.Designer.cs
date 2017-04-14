@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170412225554_01")]
+    [Migration("20170414005127_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -513,10 +513,14 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<int?>("LeagueId");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
 
                     b.ToTable("Cup");
                 });
@@ -1193,6 +1197,13 @@ namespace ProjectArcBlade.Data.Migrations
                         .WithMany("ClubUsers")
                         .HasForeignKey("UserDetailId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Cup", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.League", "League")
+                        .WithMany("Cups")
+                        .HasForeignKey("LeagueId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.CupMatch", b =>

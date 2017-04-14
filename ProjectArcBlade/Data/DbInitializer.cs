@@ -344,7 +344,27 @@ namespace ProjectArcBlade.Data
                 }
                 foreach (ClubUser cu in clubUsers) context.ClubUsers.Add(cu);
                 context.SaveChanges();
+            }
 
+            if (!context.Cups.Any())
+            {
+                var cups = new Cup[]
+                {
+                    new Cup()
+                    {
+                        Name = "Kerslake Cup",
+                        League = context.Leagues.Find(1)
+                        
+                    },
+
+                    new Cup()
+                    {
+                        Name = "Grant Williams Cup",
+                        League = context.Leagues.Find(1)
+                    }
+                };
+                foreach (Cup c in cups) context.Cups.Add(c);
+                context.SaveChanges();
             }
 
         }

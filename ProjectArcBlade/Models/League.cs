@@ -15,6 +15,7 @@ namespace ProjectArcBlade.Models
 
         public ICollection<Season> Seasons { get; set; }
         public ICollection<LeagueClub> LeagueClubs { get; set; }
+        public ICollection<Cup> Cups { get; set; }
 
         public override string ToString()
         {

@@ -12,6 +12,7 @@ namespace ProjectArcBlade.Models
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        public League League { get; set; }
 
         public ICollection<CupMatch> CupMatches { get; set; }
     }

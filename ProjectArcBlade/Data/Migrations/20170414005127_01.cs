@@ -77,20 +77,6 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Cup",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Cup", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Division",
                 columns: table => new
                 {
@@ -383,6 +369,27 @@ namespace ProjectArcBlade.Data.Migrations
                         principalTable: "UserDetail",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cup",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Description = table.Column<string>(nullable: true),
+                    LeagueId = table.Column<int>(nullable: true),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cup", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cup_League_LeagueId",
+                        column: x => x.LeagueId,
+                        principalTable: "League",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1196,6 +1203,11 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_ClubUser_UserDetailId",
                 table: "ClubUser",
                 column: "UserDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cup_LeagueId",
+                table: "Cup",
+                column: "LeagueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CupMatch_CupId",

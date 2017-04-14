@@ -512,10 +512,14 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<int?>("LeagueId");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LeagueId");
 
                     b.ToTable("Cup");
                 });
@@ -1192,6 +1196,13 @@ namespace ProjectArcBlade.Data.Migrations
                         .WithMany("ClubUsers")
                         .HasForeignKey("UserDetailId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Cup", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.League", "League")
+                        .WithMany("Cups")
+                        .HasForeignKey("LeagueId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.CupMatch", b =>
