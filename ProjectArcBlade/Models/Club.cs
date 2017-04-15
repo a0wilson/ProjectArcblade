@@ -12,12 +12,11 @@ namespace ProjectArcBlade.Models
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
-        [Display(Name="Venue")]
-        public Address Address { get; set; }
-        public ICollection<AvailableDay> AvailableDays {get; set;}
-        public ICollection<ClubUser> ClubUsers { get; set; }
-        public ICollection<ClubSubscription> ClubSubscriptions { get; set; }
         public bool IsActive { get; set; }
 
+        public ICollection<ClubUser> ClubUsers { get; set; }
+        public ICollection<ClubSubscription> ClubSubscriptions { get; set; }
+        public ICollection<ClubVenue> ClubVenues { get; set; }
+        
     }
 }

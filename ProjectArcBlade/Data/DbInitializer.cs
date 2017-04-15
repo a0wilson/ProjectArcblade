@@ -11,7 +11,35 @@ namespace ProjectArcBlade.Data
         public static void Initialize(ApplicationDbContext context)
         {
             context.Database.EnsureCreated();
+
+            if(!context.Sports.Any())
+            {
+                var sports = new Sport[]
+                {
+                    new Sport{Name="Badminton"},
+                    new Sport{Name="Squash"},
+                    new Sport{Name="Tennis"},
+                    new Sport{Name="Badminton"},
+                };
+                foreach (Sport s in sports) context.Sports.Add(s);
+                context.SaveChanges();                
+            }
             
+            if(!context.DaysOfTheWeek.Any())
+            {
+                var days = new DayOfTheWeek[]
+                {
+                    new DayOfTheWeek{Name="Monday"},
+                    new DayOfTheWeek{Name="Tuesday"},
+                    new DayOfTheWeek{Name="Wednesday"},
+                    new DayOfTheWeek{Name="Thursday"},
+                    new DayOfTheWeek{Name="Friday"},
+                    new DayOfTheWeek{Name="Saturday"},
+                    new DayOfTheWeek{Name="Sunday"},
+                };
+                foreach (DayOfTheWeek d in days) context.Add(d);
+                context.SaveChanges();
+            }
             
             if (!context.Categories.Any())
             {
@@ -126,12 +154,23 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
+            if (!context.Venues.Any())
+            {
+                var venues = new Venue[]
+                {
+                    new Venue{Name="Sport Wales National Centre", AddressLine1="Sophia Close",Postcode="CF11 9SW" },
+                    new Venue{Name="Llantrisant Leisure Centre", AddressLine1="Llantrisant", Postcode="CF72 8DJ"}
+                };
+                foreach (Venue v in venues) context.Venues.Add(v);
+                context.SaveChanges();
+            }
+
             if (!context.Leagues.Any())
             {
                 var leagues = new League[]
                 {
-                    new League{Name="Cardiff League", Sport=context.Sports.Where(s => s.Name=="Badminton").FirstOrDefault() },
-                    new League{Name="Swansea League", Sport=context.Sports.Where(s => s.Name=="Badminton").FirstOrDefault() }
+                    new League{Name="Cardiff League", Sport=context.Sports.Find(1) },
+                    new League{Name="Swansea League", Sport=context.Sports.Find(1) }
                 };
                 foreach (League l in leagues) context.Leagues.Add(l);
                 context.SaveChanges();
@@ -152,10 +191,43 @@ namespace ProjectArcBlade.Data
             {
                 var leagueClubs = new LeagueClub[]
                 {
-                    new LeagueClub { League = context.Leagues.Where(l => l.Name == "Cardiff League").FirstOrDefault(), Club = context.Clubs.Where(c => c.Name == "Cardiff Nomads").FirstOrDefault() },
-                    new LeagueClub { League = context.Leagues.Where(l => l.Name == "Cardiff League").FirstOrDefault(), Club = context.Clubs.Where(c => c.Name == "Llantrisant").FirstOrDefault() }
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find (1) },
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(2) }
                 };
                 foreach (LeagueClub lc in leagueClubs) context.LeagueClubs.Add(lc);
+                context.SaveChanges();
+            }
+
+            if(!context.ClubVenues.Any())
+            {
+                var clubVenues = new ClubVenue[]
+                {
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(1),
+                        Venue = context.Venues.Find(1),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Monday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,22,30,0)
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(2),
+                        Venue = context.Venues.Find(2),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Tuesday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,21,30,0)
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(2),
+                        Venue = context.Venues.Find(2),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Friday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,21,30,0)
+                    }
+                };
+                foreach (ClubVenue cv in clubVenues) context.ClubVenues.Add(cv);
                 context.SaveChanges();
             }
 
@@ -164,26 +236,26 @@ namespace ProjectArcBlade.Data
                 var seasons = new Season[]
                 {
                     new Season {
-                        Name ="2015 -2016",
+                        Name ="2015-2016",
                         StartDate = new DateTime(2015,9,1),
                         EndDate = new DateTime(2016,6,1),
-                        League = context.Leagues.Where(l=>l.Name=="Cardiff League").FirstOrDefault(),
+                        League = context.Leagues.Find(1),
                         IsActive = false
                         
                     },
                     new Season {
-                        Name ="2016 -2017",
+                        Name ="2016-2017",
                         StartDate = new DateTime(2016,9,1),
                         EndDate = new DateTime(2017,6,1),
-                        League = context.Leagues.Where(l=>l.Name=="Cardiff League").FirstOrDefault(),
+                        League = context.Leagues.Find(1),
                         IsActive = true
 
                     },
                     new Season {
-                        Name ="2016 -2017",
+                        Name ="2016-2017",
                         StartDate = new DateTime(2016,9,1),
                         EndDate = new DateTime(2017,6,1),
-                        League = context.Leagues.Where(l=>l.Name=="Swansea League").FirstOrDefault(),
+                        League = context.Leagues.Find(2),
                         IsActive = true
                     }
                 };
@@ -335,10 +407,10 @@ namespace ProjectArcBlade.Data
                 {
                     var clubUser = new ClubUser
                     {
-                        Club = context.Clubs.Where(c => c.Name == "Cardiff Nomads").FirstOrDefault(),
+                        Club = context.Clubs.Find(1),
                         UserDetail = gu,
                         IsActive = true,
-                        ClubUserStatus = context.ClubUserStatuses.Where(cus => cus.Name== "Available").FirstOrDefault()
+                        ClubUserStatus = context.ClubUserStatuses.Find(1)
                     };
                     clubUsers.Add(clubUser);
                 }

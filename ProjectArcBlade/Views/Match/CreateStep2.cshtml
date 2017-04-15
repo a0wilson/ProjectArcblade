@@ -1,16 +1,27 @@
 @model ProjectArcBlade.Models.MatchViewModels.CreateStep2ViewModel
 
 @{
-    ViewData["Title"] = "Create Match - Step 2 of 3";
+    ViewData["Title"] = "Create Match - Step 2 of 4";
 }
 
-<h2>Create Match - Step 2 of 3</h2>
+<h2>Create Match - Step 2 of 4</h2>
 
 <form asp-action="CreateStep2">
     <div class="form-horizontal">
-        <h4>Match</h4>
+        <h4>Home Team</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        @if (Model.IsCupMatch)
+        {
+            <div class="form-group">
+                <label asp-for="CupId" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <select asp-for="CupId" asp-items="Model.Cups" class="form-control"></select>
+                    <span asp-validation-for="CupId" class="text-danger"></span>
+                </div>
+            </div>
+        }
 
         <div class="form-group">
             <label asp-for="HomeTeamId" class="col-md-2 control-label"></label>
@@ -20,6 +31,24 @@
             </div>
         </div>
 
+        @if (Model.IsCupMatch)
+        {
+            <div class="form-group">
+                <label asp-for="HomeTeamHandicap" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="HomeTeamHandicap" class="form-control" />
+                    <span asp-validation-for="HomeTeamHandicap" class="text-danger"></span>
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <label asp-for="ScheduledDate" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="ScheduledDate" class="form-control" />
+                <span asp-validation-for="ScheduledDate" class="text-danger"></span>
+            </div>
+        </div>
         <div class="form-group">
             <label asp-for="StartTime" class="col-md-2 control-label"></label>
             <div class="col-md-10">

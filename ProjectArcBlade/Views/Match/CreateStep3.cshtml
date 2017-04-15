@@ -1,0 +1,49 @@
+@model ProjectArcBlade.Models.MatchViewModels.CreateStep3ViewModel
+
+@{
+    ViewData["Title"] = "Create Match - Step 2 of 4";
+}
+
+<h2>Create Match - Step 3 of 4</h2>
+
+<form asp-action="CreateStep3">
+    <div class="form-horizontal">
+        <h4>Away Team</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="AwayTeamId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="AwayTeamId" asp-items="Model.AwayTeams" class="form-control"></select>
+                <span asp-validation-for="AwayTeamId" class="text-danger"></span>
+            </div>
+        </div>
+
+        @if (Model.IsCupMatch)
+        {
+            <div class="form-group">
+                <label asp-for="AwayTeamHandicap" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="AwayTeamHandicap" class="form-control" />
+                    <span asp-validation-for="AwayTeamHandicap" class="text-danger"></span>
+                </div>
+            </div>
+        }
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" name="btnPrevious" value="Previous" class="btn btn-default" />
+                <input type="submit" name="btnNext" value="Next" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+

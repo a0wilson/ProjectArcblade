@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using ProjectArcBlade.Data;
 using ProjectArcBlade.Models;
 using ProjectArcBlade.Services;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace ProjectArcBlade
 {
@@ -48,10 +49,12 @@ namespace ProjectArcBlade
                 .AddDefaultTokenProviders();
 
             // add services to store application data.
-            services.AddSingleton<MatchAppData>();
             services.AddSingleton<AppData>();
 
             services.AddMvc();
+
+            //enable cookie storage for TempData 
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
@@ -76,7 +79,7 @@ namespace ProjectArcBlade
             }
 
             app.UseStaticFiles();
-
+            
             app.UseIdentity();
 
             // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715

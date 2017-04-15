@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,6 +12,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
     {
         [Display(Name = "Cup")]
         public int CupId { get; set; }
+        public bool IsCupMatch { get; set; }
 
         [Display(Name = "Home Team")]
         public int HomeTeamId { get; set; }
@@ -18,15 +20,18 @@ namespace ProjectArcBlade.Models.MatchViewModels
         [Display(Name ="Home Team Handicap")]
         public int HomeTeamHandicap { get; set; }
 
-        [Display(Name = "Start Time ")]
+        [DataType(DataType.Time)]
+        [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
+
+        [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         public DateTime ScheduledDate { get; set; }
 
-        public Address Address { get; set; }
+        public Venue Address { get; set; }
 
         public List<SelectListItem> HomeTeams { get; set; }
         public List<SelectListItem> Cups { get; set; }
-       
+        
     }
 }

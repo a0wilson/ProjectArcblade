@@ -14,7 +14,7 @@ namespace ProjectArcBlade.Models
         [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
         [Display(Name = "Venue")]
-        public Address Address { get; set; }
+        public Venue Venue { get; set; }
 
         public ICollection<HomeMatchTeam> MatchTeams { get; set; }
         public ICollection<MatchScheduledDate> MatchScheduledDates { get; set; }

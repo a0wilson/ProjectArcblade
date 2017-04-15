@@ -9,22 +9,34 @@ namespace ProjectArcBlade.Models.MatchViewModels
 {
     public class CreateMatchViewModel
     {
-        [Display(Name = "Home Team")]
-        public int HomeTeamId { get; set; }
+        [Display(Name = "Division")]
+        public string DivisionName { get; set; }
 
-        [Display(Name = "Away Team")]
-        public int AwayTeamId { get; set; }
+        [Display(Name = "Category")]
+        public string CategoryName { get; set; }
 
         [Display(Name = "Season")]
-        public int SeasonId { get; set; }
+        public string SeasonName { get; set; }
+
+        [Display(Name = "Cup Match")]
+        public bool IsCupMatch { get; set; }
+
+        [Display(Name = "Home Team")]
+        public string HomeTeamName { get; set; }
+      
+        [Display(Name = "Away Team")]
+        public string AwayTeamName { get; set; }
 
         [Display(Name = "Start Time ")]
-        public DateTime StartTime { get; set; }
-        [Display(Name ="Start Date")]
-        public DateTime ScheduledDate { get; set; }
+        [DataType(DataType.Date)]
+        public string StartTime { get; set; }
 
-        public List<SelectListItem> HomeTeams { get; set; }
-        public List<SelectListItem> AwayTeams { get; set; }
-        public List<SelectListItem> Seasons { get; set; }
+        [Display(Name ="Start Date")]
+        [DataType(DataType.Time)]
+        public string ScheduledDate { get; set; }
+
+        public int HomeTeamHandicap { get; set; }
+        public int AwayTeamHandicap { get; set; }
+
     }
 }

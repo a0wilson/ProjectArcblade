@@ -15,6 +15,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
         [Display(Name ="Away Team Handicap")]
         public int AwayTeamHandicap { get; set; }
 
+        public bool IsCupMatch { get; set; }
+
         public List<SelectListItem> AwayTeams { get; set; }
         
     }

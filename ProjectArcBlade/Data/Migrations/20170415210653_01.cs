@@ -18,25 +18,6 @@ namespace ProjectArcBlade.Data.Migrations
                 table: "AspNetRoles");
 
             migrationBuilder.CreateTable(
-                name: "Address",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Country = table.Column<string>(nullable: true),
-                    County = table.Column<string>(nullable: true),
-                    Line1 = table.Column<string>(nullable: false),
-                    Line2 = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: true),
-                    Number = table.Column<string>(nullable: true),
-                    Postcode = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Address", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Award",
                 columns: table => new
                 {
@@ -74,6 +55,19 @@ namespace ProjectArcBlade.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClubUserStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DayOfTheWeek",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DayOfTheWeek", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -182,25 +176,21 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Club",
+                name: "Venue",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddressId = table.Column<int>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    AddressLine1 = table.Column<string>(nullable: true),
+                    AddressLine2 = table.Column<string>(nullable: true),
+                    Country = table.Column<string>(nullable: true),
+                    County = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: false),
+                    Postcode = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Club", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Club_Address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                    table.PrimaryKey("PK_Venue", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -209,7 +199,6 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddressId = table.Column<int>(nullable: true),
                     DateOfBirth = table.Column<DateTime>(nullable: false),
                     EmailAddress = table.Column<string>(nullable: true),
                     FirstName = table.Column<string>(nullable: false),
@@ -221,12 +210,6 @@ namespace ProjectArcBlade.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserDetail", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_UserDetail_Address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_UserDetail_Gender_GenderId",
                         column: x => x.GenderId,
@@ -308,67 +291,25 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AvailableDay",
+                name: "Club",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: false),
-                    Day = table.Column<string>(nullable: false),
-                    EndTime = table.Column<DateTime>(nullable: false),
-                    StartTime = table.Column<DateTime>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AvailableDay", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AvailableDay_Club_ClubId",
-                        column: x => x.ClubId,
-                        principalTable: "Club",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ClubUser",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: true),
-                    ClubUserStatusId = table.Column<int>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false),
-                    MembershipNumber = table.Column<string>(nullable: true),
-                    MembershipTypeId = table.Column<int>(nullable: true),
-                    UserDetailId = table.Column<int>(nullable: false)
+                    Name = table.Column<string>(nullable: false),
+                    VenueId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClubUser", x => x.Id);
+                    table.PrimaryKey("PK_Club", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ClubUser_Club_ClubId",
-                        column: x => x.ClubId,
-                        principalTable: "Club",
+                        name: "FK_Club_Venue_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venue",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ClubUser_ClubUserStatus_ClubUserStatusId",
-                        column: x => x.ClubUserStatusId,
-                        principalTable: "ClubUserStatus",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ClubUser_MembershipType_MembershipTypeId",
-                        column: x => x.MembershipTypeId,
-                        principalTable: "MembershipType",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_ClubUser_UserDetail_UserDetailId",
-                        column: x => x.UserDetailId,
-                        principalTable: "UserDetail",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -386,32 +327,6 @@ namespace ProjectArcBlade.Data.Migrations
                     table.PrimaryKey("PK_Cup", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Cup_League_LeagueId",
-                        column: x => x.LeagueId,
-                        principalTable: "League",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "LeagueClub",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: true),
-                    LeagueId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_LeagueClub", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_LeagueClub_Club_ClubId",
-                        column: x => x.ClubId,
-                        principalTable: "Club",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_LeagueClub_League_LeagueId",
                         column: x => x.LeagueId,
                         principalTable: "League",
                         principalColumn: "Id",
@@ -468,6 +383,109 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClubUser",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ClubId = table.Column<int>(nullable: true),
+                    ClubUserStatusId = table.Column<int>(nullable: true),
+                    IsActive = table.Column<bool>(nullable: false),
+                    MembershipNumber = table.Column<string>(nullable: true),
+                    MembershipTypeId = table.Column<int>(nullable: true),
+                    UserDetailId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClubUser", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClubUser_Club_ClubId",
+                        column: x => x.ClubId,
+                        principalTable: "Club",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClubUser_ClubUserStatus_ClubUserStatusId",
+                        column: x => x.ClubUserStatusId,
+                        principalTable: "ClubUserStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClubUser_MembershipType_MembershipTypeId",
+                        column: x => x.MembershipTypeId,
+                        principalTable: "MembershipType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClubUser_UserDetail_UserDetailId",
+                        column: x => x.UserDetailId,
+                        principalTable: "UserDetail",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ClubVenue",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ClubId = table.Column<int>(nullable: true),
+                    DayOfTheWeekId = table.Column<int>(nullable: true),
+                    EndTime = table.Column<DateTime>(nullable: false),
+                    StartTime = table.Column<DateTime>(nullable: false),
+                    VenueId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClubVenue", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClubVenue_Club_ClubId",
+                        column: x => x.ClubId,
+                        principalTable: "Club",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClubVenue_DayOfTheWeek_DayOfTheWeekId",
+                        column: x => x.DayOfTheWeekId,
+                        principalTable: "DayOfTheWeek",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClubVenue_Venue_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LeagueClub",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ClubId = table.Column<int>(nullable: true),
+                    LeagueId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LeagueClub", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LeagueClub_Club_ClubId",
+                        column: x => x.ClubId,
+                        principalTable: "Club",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_LeagueClub_League_LeagueId",
+                        column: x => x.LeagueId,
+                        principalTable: "League",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClubSubscription",
                 columns: table => new
                 {
@@ -501,23 +519,23 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddressId = table.Column<int>(nullable: true),
                     SeasonId = table.Column<int>(nullable: true),
-                    StartTime = table.Column<DateTime>(nullable: false)
+                    StartTime = table.Column<DateTime>(nullable: false),
+                    VenueId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Match", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Match_Address_AddressId",
-                        column: x => x.AddressId,
-                        principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_Match_Season_SeasonId",
                         column: x => x.SeasonId,
                         principalTable: "Season",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Match_Venue_VenueId",
+                        column: x => x.VenueId,
+                        principalTable: "Venue",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1070,11 +1088,6 @@ namespace ProjectArcBlade.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AvailableDay_ClubId",
-                table: "AvailableDay",
-                column: "ClubId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AwardNominee_AwardId",
                 table: "AwardNominee",
                 column: "AwardId");
@@ -1160,9 +1173,9 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "RuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Club_AddressId",
+                name: "IX_Club_VenueId",
                 table: "Club",
-                column: "AddressId");
+                column: "VenueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClubSubscriber_ClubSubscriptionId",
@@ -1203,6 +1216,21 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_ClubUser_UserDetailId",
                 table: "ClubUser",
                 column: "UserDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClubVenue_ClubId",
+                table: "ClubVenue",
+                column: "ClubId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClubVenue_DayOfTheWeekId",
+                table: "ClubVenue",
+                column: "DayOfTheWeekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClubVenue_VenueId",
+                table: "ClubVenue",
+                column: "VenueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cup_LeagueId",
@@ -1315,14 +1343,14 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "RuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Match_AddressId",
-                table: "Match",
-                column: "AddressId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Match_SeasonId",
                 table: "Match",
                 column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Match_VenueId",
+                table: "Match",
+                column: "VenueId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MatchScheduledDate_MatchId",
@@ -1385,11 +1413,6 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "TeamId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserDetail_AddressId",
-                table: "UserDetail",
-                column: "AddressId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserDetail_GenderId",
                 table: "UserDetail",
                 column: "GenderId");
@@ -1397,9 +1420,6 @@ namespace ProjectArcBlade.Data.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AvailableDay");
-
             migrationBuilder.DropTable(
                 name: "AwardNominee");
 
@@ -1414,6 +1434,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClubSubscriber");
+
+            migrationBuilder.DropTable(
+                name: "ClubVenue");
 
             migrationBuilder.DropTable(
                 name: "CupMatchHandicap");
@@ -1447,6 +1470,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "ClubSubscription");
+
+            migrationBuilder.DropTable(
+                name: "DayOfTheWeek");
 
             migrationBuilder.DropTable(
                 name: "CupMatch");
@@ -1527,7 +1553,7 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "League");
 
             migrationBuilder.DropTable(
-                name: "Address");
+                name: "Venue");
 
             migrationBuilder.DropTable(
                 name: "Sport");

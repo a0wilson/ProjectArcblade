@@ -15,32 +15,32 @@ namespace ProjectArcBlade.Models
             _context = context;
         }
 
-        public void Add(Address entity)
+        public void Add(Venue entity)
         {
-            _context.Addresses.Add(entity);
+            _context.Venues.Add(entity);
             _context.SaveChanges();
         }
 
-        public Address Find(int id)
+        public Venue Find(int id)
         {
-            return _context.Addresses.FirstOrDefault(entity => entity.Id == id);
+            return _context.Venues.FirstOrDefault(entity => entity.Id == id);
         }
 
-        public IEnumerable<Address> GetAll()
+        public IEnumerable<Venue> GetAll()
         {
-            return _context.Addresses.ToList();
+            return _context.Venues.ToList();
         }
 
         public void Remove(int id)
         {
-            var entity = _context.Addresses.First(e => e.Id == id);
-            _context.Addresses.Remove(entity);
+            var entity = _context.Venues.First(e => e.Id == id);
+            _context.Venues.Remove(entity);
             _context.SaveChanges();
         }
 
-        public void Update(Address entity)
+        public void Update(Venue entity)
         {
-            _context.Addresses.Update(entity);
+            _context.Venues.Update(entity);
             _context.SaveChanges();
         }
     }

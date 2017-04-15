@@ -26,7 +26,6 @@ namespace ProjectArcBlade.Models
         [EmailAddress]
         [Display(Name ="Email Address")]
         public string EmailAddress { get; set; }
-        public Address Address { get; set; }
                  
         public ICollection<ClubUser> ClubUsers { get; set; }
     }

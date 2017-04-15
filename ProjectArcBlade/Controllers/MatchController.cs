@@ -18,7 +18,7 @@ namespace ProjectArcBlade.Controllers
 
         public MatchController(ApplicationDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET: Match
@@ -75,23 +75,34 @@ namespace ProjectArcBlade.Controllers
         // POST: Match/CreateStep1
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateStep1(MatchAppData matchAppData, CreateStep1ViewModel viewModel)
+        public IActionResult CreateStep1(CreateStep1ViewModel createStep1ViewModel)
         {
             if (ModelState.IsValid)
             {
+                TempData[Constants.CreateMatchStrings.CategoryId] = createStep1ViewModel.CategoryId;
+                TempData[Constants.CreateMatchStrings.DivisionId] = createStep1ViewModel.DivisionId;
+                TempData[Constants.CreateMatchStrings.SeasonId] = createStep1ViewModel.SeasonId;
+                TempData[Constants.CreateMatchStrings.IsCupMatch] = createStep1ViewModel.IsCupMatch;
+                TempData.Keep();
+                
                 return RedirectToAction("CreateStep2");
             }
             return View();
         }
 
         // GET: Match/CreateStep2
-        public async Task<IActionResult> CreateStep2(AppData appData, MatchAppData matchAppData)
+        public async Task<IActionResult> CreateStep2(AppData appData)
         {
+            var divisionId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.DivisionId).ToString());
+            var categoryId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.CategoryId).ToString());
+            var seasonId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.SeasonId).ToString());
+            var isCupMatch = bool.Parse(TempData.Peek(Constants.CreateMatchStrings.IsCupMatch).ToString());
+
             var teams = await _context.Teams
-                .Where(t => t.Division.Id == matchAppData.DivisionId 
-                    && t.Category.Id == matchAppData.CategoryId
-                    && t.Season.Id == matchAppData.SeasonId)
-                .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name })
+                .Where(t => t.Division.Id == divisionId
+                    && t.Category.Id == categoryId
+                    && t.Season.Id == seasonId)
+                .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
                 .ToListAsync();
 
             var cups = await _context.Cups.Where(c => c.League.Id == appData.LeagueId)
@@ -101,7 +112,8 @@ namespace ProjectArcBlade.Controllers
             var viewlModel = new CreateStep2ViewModel()
             {
                 HomeTeams = teams,
-                Cups = cups
+                Cups = cups,
+                IsCupMatch = bool.Parse(isCupMatch.ToString())
             };
 
             return View(viewlModel);
@@ -110,29 +122,114 @@ namespace ProjectArcBlade.Controllers
         // POST: Match/CreateStep2
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateStep2(MatchAppData matchAppData, CreateStep2ViewModel viewModel, string btnNext, string btnPrevious)
+        public IActionResult CreateStep2(CreateStep2ViewModel createSetp2ViewModel, string btnNext, string btnPrevious)
         {
+
+            if (btnPrevious != null)
+            {
+                return RedirectToAction("CreateStep1");
+            }
+
             if (ModelState.IsValid)
             {
-                if(btnNext != null)
-                {
-                    return RedirectToAction("CreateStep3");
-                }
+                TempData[Constants.CreateMatchStrings.HomeTeamId] = createSetp2ViewModel.HomeTeamId;
+                TempData[Constants.CreateMatchStrings.HomeTeamHandicap] = createSetp2ViewModel.HomeTeamHandicap;
+                TempData[Constants.CreateMatchStrings.StartTime] = createSetp2ViewModel.StartTime;
+                TempData[Constants.CreateMatchStrings.ScheduledDate] = createSetp2ViewModel.ScheduledDate;
 
-                if( btnPrevious == null)
-                {
-                    return RedirectToAction("CreateStep1");
-                }
-                
+                return RedirectToAction("CreateStep3");
+            }
+            return View();
+        }
+
+        // GET: Match/CreateStep3
+        public async Task<IActionResult> CreateStep3(AppData appData)
+        {
+            var divisionId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.DivisionId).ToString());
+            var categoryId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.CategoryId).ToString());
+            var seasonId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.SeasonId).ToString());
+            var homeTeamId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.HomeTeamId).ToString());
+            var isCupMatch = bool.Parse(TempData.Peek(Constants.CreateMatchStrings.IsCupMatch).ToString());
+            TempData.Keep();
+
+            var teams = await _context.Teams
+                .Where(t => t.Division.Id == divisionId
+                    && t.Category.Id == categoryId
+                    && t.Season.Id == seasonId
+                    && t.Id != homeTeamId)
+                .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name })
+                .ToListAsync();
+                       
+            var viewlModel = new CreateStep3ViewModel()
+            {
+                AwayTeams = teams,
+                IsCupMatch = isCupMatch
+            };
+
+            return View(viewlModel);
+        }
+
+        // POST: Match/CreateStep3
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateStep3(CreateStep3ViewModel createSetp3ViewModel, string btnNext, string btnPrevious)
+        {
+
+            if (btnPrevious != null)
+            {
+                return RedirectToAction("CreateStep2");
+            }
+
+            if (ModelState.IsValid)
+            {
+                TempData[Constants.CreateMatchStrings.AwayTeamId] = createSetp3ViewModel.AwayTeamId;
+                TempData[Constants.CreateMatchStrings.AwayTeamHandicap] = createSetp3ViewModel.AwayTeamHandicap;
+
+                return RedirectToAction("Create");
             }
             return View();
         }
 
         // GET: Match/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var divisionId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.DivisionId).ToString());
+            var categoryId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.CategoryId).ToString());
+            var seasonId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.SeasonId).ToString());
 
-            return View();
+            var homeTeamId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.HomeTeamId).ToString());
+            var homeTeamHandicap = int.Parse(TempData.Peek(Constants.CreateMatchStrings.HomeTeamHandicap).ToString());
+
+            var awayTeamId = int.Parse(TempData.Peek(Constants.CreateMatchStrings.AwayTeamId).ToString());
+            var awayTeamHandicap = int.Parse(TempData.Peek(Constants.CreateMatchStrings.AwayTeamHandicap).ToString());
+            
+            var isCupMatch = bool.Parse(TempData.Peek(Constants.CreateMatchStrings.IsCupMatch).ToString());
+
+            var startTime = DateTime.Parse(TempData.Peek(Constants.CreateMatchStrings.StartTime).ToString());
+            var scheduledDate = DateTime.Parse(TempData.Peek(Constants.CreateMatchStrings.ScheduledDate).ToString());
+            TempData.Keep();
+
+            //get entities
+            var division = await _context.Divisions.FindAsync(divisionId);
+            var category = await _context.Categories.FindAsync(categoryId);
+            var season = await _context.Seasons.Include(s => s.League).FirstOrDefaultAsync(s => s.Id == seasonId);
+            var homeTeam = await _context.Teams.Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).FirstOrDefaultAsync(t => t.Id == homeTeamId);
+            var awayTeam = await _context.Teams.Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).FirstOrDefaultAsync(t => t.Id == awayTeamId);
+
+            var viewModel = new CreateMatchViewModel
+            {
+                SeasonName = String.Format("{0} > {1}", season.League.Name, season.Name),
+                DivisionName = division.Name,
+                CategoryName = category.Name,
+                HomeTeamName = String.Format("{0} - {1}", homeTeam.LeagueClub.Club.Name, homeTeam.Name),
+                AwayTeamName = String.Format("{0} - {1}", awayTeam.LeagueClub.Club.Name, awayTeam.Name),
+                StartTime = startTime.ToString("hh:mm"),
+                ScheduledDate = scheduledDate.ToString("dd/mm/yyyy"),
+                IsCupMatch = isCupMatch
+
+            };
+
+            return View(viewModel);
         }
 
         // POST: Match/Create

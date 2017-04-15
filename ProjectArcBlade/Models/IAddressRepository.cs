@@ -4,10 +4,10 @@ namespace ProjectArcBlade.Models
 {
     public interface IAddressRepository
     {
-        void Add(Address entity);
-        IEnumerable<Address> GetAll();
-        Address Find(int id);
+        void Add(Venue entity);
+        IEnumerable<Venue> GetAll();
+        Venue Find(int id);
         void Remove(int id);
-        void Update(Address entity);
+        void Update(Venue entity);
     }
 }

@@ -38,6 +38,8 @@ namespace ProjectArcBlade.Controllers
                 .Include( t => t.LeagueClub).ThenInclude( lc => lc.Club).ThenInclude(c => c.ClubUsers)
                 .Include( t=> t.TeamPlayers)
                 .Include( t=> t.Category)
+                .Include( t=> t.Season)
+
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (team == null)
@@ -58,7 +60,11 @@ namespace ProjectArcBlade.Controllers
                     .Select(tp => new SelectListItem { Value = tp.Id.ToString(), Text = String.Format("{0} {1} ({2})", tp.ClubUser.UserDetail.FirstName, tp.ClubUser.UserDetail.LastName, tp.Group.Name) })
                     .ToListAsync();
 
-            var assignedPlayerIds = team.TeamPlayers.Where(tp => tp.Team.Id == id).Select(tp => tp.ClubUser.Id).ToList();
+            var assignedPlayerIds = await _context.TeamPlayers
+                .Where(tp => tp.Team.Season.Id == team.Season.Id && tp.Team.Category.Id == team.Category.Id)
+                .Select(tp => tp.ClubUser.Id)
+                .ToListAsync();
+                
             var availableTeamPlayers = new List<SelectListItem>();
             switch (team.Category.Id)
             {
@@ -151,20 +157,28 @@ namespace ProjectArcBlade.Controllers
                 .Include(lc => lc.Club)
                 .Include(lc => lc.League)
                 .Where(lc => lc.Id == leagueClubId).FirstOrDefaultAsync();
-            
-            CreateTeamViewModel createTeamViewModel = new CreateTeamViewModel
-            {
-                LeagueClubs = new List<SelectListItem> { new SelectListItem { Value = leagueClub.Id.ToString(), Text = leagueClub.Club.Name } },
-                Categories = await _context.Categories
+
+            var leagueClubs = new List<SelectListItem> { new SelectListItem { Value = leagueClub.Id.ToString(), Text = leagueClub.Club.Name } };
+
+            var categories = await _context.Categories
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
-                    .ToListAsync(),
-                Divisions = await _context.Divisions
+                    .ToListAsync();
+
+            var divisions = await _context.Divisions
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
-                    .ToListAsync(),
-                Seasons = await _context.Seasons
+                    .ToListAsync();
+
+            var seasons = await _context.Seasons
                     .Where(s => s.IsActive == true && s.League.Id == leagueClub.League.Id)
                     .Select(d => new SelectListItem { Value = d.Id.ToString(), Text = d.Name })
-                    .ToListAsync()
+                    .ToListAsync();
+
+            CreateTeamViewModel createTeamViewModel = new CreateTeamViewModel
+            {
+                LeagueClubs = leagueClubs,
+                Categories = categories,
+                Divisions = divisions,
+                Seasons = seasons
             };
             return View(createTeamViewModel);
         }

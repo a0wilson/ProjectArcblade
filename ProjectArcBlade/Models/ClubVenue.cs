@@ -6,18 +6,14 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class AvailableDay
+    public class ClubVenue
     {
         public int Id { get; set; }
-        [Required]
-        public string Day { get; set; }
-        [Required]
-        [Display(Name = "Start Time")]
-        public DateTime StartTime { get; set; }
-        [Required]
-        [Display(Name = "End Time")]
-        public DateTime EndTime { get; set; }
-        [Required]
         public Club Club { get; set; }
+        public Venue Venue { get; set; }
+        public DayOfTheWeek DayOfTheWeek { get; set; }
+        [Required]
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
     }
 }

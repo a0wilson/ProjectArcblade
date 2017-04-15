@@ -15,24 +15,26 @@ namespace ProjectArcBlade.Data
         {
         }
 
-        public DbSet<Address> Addresses { get; set; }
-        public DbSet<AvailableDay> AvailableDays { get; set; }
-        public DbSet<Award> Awards { get; set; }
-        public DbSet<AwardNominee> AwardNominees { get; set; }
-        
+        public DbSet<Venue> Venues { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Club> Clubs { get; set; }
-        public DbSet<ClubSubscriber> ClubSubscribers { get; set; }
-        public DbSet<ClubSubscription> ClubSubscriptions { get; set; }
-        public DbSet<ClubUser> ClubUsers { get; set; }
-        public DbSet<ClubUserStatus> ClubUserStatuses { get; set; }
-        public DbSet<Cup> Cups { get; set; }
-        public DbSet<CupMatch> CupMatches { get; set; }
-        public DbSet<CupMatchHandicap> CupMatchHandicaps { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<Gender> Genders { get; set; }
         public DbSet<Group> Groups { get; set; }
-        
+        public DbSet<DayOfTheWeek> DaysOfTheWeek { get; set; }
+        public DbSet<Award> Awards { get; set; }
+        public DbSet<AwardNominee> AwardNominees { get; set; }
+
+        public DbSet<Club> Clubs { get; set; }
+        public DbSet<ClubSubscriber> ClubSubscribers { get; set; }
+        public DbSet<ClubSubscription> ClubSubscriptions { get; set; }
+        public DbSet<ClubVenue> ClubVenues { get; set; }
+        public DbSet<ClubUser> ClubUsers { get; set; }
+        public DbSet<ClubUserStatus> ClubUserStatuses { get; set; }
+
+        public DbSet<Cup> Cups { get; set; }
+        public DbSet<CupMatch> CupMatches { get; set; }
+        public DbSet<CupMatchHandicap> CupMatchHandicaps { get; set; }
+                
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueClub> LeagueClubs { get; set; }
         public DbSet<Match> Matches { get; set; }
@@ -75,16 +77,17 @@ namespace ProjectArcBlade.Data
             // Add your customizations after calling base.OnModelCreating(builder);En
 
             
-            builder.Entity<Address>().ToTable("Address");
-            builder.Entity<AvailableDay>().ToTable("AvailableDay");
+            builder.Entity<Venue>().ToTable("Venue");
             builder.Entity<Award>().ToTable("Award");
             builder.Entity<AwardNominee>().ToTable("AwardNominee");
+            builder.Entity<DayOfTheWeek>().ToTable("DayOfTheWeek");
             
             builder.Entity<Category>().ToTable("Category");
             builder.Entity<Club>().ToTable("Club");
             builder.Entity<ClubSubscriber>().ToTable("ClubSubscriber");
             builder.Entity<ClubSubscription>().ToTable("ClubSubscription");
             builder.Entity<ClubUser>().ToTable("ClubUser");
+            builder.Entity<ClubVenue>().ToTable("ClubVenue");
             builder.Entity<ClubUserStatus>().ToTable("ClubUserStatus");
             builder.Entity<Cup>().ToTable("Cup");
             builder.Entity<CupMatch>().ToTable("CupMatch");

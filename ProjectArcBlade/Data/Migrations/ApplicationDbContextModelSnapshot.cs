@@ -123,32 +123,6 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Country");
-
-                    b.Property<string>("County");
-
-                    b.Property<string>("Line1")
-                        .IsRequired();
-
-                    b.Property<string>("Line2");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("Number");
-
-                    b.Property<string>("Postcode")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Address");
-                });
-
             modelBuilder.Entity("ProjectArcBlade.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -197,27 +171,6 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("ProjectArcBlade.Models.AvailableDay", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("ClubId");
-
-                    b.Property<string>("Day")
-                        .IsRequired();
-
-                    b.Property<DateTime>("EndTime");
-
-                    b.Property<DateTime>("StartTime");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ClubId");
-
-                    b.ToTable("AvailableDay");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Award", b =>
@@ -405,8 +358,6 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("AddressId");
-
                     b.Property<string>("Description");
 
                     b.Property<bool>("IsActive");
@@ -414,9 +365,11 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<int?>("VenueId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("VenueId");
 
                     b.ToTable("Club");
                 });
@@ -505,6 +458,32 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("ClubUserStatus");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.ClubVenue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("ClubId");
+
+                    b.Property<int?>("DayOfTheWeekId");
+
+                    b.Property<DateTime>("EndTime");
+
+                    b.Property<DateTime>("StartTime");
+
+                    b.Property<int?>("VenueId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClubId");
+
+                    b.HasIndex("DayOfTheWeekId");
+
+                    b.HasIndex("VenueId");
+
+                    b.ToTable("ClubVenue");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Cup", b =>
                 {
                     b.Property<int>("Id")
@@ -560,6 +539,19 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("CupMatchHandicap");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.DayOfTheWeek", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DayOfTheWeek");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Division", b =>
@@ -771,17 +763,17 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("AddressId");
-
                     b.Property<int?>("SeasonId");
 
                     b.Property<DateTime>("StartTime");
 
+                    b.Property<int?>("VenueId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("SeasonId");
+
+                    b.HasIndex("VenueId");
 
                     b.ToTable("Match");
                 });
@@ -980,8 +972,6 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("AddressId");
-
                     b.Property<DateTime>("DateOfBirth");
 
                     b.Property<string>("EmailAddress");
@@ -1000,11 +990,33 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
-
                     b.HasIndex("GenderId");
 
                     b.ToTable("UserDetail");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Venue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AddressLine1");
+
+                    b.Property<string>("AddressLine2");
+
+                    b.Property<string>("Country");
+
+                    b.Property<string>("County");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<string>("Postcode")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Venue");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
@@ -1041,14 +1053,6 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.ApplicationUser")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("ProjectArcBlade.Models.AvailableDay", b =>
-                {
-                    b.HasOne("ProjectArcBlade.Models.Club", "Club")
-                        .WithMany("AvailableDays")
-                        .HasForeignKey("ClubId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -1149,9 +1153,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.Club", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.Address", "Address")
+                    b.HasOne("ProjectArcBlade.Models.Venue")
                         .WithMany("Clubs")
-                        .HasForeignKey("AddressId");
+                        .HasForeignKey("VenueId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.ClubSubscriber", b =>
@@ -1196,6 +1200,21 @@ namespace ProjectArcBlade.Data.Migrations
                         .WithMany("ClubUsers")
                         .HasForeignKey("UserDetailId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ClubVenue", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.Club", "Club")
+                        .WithMany("ClubVenues")
+                        .HasForeignKey("ClubId");
+
+                    b.HasOne("ProjectArcBlade.Models.DayOfTheWeek", "DayOfTheWeek")
+                        .WithMany("ClubVenues")
+                        .HasForeignKey("DayOfTheWeekId");
+
+                    b.HasOne("ProjectArcBlade.Models.Venue", "Venue")
+                        .WithMany("ClubVenues")
+                        .HasForeignKey("VenueId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Cup", b =>
@@ -1329,13 +1348,13 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.Address", "Address")
-                        .WithMany("Matches")
-                        .HasForeignKey("AddressId");
-
                     b.HasOne("ProjectArcBlade.Models.Season", "Season")
                         .WithMany("Matches")
                         .HasForeignKey("SeasonId");
+
+                    b.HasOne("ProjectArcBlade.Models.Venue", "Venue")
+                        .WithMany("Matches")
+                        .HasForeignKey("VenueId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.MatchScheduledDate", b =>
@@ -1407,10 +1426,6 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.UserDetail", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.Address", "Address")
-                        .WithMany("Users")
-                        .HasForeignKey("AddressId");
-
                     b.HasOne("ProjectArcBlade.Models.Gender", "Gender")
                         .WithMany("Users")
                         .HasForeignKey("GenderId")
