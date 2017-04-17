@@ -10,15 +10,16 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public Season Season { get; set; }
-                
-        [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
-        [Display(Name = "Venue")]
+        public DateTime StartDate { get; set; }
         public Venue Venue { get; set; }
+        public MatchType MatchType { get; set;}
 
-        public ICollection<HomeMatchTeam> MatchTeams { get; set; }
-        public ICollection<MatchScheduledDate> MatchScheduledDates { get; set; }
+        public AwayMatchTeam AwayMatchTeam { get; set; }
+        public HomeMatchTeam HomeMatchTeam { get; set; }
+        public ICollection<RescheduledStartDate> RescheduledStartDates { get; set; }
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
+        
     }
 }

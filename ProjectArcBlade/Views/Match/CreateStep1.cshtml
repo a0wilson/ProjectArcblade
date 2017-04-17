@@ -12,6 +12,14 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
         <div class="form-group">
+            <label asp-for="MatchTypeId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="MatchTypeId" asp-items="Model.MatchTypes" class="form-control"></select>
+                <span asp-validation-for="MatchTypeId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label asp-for="DivisionId" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <select asp-for="DivisionId" asp-items="Model.Divisions" class="form-control"></select>
@@ -35,13 +43,8 @@
             </div>
         </div>
 
-        <div class="form-group">
-            <label asp-for="IsCupMatch" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="IsCupMatch" class="form-control" />
-                <span asp-validation-for="IsCupMatch" class="text-danger"></span>
-            </div>
-        </div>
+        <!--Hidden Fields-->
+        <input asp-for="LeagueId"/>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

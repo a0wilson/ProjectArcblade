@@ -18,7 +18,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
         [Display(Name = "Season")]
         public string SeasonName { get; set; }
 
-        [Display(Name = "Cup Match")]
+        [Display(Name = "Match Type")]
+        public string MatchType { get; set; }
         public bool IsCupMatch { get; set; }
 
         [Display(Name = "Home Team")]
@@ -31,7 +32,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
         [DataType(DataType.Date)]
         public string StartTime { get; set; }
 
-        [Display(Name ="Start Date")]
+        [Display(Name ="Scheduled Date")]
         [DataType(DataType.Time)]
         public string ScheduledDate { get; set; }
 

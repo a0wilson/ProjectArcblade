@@ -2,6 +2,13 @@
 {
     public static class Constants
     {
+        public static class MatchType
+        {
+            public const int League = 1;
+            public const int Cup = 2;
+            public const int Casual = 3;
+        }
+
         public static class Gender
         {
             public const int Male = 1;
@@ -29,6 +36,8 @@
 
         public static class CreateMatchStrings
         {
+            public const string MatchTypeId = "MatchTypeId";
+            public const string LeagueId = "LeagueId";
             public const string SeasonId = "SeasonId";
             public const string CategoryId = "CategoryId";
             public const string DivisionId = "DivisionId";

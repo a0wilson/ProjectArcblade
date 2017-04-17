@@ -15,6 +15,7 @@ namespace ProjectArcBlade.Data
         {
         }
 
+        public DbSet<MatchType> MatchTypes { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Division> Divisions { get; set; }
@@ -38,7 +39,7 @@ namespace ProjectArcBlade.Data
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueClub> LeagueClubs { get; set; }
         public DbSet<Match> Matches { get; set; }
-        public DbSet<MatchScheduledDate> MatchScheduledDates { get; set; }
+        public DbSet<RescheduledStartDate> RescheduledStartDates { get; set; }
 
         public DbSet<HomeMatchTeam> HomeMatchTeams { get; set; }
         public DbSet<HomeMatchTeamCaptain> HomeMatchTeamCaptains { get; set; }
@@ -65,7 +66,7 @@ namespace ProjectArcBlade.Data
         public DbSet<Sport> Sports { get; set; }
 
         public DbSet<Rule> Rules { get; set; }
-        public DbSet<LeagueRule> LeaugeRules { get; set; }
+        public DbSet<LeagueRule> LeagueRules { get; set; }
         public DbSet<SportRule> SportRules { get; set; }
         public DbSet<CategoryRule> CategoryRules { get; set; }
         
@@ -76,7 +77,7 @@ namespace ProjectArcBlade.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);En
 
-            
+            builder.Entity<MatchType>().ToTable("MatchType");
             builder.Entity<Venue>().ToTable("Venue");
             builder.Entity<Award>().ToTable("Award");
             builder.Entity<AwardNominee>().ToTable("AwardNominee");
@@ -98,8 +99,18 @@ namespace ProjectArcBlade.Data
             
             builder.Entity<League>().ToTable("League");
             builder.Entity<LeagueClub>().ToTable("LeagueClub");
+            
+            //specify 1 to 1 relationships for match
             builder.Entity<Match>().ToTable("Match");
-            builder.Entity<MatchScheduledDate>().ToTable("MatchScheduledDate");
+            builder.Entity<Match>()
+                .HasOne(m => m.AwayMatchTeam)
+                .WithOne(amt => amt.Match)
+                .HasForeignKey<AwayMatchTeam>(amt => amt.MatchId);
+            builder.Entity<Match>()
+                .HasOne(m => m.HomeMatchTeam)
+                .WithOne(hmt => hmt.Match)
+                .HasForeignKey<HomeMatchTeam>(amt => amt.MatchId);
+            builder.Entity<RescheduledStartDate>().ToTable("RescheduledStartDate");
 
             builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");
             builder.Entity<HomeMatchTeamCaptain>().ToTable("HomeMatchTeamCaptain");

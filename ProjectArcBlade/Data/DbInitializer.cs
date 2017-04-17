@@ -12,7 +12,19 @@ namespace ProjectArcBlade.Data
         {
             context.Database.EnsureCreated();
 
-            if(!context.Sports.Any())
+            if (!context.MatchTypes.Any())
+            {
+                var matchTypes = new MatchType[]
+                {
+                    new MatchType{Name="League"},
+                    new MatchType{Name="Cup"},
+                    new MatchType{Name="Casual"}
+                };
+                foreach (MatchType mt in matchTypes) context.MatchTypes.Add(mt);
+                context.SaveChanges();
+            }
+
+            if (!context.Sports.Any())
             {
                 var sports = new Sport[]
                 {
@@ -159,7 +171,9 @@ namespace ProjectArcBlade.Data
                 var venues = new Venue[]
                 {
                     new Venue{Name="Sport Wales National Centre", AddressLine1="Sophia Close",Postcode="CF11 9SW" },
-                    new Venue{Name="Llantrisant Leisure Centre", AddressLine1="Llantrisant", Postcode="CF72 8DJ"}
+                    new Venue{Name="Llantrisant Leisure Centre", AddressLine1="Llantrisant", Postcode="CF72 8DJ"},
+                    new Venue{Name="Western Leisure Centre", AddressLine1="Caerau Lane", Postcode="CF5 5HJ"},
+                    new Venue{Name="Holm View Leisure Centre", AddressLine1="Skomer Road", Postcode="CF62 9DA"}
                 };
                 foreach (Venue v in venues) context.Venues.Add(v);
                 context.SaveChanges();
@@ -181,7 +195,11 @@ namespace ProjectArcBlade.Data
                 var clubs = new Club[]
                 {
                     new Club {Name="Cardiff Nomads",IsActive=true},
-                    new Club{Name="Llantrisant", IsActive=true}
+                    new Club{Name="Llantrisant", IsActive=true},
+                    new Club{Name="Penarth", IsActive=true},
+                    new Club{Name="Heath", IsActive=true},
+                    new Club{Name="Bridgend Phoenix", IsActive=true},
+                    new Club{Name="Holm View", IsActive=true}
                 };
                 foreach (Club c in clubs) context.Clubs.Add(c);
                 context.SaveChanges();
@@ -192,8 +210,13 @@ namespace ProjectArcBlade.Data
                 var leagueClubs = new LeagueClub[]
                 {
                     new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find (1) },
-                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(2) }
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(2) },
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(3) },
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(4) },
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(5) },
+                    new LeagueClub { League = context.Leagues.Find(1), Club = context.Clubs.Find(6) }
                 };
+                
                 foreach (LeagueClub lc in leagueClubs) context.LeagueClubs.Add(lc);
                 context.SaveChanges();
             }
@@ -225,7 +248,39 @@ namespace ProjectArcBlade.Data
                         DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Friday),
                         StartTime = new DateTime(1,1,1,19,30,0),
                         EndTime = new DateTime(1,1,1,21,30,0)
-                    }
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(3),
+                        Venue = context.Venues.Find(3),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Monday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,22,30,0)
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(6),
+                        Venue = context.Venues.Find(4),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Tuesday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,22,30,0)
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(4),
+                        Venue = context.Venues.Find(1),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Thursday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,22,30,0)
+                    },
+                    new ClubVenue
+                    {
+                        Club = context.Clubs.Find(5),
+                        Venue = context.Venues.Find(1),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Friday),
+                        StartTime = new DateTime(1,1,1,19,30,0),
+                        EndTime = new DateTime(1,1,1,22,30,0)
+                    },
                 };
                 foreach (ClubVenue cv in clubVenues) context.ClubVenues.Add(cv);
                 context.SaveChanges();
@@ -426,7 +481,6 @@ namespace ProjectArcBlade.Data
                     {
                         Name = "Kerslake Cup",
                         League = context.Leagues.Find(1)
-                        
                     },
 
                     new Cup()
@@ -436,6 +490,139 @@ namespace ProjectArcBlade.Data
                     }
                 };
                 foreach (Cup c in cups) context.Cups.Add(c);
+                context.SaveChanges();
+            }
+            
+            if (!context.Teams.Any())
+            {
+                var teams = new Team[]
+                {
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(1),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)                        
+                    },
+                    new Team
+                    {
+                        Name = "Mens B",
+                        LeagueClub = context.LeagueClubs.Find(1),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(2),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens B",
+                        LeagueClub = context.LeagueClubs.Find(2),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(3),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Womens A",
+                        LeagueClub = context.LeagueClubs.Find(1),
+                        Category = context.Categories.Find(Constants.Category.Womens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(4),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(2),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(5),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Mens A",
+                        LeagueClub = context.LeagueClubs.Find(6),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(3),
+                        Season = context.Seasons.Find(2)
+                    },
+                    new Team
+                    {
+                        Name = "Womens A",
+                        LeagueClub = context.LeagueClubs.Find(2),
+                        Category = context.Categories.Find(Constants.Category.Womens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(2)
+                    },
+                };
+                foreach (Team t in teams) context.Teams.Add(t);
+                context.SaveChanges();
+            }
+
+            if(!context.Rules.Any())
+            {
+                var rules = new Rule[]
+                {
+                    new Rule{Name="MaxGroupsPerTeam", Value=3 },
+                    new Rule{Name="MaxPlayersPerGroup", Value=2}
+                };
+                foreach (Rule r in rules) context.Rules.Add(r);
+                context.SaveChanges();
+            }
+
+            if (!context.SportRules.Any())
+            {
+                var sportRules = new SportRule[]
+                {
+                    new SportRule{Sport=context.Sports.Find(1), Rule=context.Rules.Find(1)},
+                    new SportRule{Sport=context.Sports.Find(1), Rule=context.Rules.Find(2)}
+                };
+                foreach (SportRule sr in sportRules) context.SportRules.Add(sr);
+                context.SaveChanges();
+            }
+
+            if (!context.LeagueRules.Any())
+            {
+                var leagueRules = new LeagueRule[]
+                {
+                    new LeagueRule{League=context.Leagues.Find(1), Rule=context.Rules.Find(1)},
+                    new LeagueRule{League=context.Leagues.Find(1), Rule=context.Rules.Find(2)}
+                };
+                foreach (LeagueRule lr in leagueRules) context.LeagueRules.Add(lr);
+                context.SaveChanges();
+            }
+
+            if (!context.CategoryRules.Any())
+            {
+                var categoryRules = new CategoryRule[]
+                {
+                    new CategoryRule{Category=context.Categories.Find(1), Rule=context.Rules.Find(1)},
+                    new CategoryRule{Category=context.Categories.Find(1), Rule=context.Rules.Find(2)}
+                };
+                foreach (CategoryRule lr in categoryRules) context.CategoryRules.Add(lr);
                 context.SaveChanges();
             }
 

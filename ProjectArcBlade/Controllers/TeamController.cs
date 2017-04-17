@@ -23,7 +23,7 @@ namespace ProjectArcBlade.Controllers
         // GET: Team
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Teams.ToListAsync());
+            return View(await _context.Teams.Include(t=>t.LeagueClub).ThenInclude(lc=>lc.Club).ToListAsync());
         }
 
         // GET: Team/Details/5
@@ -51,6 +51,7 @@ namespace ProjectArcBlade.Controllers
 
             var groups = 
                 await _context.Groups
+                    .Where(g => g.Id <= 3) //TODO: Limit to 3 groups artifically - this should be handled by a rule.
                     .Select(g => new SelectListItem { Value = g.Id.ToString(), Text = g.Name })
                     .ToListAsync();
 

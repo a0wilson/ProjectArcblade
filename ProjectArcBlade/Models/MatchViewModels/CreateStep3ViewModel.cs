@@ -9,6 +9,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
 {
     public class CreateStep3ViewModel
     {
+        [Required]
         [Display(Name = "Away Team")]
         public int AwayTeamId { get; set; }
         

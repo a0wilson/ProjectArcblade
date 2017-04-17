@@ -8,6 +8,7 @@ namespace ProjectArcBlade.Models
         public Team Team { get; set; }
         public Match Match { get; set; }
 
+        public int MatchId { get; set; }
         public ICollection<HomeMatchTeamGroup> HomeMatchTeamGroups { get; set; }
     }
 }

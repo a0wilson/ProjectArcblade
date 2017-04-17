@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class MatchScheduledDate
+    public class RescheduledStartDate
     {
         public int Id { get; set; }
         [Required]
-        public DateTime ScheduledDate { get; set; }
-        [Required]
+        public DateTime StartDate { get; set; }
         public Match Match { get; set; }
     }
 }

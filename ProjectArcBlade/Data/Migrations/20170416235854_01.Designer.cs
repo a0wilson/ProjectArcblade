@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170415210653_01")]
+    [Migration("20170416235854_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -260,13 +260,14 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("MatchId");
+                    b.Property<int>("MatchId");
 
                     b.Property<int?>("TeamId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MatchId");
+                    b.HasIndex("MatchId")
+                        .IsUnique();
 
                     b.HasIndex("TeamId");
 
@@ -643,13 +644,14 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("MatchId");
+                    b.Property<int>("MatchId");
 
                     b.Property<int?>("TeamId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MatchId");
+                    b.HasIndex("MatchId")
+                        .IsUnique();
 
                     b.HasIndex("TeamId");
 
@@ -764,13 +766,19 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("MatchTypeId");
+
                     b.Property<int?>("SeasonId");
+
+                    b.Property<DateTime>("StartDate");
 
                     b.Property<DateTime>("StartTime");
 
                     b.Property<int?>("VenueId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("MatchTypeId");
 
                     b.HasIndex("SeasonId");
 
@@ -779,20 +787,16 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("Match");
                 });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchScheduledDate", b =>
+            modelBuilder.Entity("ProjectArcBlade.Models.MatchType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("MatchId");
-
-                    b.Property<DateTime>("ScheduledDate");
+                    b.Property<string>("Name");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MatchId");
-
-                    b.ToTable("MatchScheduledDate");
+                    b.ToTable("MatchType");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.MembershipType", b =>
@@ -806,6 +810,22 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MembershipType");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.RescheduledStartDate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("MatchId");
+
+                    b.Property<DateTime>("StartDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchId");
+
+                    b.ToTable("RescheduledStartDate");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.ResultType", b =>
@@ -1104,8 +1124,9 @@ namespace ProjectArcBlade.Data.Migrations
             modelBuilder.Entity("ProjectArcBlade.Models.AwayMatchTeam", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Match", "Match")
-                        .WithMany()
-                        .HasForeignKey("MatchId");
+                        .WithOne("AwayMatchTeam")
+                        .HasForeignKey("ProjectArcBlade.Models.AwayMatchTeam", "MatchId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ProjectArcBlade.Models.Team", "Team")
                         .WithMany("AwayMatchTeams")
@@ -1281,8 +1302,9 @@ namespace ProjectArcBlade.Data.Migrations
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeam", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Match", "Match")
-                        .WithMany("MatchTeams")
-                        .HasForeignKey("MatchId");
+                        .WithOne("HomeMatchTeam")
+                        .HasForeignKey("ProjectArcBlade.Models.HomeMatchTeam", "MatchId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ProjectArcBlade.Models.Team", "Team")
                         .WithMany("HomeMatchTeams")
@@ -1349,6 +1371,10 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
+                    b.HasOne("ProjectArcBlade.Models.MatchType", "MatchType")
+                        .WithMany("Matches")
+                        .HasForeignKey("MatchTypeId");
+
                     b.HasOne("ProjectArcBlade.Models.Season", "Season")
                         .WithMany("Matches")
                         .HasForeignKey("SeasonId");
@@ -1358,12 +1384,11 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasForeignKey("VenueId");
                 });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchScheduledDate", b =>
+            modelBuilder.Entity("ProjectArcBlade.Models.RescheduledStartDate", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Match", "Match")
-                        .WithMany("MatchScheduledDates")
-                        .HasForeignKey("MatchId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("RescheduledStartDates")
+                        .HasForeignKey("MatchId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>
