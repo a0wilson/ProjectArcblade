@@ -65,10 +65,13 @@ namespace ProjectArcBlade.Data
         public DbSet<UserDetail> UserDetails { get; set; }
         public DbSet<Sport> Sports { get; set; }
 
+        public DbSet<Setting> Settings { get; set; }
         public DbSet<Rule> Rules { get; set; }
         public DbSet<LeagueRule> LeagueRules { get; set; }
-        public DbSet<SportRule> SportRules { get; set; }
         public DbSet<CategoryRule> CategoryRules { get; set; }
+
+        public DbSet<ExclusionDate> ExclusionDates { get; set; }
+        public DbSet<PointScore> PointScores { get; set; }        
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -136,10 +139,13 @@ namespace ProjectArcBlade.Data
             builder.Entity<UserDetail>().ToTable("UserDetail");
             builder.Entity<Sport>().ToTable("Sport");
 
+            builder.Entity<Setting>().ToTable("Setting");
             builder.Entity<Rule>().ToTable("Rule");
             builder.Entity<LeagueRule>().ToTable("LeagueRule");
-            builder.Entity<SportRule>().ToTable("SportRule");
             builder.Entity<CategoryRule>().ToTable("CategoryRule");
+
+            builder.Entity<ExclusionDate>().ToTable("ExclusionDate");
+            builder.Entity<PointScore>().ToTable("PointScore");
 
         }
     }

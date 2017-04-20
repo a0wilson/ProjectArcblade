@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class Rule
+    public class PointScore
     {
         public int Id { get; set; }
+        public Season Season { get; set; }
+        public ResultType ResultType { get; set; }
         [Required]
-        public int Value { get; set; }
-        public Setting Setting { get; set; }
-        
-        public ICollection<LeagueRule> LeagueRules { get; set; }
-        public ICollection<CategoryRule> CategoryRules { get; set; }
+        public int PointValue { get; set; }
     }
 }

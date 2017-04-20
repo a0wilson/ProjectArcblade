@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class SportRule
+    public class Setting
     {
         public int Id { get; set; }
-        public Rule Rule { get; set; }
-        public Sport Sport { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public ICollection<Rule> Rules { get; set; }
     }
 }

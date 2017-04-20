@@ -12,8 +12,11 @@ namespace ProjectArcBlade.Models
         [Required]
         public string Name { get; set; }
 
+        public ICollection<AwayMatchTeam> AwayMatchTeams { get; set; }
         public ICollection<AwayGameResult> AwayGameResults { get; set; }
+        public ICollection<HomeMatchTeam> HomeMatchTeams { get; set; }
         public ICollection<HomeGameResult> HomeGameResults { get; set; }
+        public ICollection<PointScore> PointScores { get; set; }
 
     }
 }

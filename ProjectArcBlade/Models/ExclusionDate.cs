@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class Rule
+    public class ExclusionDate
     {
         public int Id { get; set; }
+        public string Reason { get; set; }
         [Required]
-        public int Value { get; set; }
-        public Setting Setting { get; set; }
-        
-        public ICollection<LeagueRule> LeagueRules { get; set; }
-        public ICollection<CategoryRule> CategoryRules { get; set; }
+        public DateTime DateToExclude { get; set; }
+        public Season Season { get; set; }
+        public LeagueClub LeagueClub { get; set; }
     }
 }

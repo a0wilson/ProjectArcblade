@@ -25,5 +25,7 @@ namespace ProjectArcBlade.Models
         public ICollection<Team> Teams { get; set; }
         public ICollection<Match> Matches { get; set; }
         public ICollection<ClubSubscription> ClubSubscriptions { get; set; }
+        public ICollection<PointScore> PointScores { get; set; }
+        public ICollection<ExclusionDate> ExclusionDates { get; set; }
     }
 }

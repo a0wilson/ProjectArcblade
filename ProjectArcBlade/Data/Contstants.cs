@@ -2,6 +2,12 @@
 {
     public static class Constants
     {
+        public static class Setting
+        {
+            public const int MaxGroupsPerTeam = 1;
+            public const int MaxPlayersPerGroup = 2;
+        }
+
         public static class MatchType
         {
             public const int League = 1;

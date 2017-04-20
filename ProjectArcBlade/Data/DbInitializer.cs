@@ -582,28 +582,29 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
+
+            if (!context.Settings.Any())
+            {
+                var settings = new Setting[]
+                {
+                    new Setting{Name="MaxGroupsPerTeam" },
+                    new Setting{Name="MaxPlayersPerGroup"}
+                };
+                foreach (Setting s in settings) context.Settings.Add(s);
+                context.SaveChanges();
+            }
+
             if(!context.Rules.Any())
             {
                 var rules = new Rule[]
                 {
-                    new Rule{Name="MaxGroupsPerTeam", Value=3 },
-                    new Rule{Name="MaxPlayersPerGroup", Value=2}
+                    new Rule{Setting=context.Settings.Find(1), Value=3 },
+                    new Rule{Setting=context.Settings.Find(2), Value=2}
                 };
                 foreach (Rule r in rules) context.Rules.Add(r);
                 context.SaveChanges();
             }
-
-            if (!context.SportRules.Any())
-            {
-                var sportRules = new SportRule[]
-                {
-                    new SportRule{Sport=context.Sports.Find(1), Rule=context.Rules.Find(1)},
-                    new SportRule{Sport=context.Sports.Find(1), Rule=context.Rules.Find(2)}
-                };
-                foreach (SportRule sr in sportRules) context.SportRules.Add(sr);
-                context.SaveChanges();
-            }
-
+                       
             if (!context.LeagueRules.Any())
             {
                 var leagueRules = new LeagueRule[]
@@ -627,7 +628,6 @@ namespace ProjectArcBlade.Data
             }
 
         }
-
-        
+                
     }
 }
