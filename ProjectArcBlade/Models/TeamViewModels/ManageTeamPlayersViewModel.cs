@@ -21,8 +21,9 @@ namespace ProjectArcBlade.Models.TeamViewModels
         public int TeamId { get; set; }
         [Display(Name="Filter Available Players")]
         public bool FilterAvailablePlayers { get; set; }
+        [Display(Name="Team Status")]
+        public TeamStatus TeamStatus { get; set; }
 
-        
         public List<SelectListItem> AvailableTeamPlayers { get; set; }
         public List<SelectListItem> AssignedTeamPlayers { get; set; }
         public List<SelectListItem> Groups { get; set; }

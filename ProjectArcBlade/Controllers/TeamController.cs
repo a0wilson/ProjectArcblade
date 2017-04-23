@@ -41,6 +41,7 @@ namespace ProjectArcBlade.Controllers
                 .Include( t=> t.TeamPlayers)
                 .Include( t=> t.Category)
                 .Include( t=> t.Season)
+                .Include( t=> t.TeamStatus)
 
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -124,7 +125,8 @@ namespace ProjectArcBlade.Controllers
                 Groups = groups,
                 AssignedTeamPlayers = assignedTeamPlayers,
                 AvailableTeamPlayers = availableTeamPlayers,
-                FilterAvailablePlayers = filterAvailablePlayers
+                FilterAvailablePlayers = filterAvailablePlayers,
+                TeamStatus = team.TeamStatus
             };
 
             return View(manageTeamPlayersViewModel);
@@ -151,28 +153,41 @@ namespace ProjectArcBlade.Controllers
                 {
                     var team = await _context.Teams.Include(t=>t.LeagueClub).ThenInclude(lc=>lc.League).Include(t=>t.Category).Where(t=> t.Id == manageTeamPlayersViewModel.TeamId).SingleAsync();
                     var group = await _context.Groups.FindAsync(manageTeamPlayersViewModel.GroupId);
-                    var maxPlayersPerGroupRuleValue = settingsService.GetSettingValue(_context, Constants.Setting.MaxPlayersPerGroup, team.LeagueClub.League.Id, team.Category.Id).Value;
+                    var settings = settingsService.GetSettingValues(_context, Constants.Setting.MaxPlayersPerGroup, team.LeagueClub.League.Id);
+                    var maxPlayersPerGroupRuleValue = settings.Where(r => r.Id == Constants.Setting.MaxPlayersPerGroup).Single().Value;
+                    var maxGroupsPerTeamRuleValue = settings.Where(r => r.Id == Constants.Setting.MaxGroupsPerTeam).Single().Value;
+                    var completedTeamValue = maxGroupsPerTeamRuleValue * maxPlayersPerGroupRuleValue;
 
-                    var currentTeamPlayerGroupCount = await _context.TeamPlayers.Where(t => t.Team.Id == team.Id && t.Group.Id == group.Id).CountAsync();
+                    //determine how many current players there are and how many are being added.
+                    var currentTeamPlayers = await _context.TeamPlayers.Include(tp => tp.Group).Where(t => t.Team.Id == team.Id).ToListAsync();
+                    var currentTeamPlayerCount = currentTeamPlayers.Count();
+                    var currentTeamPlayerGroupCount = currentTeamPlayers.Where( ctp => ctp.Group.Id == group.Id).Count();
                     var newTeamPlayersCount = manageTeamPlayersViewModel.AvailableTeamPlayerIds.Count();
 
+                    //if too many are being added show an error message.
                     if((currentTeamPlayerGroupCount + newTeamPlayersCount) > maxPlayersPerGroupRuleValue)
                     {
                         TempData["errorMessage"] = String.Format("The maximum amount of players allowed in each group is {0}", maxPlayersPerGroupRuleValue);
                         return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
                     }
 
+                    //update the team status accordingly 
+                    var teamStatusId = Constants.TeamStatus.New;
+                    teamStatusId = currentTeamPlayerCount + currentTeamPlayerGroupCount == completedTeamValue ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
+                    team.TeamStatus = _context.TeamStatuses.Find(teamStatusId);
+                                        
                     foreach (int id in manageTeamPlayersViewModel.AvailableTeamPlayerIds)
                     {
                         var newTeamPlayer = new TeamPlayer
                         {
                             ClubUser = await _context.ClubUsers.FindAsync(id),
                             Group = group,
-                            Team = team
+                            Team = team                                                        
                         };
-                        _context.TeamPlayers.Add(newTeamPlayer);
-                        await _context.SaveChangesAsync();
+                        _context.TeamPlayers.Add(newTeamPlayer);                        
                     }
+
+                    await _context.SaveChangesAsync();
                 }
                 
                 return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
@@ -195,7 +210,7 @@ namespace ProjectArcBlade.Controllers
                     {
                         var teamPlayer = await _context.TeamPlayers.Where(tp => tp.Id == id).SingleOrDefaultAsync();
                         _context.TeamPlayers.Remove(teamPlayer);
-                    }
+                    }                    
                 }
                 
                 await _context.SaveChangesAsync();
@@ -245,14 +260,15 @@ namespace ProjectArcBlade.Controllers
         {            
             if (ModelState.IsValid)
             {
-                
+
                 Team team = new Team
                 {
                     Name = createTeamViewModel.Name,
                     Category = await _context.Categories.FindAsync(createTeamViewModel.CategoryId),
                     Division = await _context.Divisions.FindAsync(createTeamViewModel.DivisionId),
                     Season = await _context.Seasons.FindAsync(createTeamViewModel.SeasonId),
-                    LeagueClub = await _context.LeagueClubs.FindAsync(createTeamViewModel.LeagueClubId)
+                    LeagueClub = await _context.LeagueClubs.FindAsync(createTeamViewModel.LeagueClubId),
+                    TeamStatus = _context.TeamStatuses.Find(Constants.TeamStatus.New)
                 };
 
                 _context.Teams.Add(team);

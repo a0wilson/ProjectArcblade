@@ -2,6 +2,23 @@
 {
     public static class Constants
     {
+        public enum MatchScheduleRange
+        {
+            Initial,
+            Return,
+            Any
+        }
+
+        public static class DateFormat
+        {
+            public static string Long = "dddd, MMM dd, yyyy";
+        }
+
+        public static class TimeFormat
+        {
+            public static string Short = "HH:mm";
+        }
+
         public static class Setting
         {
             public const int MaxGroupsPerTeam = 1;
@@ -13,6 +30,15 @@
             public const int League = 1;
             public const int Cup = 2;
             public const int Casual = 3;
+        }
+
+        public static class TeamStatus
+        {
+            public const int New = 1;
+            public const int InProgress = 2;
+            public const int Complete = 3;
+            public const int Active = 4;
+            public const int Inactive = 5;
         }
 
         public static class Gender

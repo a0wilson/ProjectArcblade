@@ -59,9 +59,12 @@ namespace ProjectArcBlade.Data
         public DbSet<ResultType> ResultTypes { get; set; }
         public DbSet<ScoreStatus> ScoreStatuses { get; set; }
         public DbSet<Season> Seasons { get; set; }
+
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamCaptain> TeamCaptains { get; set; }
         public DbSet<TeamPlayer> TeamPlayers { get; set; }
+        public DbSet<TeamStatus> TeamStatuses { get; set; }
+
         public DbSet<UserDetail> UserDetails { get; set; }
         public DbSet<Sport> Sports { get; set; }
 
@@ -136,6 +139,8 @@ namespace ProjectArcBlade.Data
             builder.Entity<Team>().ToTable("Team");
             builder.Entity<TeamCaptain>().ToTable("TeamCaptain");
             builder.Entity<TeamPlayer>().ToTable("TeamPlayer");
+            builder.Entity<TeamStatus>().ToTable("TeamStatus");
+
             builder.Entity<UserDetail>().ToTable("UserDetail");
             builder.Entity<Sport>().ToTable("Sport");
 

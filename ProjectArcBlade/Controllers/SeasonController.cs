@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectArcBlade.Data;
 using ProjectArcBlade.Models;
+using ProjectArcBlade.Services;
+using ProjectArcBlade.Models.SeasonViewModels;
 
 namespace ProjectArcBlade.Controllers
 {
@@ -64,6 +66,20 @@ namespace ProjectArcBlade.Controllers
                 return RedirectToAction("Index");
             }
             return View(season);
+        }
+
+        public IActionResult ScheduleAllMatches (MatchSchedulingService matchSchedulingService, int seasonId)
+        {
+
+            var matchSchedules = matchSchedulingService.ScheduleMatches(_context, seasonId);
+            var divisionNames = matchSchedules.GroupBy(ms => ms.DivisionName).Select(ms => ms.First()).Select(ms => ms.DivisionName).ToList();
+            var viewModel = new ScheduleAllMatchesViewModel
+            {
+                MatchSchedules = matchSchedules,
+                DivisionNames = divisionNames
+            };
+            
+            return View(viewModel);
         }
 
         // GET: Seasons/Edit/5

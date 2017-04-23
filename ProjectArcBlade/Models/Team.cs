@@ -15,6 +15,7 @@ namespace ProjectArcBlade.Models
         public Division Division { get; set; }
         public Category Category { get; set; }
         public Season Season { get; set; }
+        public TeamStatus TeamStatus { get; set; }
 
         public ICollection<TeamPlayer> TeamPlayers { get; set; }
         public ICollection<HomeMatchTeam> HomeMatchTeams { get; set; }

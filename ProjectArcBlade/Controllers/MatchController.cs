@@ -37,8 +37,8 @@ namespace ProjectArcBlade.Controllers
                 .Select(m => new DisplayMatchViewModel
                 {
                     Id = m.Id,
-                    StartDate = m.StartDate.ToString("DDDD, MMM dd, yyyy"),
-                    StartTime = m.StartTime.ToString("HH:mm"),
+                    StartDate = m.StartDate.ToString(Constants.DateFormat.Long),
+                    StartTime = m.StartTime.ToString(Constants.TimeFormat.Short),
                     HomeTeam = String.Format("{0} - {1}", m.HomeMatchTeam.Team.LeagueClub.Club.Name, m.HomeMatchTeam.Team.Name),
                     AwayTeam = String.Format("{0} - {1}", m.AwayMatchTeam.Team.LeagueClub.Club.Name, m.AwayMatchTeam.Team.Name)
                         
@@ -259,8 +259,8 @@ namespace ProjectArcBlade.Controllers
                 CategoryName = category.Name,
                 HomeTeamName = String.Format("{0} - {1}", homeTeam.LeagueClub.Club.Name, homeTeam.Name),
                 AwayTeamName = String.Format("{0} - {1}", awayTeam.LeagueClub.Club.Name, awayTeam.Name),
-                StartTime = startTime.ToString("HH:mm"),
-                ScheduledDate = scheduledDate.ToString("dddd, MMM d, yyyy"),
+                StartTime = startTime.ToString(Constants.TimeFormat.Short),
+                ScheduledDate = scheduledDate.ToString(Constants.DateFormat.Long),
                 MatchType = matchType.Name,
                 IsCupMatch = matchType.Id == Constants.MatchType.Cup
             };

@@ -189,6 +189,19 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TeamStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeamStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Venue",
                 columns: table => new
                 {
@@ -621,7 +634,8 @@ namespace ProjectArcBlade.Data.Migrations
                     DivisionId = table.Column<int>(nullable: true),
                     LeagueClubId = table.Column<int>(nullable: true),
                     Name = table.Column<string>(nullable: false),
-                    SeasonId = table.Column<int>(nullable: true)
+                    SeasonId = table.Column<int>(nullable: true),
+                    TeamStatusId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -648,6 +662,12 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_Team_Season_SeasonId",
                         column: x => x.SeasonId,
                         principalTable: "Season",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Team_TeamStatus_TeamStatusId",
+                        column: x => x.TeamStatusId,
+                        principalTable: "TeamStatus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1510,6 +1530,11 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "SeasonId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Team_TeamStatusId",
+                table: "Team",
+                column: "TeamStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeamCaptain_TeamPlayerId",
                 table: "TeamCaptain",
                 column: "TeamPlayerId");
@@ -1671,6 +1696,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Season");
+
+            migrationBuilder.DropTable(
+                name: "TeamStatus");
 
             migrationBuilder.DropTable(
                 name: "Club");

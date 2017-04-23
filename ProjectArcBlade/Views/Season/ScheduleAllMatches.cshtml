@@ -1,0 +1,68 @@
+﻿@model ProjectArcBlade.Models.SeasonViewModels.ScheduleAllMatchesViewModel
+
+@{
+    ViewData["Title"] = "Schedule Matches";
+}
+
+<h2>Schedule Matches</h2>
+<p>
+    <a asp-action="ScheduleAllMatches" asp-controller="Season" asp-route-seasonId=2>Reschedule</a>
+</p>
+<ul class="nav nav-tabs">
+    @{var i = 1; }
+    @foreach (var divisionName in Model.DivisionNames)
+    {
+        <li class= "@(i==1?"active":"")"><a data-toggle="tab" href="#division@(i)">@divisionName</a></li>
+        i++;
+    }
+</ul>
+
+<div class="tab-content">
+    @{i = 1; }
+    @foreach (var divisionName in Model.DivisionNames)
+    {
+        
+        <div id="division@(i)" class="tab-pane fade @(i==1?"in active":"")">
+            <h3>@divisionName</h3>
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Match
+                            </th>
+                            <th>
+                                Venue
+                            </th>
+                            <th>
+                                Scheduled Date
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var match in Model.MatchSchedules)
+                        {
+                            @if (match.DivisionName == divisionName)
+                            {
+                                <tr>
+                                    <td>
+                                        @match.HomeTeamName vs @match.AwayTeamName
+                                    </td>
+                                    <td>
+                                        @match.VenueName
+                                    </td>
+                                    <td>
+                                        @match.DisplayDate
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+        i++;
+    }
+        
+</div>
+

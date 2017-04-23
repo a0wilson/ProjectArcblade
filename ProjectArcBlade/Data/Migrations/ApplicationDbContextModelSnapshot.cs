@@ -987,6 +987,8 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("SeasonId");
 
+                    b.Property<int?>("TeamStatusId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -996,6 +998,8 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("LeagueClubId");
 
                     b.HasIndex("SeasonId");
+
+                    b.HasIndex("TeamStatusId");
 
                     b.ToTable("Team");
                 });
@@ -1034,6 +1038,18 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("TeamPlayer");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.TeamStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TeamStatus");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.UserDetail", b =>
@@ -1500,6 +1516,10 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.Season", "Season")
                         .WithMany("Teams")
                         .HasForeignKey("SeasonId");
+
+                    b.HasOne("ProjectArcBlade.Models.TeamStatus", "TeamStatus")
+                        .WithMany("Teams")
+                        .HasForeignKey("TeamStatusId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.TeamCaptain", b =>
