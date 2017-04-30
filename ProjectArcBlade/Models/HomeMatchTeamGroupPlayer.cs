@@ -10,7 +10,7 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
-        public ClubUser ClubUser { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
 
         public ICollection<HomeMatchTeamCaptain> HomeMatchTeamCaptains { get; set; }
     }

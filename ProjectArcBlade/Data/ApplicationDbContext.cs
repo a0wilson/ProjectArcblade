@@ -29,8 +29,8 @@ namespace ProjectArcBlade.Data
         public DbSet<ClubSubscriber> ClubSubscribers { get; set; }
         public DbSet<ClubSubscription> ClubSubscriptions { get; set; }
         public DbSet<ClubVenue> ClubVenues { get; set; }
-        public DbSet<ClubUser> ClubUsers { get; set; }
-        public DbSet<ClubUserStatus> ClubUserStatuses { get; set; }
+        public DbSet<ClubPlayer> ClubPlayers { get; set; }
+        public DbSet<ClubPlayerStatus> ClubPlayerStatuses { get; set; }
 
         public DbSet<Cup> Cups { get; set; }
         public DbSet<CupMatch> CupMatches { get; set; }
@@ -65,7 +65,7 @@ namespace ProjectArcBlade.Data
         public DbSet<TeamPlayer> TeamPlayers { get; set; }
         public DbSet<TeamStatus> TeamStatuses { get; set; }
 
-        public DbSet<UserDetail> UserDetails { get; set; }
+        public DbSet<PlayerDetail> PlayerDetails { get; set; }
         public DbSet<Sport> Sports { get; set; }
 
         public DbSet<Setting> Settings { get; set; }
@@ -93,9 +93,9 @@ namespace ProjectArcBlade.Data
             builder.Entity<Club>().ToTable("Club");
             builder.Entity<ClubSubscriber>().ToTable("ClubSubscriber");
             builder.Entity<ClubSubscription>().ToTable("ClubSubscription");
-            builder.Entity<ClubUser>().ToTable("ClubUser");
+            builder.Entity<ClubPlayer>().ToTable("ClubPlayer");
             builder.Entity<ClubVenue>().ToTable("ClubVenue");
-            builder.Entity<ClubUserStatus>().ToTable("ClubUserStatus");
+            builder.Entity<ClubPlayerStatus>().ToTable("ClubPlayerStatus");
             builder.Entity<Cup>().ToTable("Cup");
             builder.Entity<CupMatch>().ToTable("CupMatch");
             builder.Entity<CupMatchHandicap>().ToTable("CupMatchHandicap");
@@ -141,7 +141,7 @@ namespace ProjectArcBlade.Data
             builder.Entity<TeamPlayer>().ToTable("TeamPlayer");
             builder.Entity<TeamStatus>().ToTable("TeamStatus");
 
-            builder.Entity<UserDetail>().ToTable("UserDetail");
+            builder.Entity<PlayerDetail>().ToTable("PlayerDetail");
             builder.Entity<Sport>().ToTable("Sport");
 
             builder.Entity<Setting>().ToTable("Setting");

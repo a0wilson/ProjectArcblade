@@ -10,8 +10,7 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         [Required]
-        public ClubUser ClubUser { get; set; }
-        [Required]
+        public ClubPlayer ClubPlayer { get; set; }
         public Award Award { get; set; }
         public Match Match { get; set; }
 

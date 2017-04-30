@@ -10,7 +10,7 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public Team Team { get; set; }
-        public ClubUser ClubUser { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
         public Group Group { get; set; }
         
         public ICollection<TeamCaptain> TeamCaptains { get; set; }

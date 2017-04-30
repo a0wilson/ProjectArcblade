@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class UserDetail
+    public class PlayerDetail
     {
         public int Id { get; set; }
         [Required]
@@ -27,6 +27,6 @@ namespace ProjectArcBlade.Models
         [Display(Name ="Email Address")]
         public string EmailAddress { get; set; }
                  
-        public ICollection<ClubUser> ClubUsers { get; set; }
+        public ICollection<ClubPlayer> ClubPlayers { get; set; }
     }
 }

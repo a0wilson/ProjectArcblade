@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class ClubUserStatus
+    public class ClubPlayerStatus
     {
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
 
-        public ICollection<ClubUser> ClubUsers { get; set; }
+        public ICollection<ClubPlayer> ClubPlayers { get; set; }
     }
 }

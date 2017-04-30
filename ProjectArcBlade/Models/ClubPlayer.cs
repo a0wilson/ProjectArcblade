@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class ClubUser
+    public class ClubPlayer
     {
         public int Id { get; set; }
         [Display(Name = "Membership Number")]
@@ -14,12 +14,11 @@ namespace ProjectArcBlade.Models
         [Display(Name = "Membership Type")]
         public MembershipType MembershipType { get; set; }
         [Display(Name = "Status")]
-        public ClubUserStatus ClubUserStatus { get; set; }
+        public ClubPlayerStatus ClubPlayerStatus { get; set; }
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
         public Club Club { get; set; }
-        [Required]
-        public UserDetail UserDetail { get; set; }
+        public PlayerDetail PlayerDetail { get; set; }
 
         public ICollection<TeamPlayer> TeamPlayers { get; set; }
         public ICollection<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }

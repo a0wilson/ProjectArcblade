@@ -23,7 +23,7 @@
                         <td>@item.Venue.Name</td>
                         <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>
                         <td>
-                            <a asp-action="Organise" asp-route-homeMatchTeamid="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())">Organise</a>
+                            <a asp-action="Organise" asp-route-homeMatchTeamId="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())">Organise</a>
                         </td>
                     </tr>
                 }

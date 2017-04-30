@@ -56,18 +56,12 @@
             <label asp-for="AvailableTeamPlayerIds" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <select asp-for="AvailableTeamPlayerIds" asp-items="Model.AvailableTeamPlayers" class="form-control"></select>
-                <span asp-validation-for="AvailableTeamPlayerIds" class="text-danger"></span>
-                <div>
-                    <label asp-for="FilterAvailablePlayers"></label>
-                    <input asp-for="FilterAvailablePlayers" />
-                    <input type="submit" asp-action="RefreshAvailablePlayers" value="Refresh" class="btn btn-info btn-xs" />
-                </div>
-            </div>
-            
+                <span asp-validation-for="AvailableTeamPlayerIds" class="text-danger"></span>                
+            </div>            
         </div>
         <div class="form-group">
-            <div class="col-md-offset-5 col-md-10">
-                <input type="submit" asp-action="Assign" value="Assign" class="btn btn-default" />
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" asp-action="AssignToTeam" value="Assign" class="btn btn-default" />
             </div>
         </div>
         <div class="form-group">
@@ -78,8 +72,8 @@
             </div>
         </div>
         <div class="form-group">
-            <div class="col-md-offset-5 col-md-10">
-                <input type="submit" asp-action="Reassign"  value="Reassign" class="btn btn-default" />
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" asp-action="ReassignFromTeam"  value="Reassign" class="btn btn-default" />
             </div>
         </div>
     </div>

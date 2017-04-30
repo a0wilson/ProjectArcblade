@@ -14,7 +14,7 @@ namespace ProjectArcBlade.Models
         public int? Score { get; set; }
         public ScoreStatus ScoreStatus { get; set; }
         [Display(Name = "Submitted By")]
-        public ClubUser ClubUser { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
         public DateTime DateSubmitted { get; set; }
     }
 }

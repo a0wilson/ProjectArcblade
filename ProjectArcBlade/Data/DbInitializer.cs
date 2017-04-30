@@ -70,8 +70,7 @@ namespace ProjectArcBlade.Data
                 var genders = new Gender[]
                 {
                     new Gender{Name="Male"},
-                    new Gender{Name="Female"},
-                    new Gender{Name="Other"}
+                    new Gender{Name="Female"}
                 };
                 foreach (Gender g in genders) context.Genders.Add(g);
                 context.SaveChanges();
@@ -123,17 +122,17 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
-            if (!context.ClubUserStatuses.Any())
+            if (!context.ClubPlayerStatuses.Any())
             {
-                var clubUserStatuses = new ClubUserStatus[]
+                var clubPlayerStatuses = new ClubPlayerStatus[]
                 {
-                    new ClubUserStatus{Name="Available"},
-                    new ClubUserStatus{Name="Limited availability"},
-                    new ClubUserStatus{Name="Injured"},
-                    new ClubUserStatus{Name="Sick"},
-                    new ClubUserStatus{Name="Unavailable"},
+                    new ClubPlayerStatus{Name="Available"},
+                    new ClubPlayerStatus{Name="Limited availability"},
+                    new ClubPlayerStatus{Name="Injured"},
+                    new ClubPlayerStatus{Name="Sick"},
+                    new ClubPlayerStatus{Name="Unavailable"},
                 };
-                foreach (ClubUserStatus cus in clubUserStatuses) context.ClubUserStatuses.Add(cus);
+                foreach (ClubPlayerStatus cus in clubPlayerStatuses) context.ClubPlayerStatuses.Add(cus);
                 context.SaveChanges();
             }
 
@@ -348,158 +347,158 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
-            if(!context.UserDetails.Any())
+            if(!context.PlayerDetails.Any())
             {
-                var userDetails = new UserDetail[]
+                var playerDetails = new PlayerDetail[]
                 {
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Alex",
                         LastName ="Wilson",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="a0wilson@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Andy",
                         LastName ="Li",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Chris",
                         LastName ="Short",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Chris",
                         LastName ="Jeynes",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Chris",
                         LastName ="Allen",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Peter",
                         LastName ="Bracegirdle",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Mike",
                         LastName ="Constantino",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Simon",
                         LastName ="Evans",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Huw",
                         LastName ="John",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Daniel",
                         LastName ="Thrift",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Peter",
                         LastName ="Yau",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Victor",
                         LastName ="Pang",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Oliver",
                         LastName ="Harerty",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Thomas",
                         LastName ="Spurrier",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Chris",
                         LastName ="Killick",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Karen",
                         LastName ="Sylvester",
-                        Gender=context.Genders.Where(g => g.Name=="Female").FirstOrDefault(),
+                        Gender=context.Genders.Find(2),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Daniel",
                         LastName ="Rhodes",
-                        Gender=context.Genders.Where(g => g.Name=="Male").FirstOrDefault(),
+                        Gender=context.Genders.Find(1),
                         EmailAddress="test@yahoo.com"
                     },
-                    new UserDetail
+                    new PlayerDetail
                     {
                         FirstName ="Nicole",
                         LastName ="Walkley",
-                        Gender=context.Genders.Where(g => g.Name=="Female").FirstOrDefault(),
+                        Gender=context.Genders.Find(2),
                         EmailAddress="test@yahoo.com"
                     }
 
                 };
-                foreach (UserDetail ud in userDetails) context.UserDetails.Add(ud);
+                foreach (PlayerDetail ud in playerDetails) context.PlayerDetails.Add(ud);
                 context.SaveChanges();
             }
 
-            if (!context.ClubUsers.Any())
+            if (!context.ClubPlayers.Any())
             {
-                var generalUsers = context.UserDetails.ToList();
-                var clubUsers = new List<ClubUser>();
-;               foreach( UserDetail gu in generalUsers)
+                var playerDetails = context.PlayerDetails.ToList();
+                var clubPlayers = new List<ClubPlayer>();
+;               foreach( PlayerDetail playerDetail in playerDetails)
                 {
-                    var clubUser = new ClubUser
+                    var clubPlayer = new ClubPlayer
                     {
                         Club = context.Clubs.Find(1),
-                        UserDetail = gu,
+                        PlayerDetail = playerDetail,
                         IsActive = true,
-                        ClubUserStatus = context.ClubUserStatuses.Find(1)
+                        ClubPlayerStatus = context.ClubPlayerStatuses.Find(1)
                     };
-                    clubUsers.Add(clubUser);
+                    clubPlayers.Add(clubPlayer);
                 }
-                foreach (ClubUser cu in clubUsers) context.ClubUsers.Add(cu);
+                foreach (ClubPlayer cp in clubPlayers) context.ClubPlayers.Add(cp);
                 context.SaveChanges();
             }
 

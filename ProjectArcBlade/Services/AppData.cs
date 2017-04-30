@@ -12,11 +12,11 @@ namespace ProjectArcBlade.Services
             //Assume Alex Wilson is logged in.
             LeagueId = 1;
             ClubId = 1;
-            ClubUserId = 1;
+            ClubPlayerId = 1;
         }
 
         public int LeagueId { get; set; }
         public int ClubId { get; set; }
-        public int ClubUserId { get; set; }
+        public int ClubPlayerId { get; set; }
     }
 }

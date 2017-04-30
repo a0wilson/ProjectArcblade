@@ -14,7 +14,7 @@ namespace ProjectArcBlade.Models
         public string Description { get; set; }
         public bool IsActive { get; set; }
 
-        public ICollection<ClubUser> ClubUsers { get; set; }
+        public ICollection<ClubPlayer> ClubPlayers { get; set; }
         public ICollection<ClubSubscription> ClubSubscriptions { get; set; }
         public ICollection<ClubVenue> ClubVenues { get; set; }
         

@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models.TeamViewModels
 {
@@ -19,8 +15,6 @@ namespace ProjectArcBlade.Models.TeamViewModels
         public int GroupId { get; set; }
         [Display(Name = "Team")]
         public int TeamId { get; set; }
-        [Display(Name="Filter Available Players")]
-        public bool FilterAvailablePlayers { get; set; }
         [Display(Name="Team Status")]
         public TeamStatus TeamStatus { get; set; }
 

@@ -12,6 +12,6 @@ namespace ProjectArcBlade.Models
         [Required]
         public string Name { get; set; }
 
-        public ICollection<UserDetail> Users { get; set; }
+        public ICollection<PlayerDetail> Users { get; set; }
     }
 }

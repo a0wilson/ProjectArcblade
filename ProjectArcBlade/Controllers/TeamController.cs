@@ -27,7 +27,7 @@ namespace ProjectArcBlade.Controllers
             if (id == null) return NotFound();
 
             Team team = await _context.Teams
-                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubUsers)
+                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubPlayers)
                 .Include(t => t.LeagueClub).ThenInclude(lc => lc.League)
                 .Include(t => t.TeamPlayers)
                 .Include(t => t.Category)
@@ -122,9 +122,158 @@ namespace ProjectArcBlade.Controllers
         {
             return View(await _context.Teams.Include(t=>t.TeamStatus).Include(t=>t.LeagueClub).ThenInclude(lc=>lc.Club).ToListAsync());
         }
+        
+        //GET: Team/Organise/5
+        public IActionResult Organise(int? awayMatchTeamId, int? homeMatchTeamId)
+        {
+           
+            if(homeMatchTeamId != null) return RedirectToAction("OrganiseHomeMatchTeam", new { id = homeMatchTeamId });
+
+            if(awayMatchTeamId != null) return RedirectToAction("OrganiseAwayMatchTeam", new { id = awayMatchTeamId });
+
+            return RedirectToAction("Index");
+        }
+
+        //GET: TeamOrganise/HomeMatchTeam/10
+        public async Task<IActionResult> OrganiseHomeMatchTeam(SettingsService settingsService, int id)
+        {
+            var homeMatchTeam = await _context.HomeMatchTeams
+                .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubPlayers)
+                .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.League)
+                .Include(hmt => hmt.Team).ThenInclude(t => t.Category)
+                .Include(hmt => hmt.TeamStatus)
+                .Include(hmt => hmt.Match)
+                .Where(hmt => hmt.Id == id)
+                .SingleAsync();
+
+
+            //check rules
+            var maxGroupRuleValue = settingsService.GetSettingValue(_context, Constants.Setting.MaxGroupsPerTeam, homeMatchTeam.Team.LeagueClub.League.Id, homeMatchTeam.Team.Category.Id).Value;
+
+            var groups =
+                await _context.Groups
+                    .Where(g => g.Id <= maxGroupRuleValue)
+                    .Select(g => new SelectListItem { Value = g.Id.ToString(), Text = g.Name })
+                    .ToListAsync();
+            // set selected group id
+            var groupId = TempData["groupId"] == null ? 0 : int.Parse(TempData["groupId"].ToString());
+
+            var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(homeMatchTeam.Team.LeagueClub.Club.Id, homeMatchTeam.Team.Category.Id);
+
+            var matchPlayers = await _context.HomeMatchTeamGroupPlayers
+                .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cu => cu.PlayerDetail)
+                .Include(hmtgp => hmtgp.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Where(hmtgp => hmtgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == homeMatchTeam.Match.Id)
+                .ToListAsync();
+
+            var assignedTeamPlayers = matchPlayers
+                    .Select(mp => new SelectListItem { Value = mp.ClubPlayer.Id.ToString(), Text = String.Format("{0} {1} ({2})", mp.ClubPlayer.PlayerDetail.FirstName, mp.ClubPlayer.PlayerDetail.LastName, mp.HomeMatchTeamGroup.Group.Name) })
+                    .ToList();
+
+            var assignedPlayerIds = matchPlayers                
+                .Select(mp => mp.ClubPlayer.Id)
+                .ToArray();
+
+            var availablePlayers = clubPlayers
+                .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = String.Format("{0} {1}", cp.PlayerDetail.FirstName, cp.PlayerDetail.LastName)})
+                .ToList();
+
+            var viewModel = new OrganiseMatchTeamViewModel
+            {
+                HomeMatchTeamId = homeMatchTeam.Id,
+                Name = String.Format("{0} - {1}", homeMatchTeam.Team.LeagueClub.Club.Name, homeMatchTeam.Team.Name),
+                Status = homeMatchTeam.TeamStatus.Name,
+                Groups = groups,
+                GroupId = groupId,
+                AssignedMatchPlayers = assignedTeamPlayers,
+                AvailableMatchlayers = availablePlayers
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignToHomeMatch(SettingsService settingsService, OrganiseMatchTeamViewModel organiseMatchTeamViewModel)
+        {
+            TempData["groupId"] = organiseMatchTeamViewModel.GroupId;
+
+            if (ModelState.IsValid)
+            {
+                if (!(organiseMatchTeamViewModel.AvailableMatchPlayerIds == null))
+                {
+                    var homeMatchTeam = await _context.HomeMatchTeams
+                        .Include(hmt => hmt.Match)
+                        .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.League)
+                        .Include(hmt => hmt.Team).ThenInclude(t => t.Category)
+                        .Where(hmt => hmt.Id == organiseMatchTeamViewModel.HomeMatchTeamId)
+                        .SingleAsync();
+                    
+                    var group = await _context.Groups.FindAsync(organiseMatchTeamViewModel.GroupId);
+
+                    var settings = settingsService.GetSettingValues(_context, Constants.Setting.MaxPlayersPerGroup, homeMatchTeam.Team.LeagueClub.League.Id);
+                    var maxPlayersPerGroupRuleValue = settings.Where(r => r.Id == Constants.Setting.MaxPlayersPerGroup).Single().Value;
+                    var maxGroupsPerTeamRuleValue = settings.Where(r => r.Id == Constants.Setting.MaxGroupsPerTeam).Single().Value;
+                    var completedTeamValue = maxGroupsPerTeamRuleValue * maxPlayersPerGroupRuleValue;
+
+                    //determine how many current players there are and how many are being added.
+                    var currentTeamPlayers = await _context.HomeMatchTeamGroupPlayers
+                        .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cu => cu.PlayerDetail)
+                        .Include(hmtgp => hmtgp.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                        .Where(hmtgp => hmtgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == homeMatchTeam.Match.Id)
+                        .ToListAsync();
+                    var currentTeamPlayerCount = currentTeamPlayers.Count();
+                    var currentTeamPlayerGroupCount = currentTeamPlayers.Where(ctp => ctp.HomeMatchTeamGroup.Group.Id == group.Id).Count();
+                    var newTeamPlayersCount = organiseMatchTeamViewModel.AvailableMatchPlayerIds.Count();
+
+                    //if too many are being added show an error message.
+                    if ((currentTeamPlayerGroupCount + newTeamPlayersCount) > maxPlayersPerGroupRuleValue)
+                    {
+                        TempData["errorMessage"] = String.Format("The maximum amount of players allowed in each group is {0}", maxPlayersPerGroupRuleValue);
+                        return RedirectToAction("OrganiseHomeMatchTeam", new { id = organiseMatchTeamViewModel.HomeMatchTeamId });
+                    }
+
+                    //update the team status accordingly 
+                    var teamStatusId = Constants.TeamStatus.New;
+                    teamStatusId = currentTeamPlayerCount + newTeamPlayersCount == completedTeamValue ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
+                    homeMatchTeam.TeamStatus = _context.TeamStatuses.Find(teamStatusId);
+
+                    //get the current homeMatchTeamGroup
+                    var homeMatchTeamGroup = await _context.HomeMatchTeamGroups
+                        .Where(hmtg => hmtg.HomeMatchTeam.Id == homeMatchTeam.Id && hmtg.Group.Id == group.Id)
+                        .FirstOrDefaultAsync();
+
+                    //if it does not exist create it!
+                    if (homeMatchTeamGroup == null)
+                    {
+                        homeMatchTeamGroup = new HomeMatchTeamGroup
+                        {
+                            HomeMatchTeam = homeMatchTeam,
+                            Group = group
+                        };
+                        _context.HomeMatchTeamGroups.Add(homeMatchTeamGroup);
+                    }
+                    await _context.SaveChangesAsync(); //save all changes so far.
+
+                    foreach (int id in organiseMatchTeamViewModel.AvailableMatchPlayerIds)
+                    {
+                        var homeMatchTeamGroupPlayer = new HomeMatchTeamGroupPlayer
+                        {
+                            ClubPlayer = await _context.ClubPlayers.FindAsync(id),
+                            HomeMatchTeamGroup = homeMatchTeamGroup                            
+                        };
+                        _context.HomeMatchTeamGroupPlayers.Add(homeMatchTeamGroupPlayer);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return RedirectToAction("OrganiseHomeMatchTeam", new { id = organiseMatchTeamViewModel.HomeMatchTeamId });
+
+        }
 
         // GET: Team/Details/5
-        public async Task<IActionResult> Details(SettingsService settingsService, int? id, bool filterAvailablePlayers)
+        public async Task<IActionResult> Details(SettingsService settingsService, int? id)
         {
             if (id == null)
             {
@@ -132,7 +281,7 @@ namespace ProjectArcBlade.Controllers
             }
 
             Team team = await _context.Teams
-                .Include( t => t.LeagueClub).ThenInclude( lc => lc.Club).ThenInclude(c => c.ClubUsers)
+                .Include( t => t.LeagueClub).ThenInclude( lc => lc.Club).ThenInclude(c => c.ClubPlayers)
                 .Include(t => t.LeagueClub).ThenInclude(lc => lc.League)
                 .Include( t=> t.TeamPlayers)
                 .Include( t=> t.Category)
@@ -162,58 +311,20 @@ namespace ProjectArcBlade.Controllers
             var assignedTeamPlayers =
                 await _context.TeamPlayers
                     .Where(tp => tp.Team.Id == id)
-                    .Select(tp => new SelectListItem { Value = tp.Id.ToString(), Text = String.Format("{0} {1} ({2})", tp.ClubUser.UserDetail.FirstName, tp.ClubUser.UserDetail.LastName, tp.Group.Name) })
+                    .Select(tp => new SelectListItem { Value = tp.Id.ToString(), Text = String.Format("{0} {1} ({2})", tp.ClubPlayer.PlayerDetail.FirstName, tp.ClubPlayer.PlayerDetail.LastName, tp.Group.Name) })
                     .ToListAsync();
 
             var assignedPlayerIds = await _context.TeamPlayers
-                .Where(tp => tp.Team.Season.Id == team.Season.Id && tp.Team.Category.Id == team.Category.Id)
-                .Select(tp => tp.ClubUser.Id)
+                .Where(tp => tp.Team.Id == id)
+                .Select(tp => tp.ClubPlayer.Id)
                 .ToListAsync();
-                
-            var availableTeamPlayers = new List<SelectListItem>();
-            switch (team.Category.Id)
-            {
-                case Constants.Category.Mens:
-                    availableTeamPlayers = filterAvailablePlayers 
-                        ?
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id && !assignedPlayerIds.Contains(cu.Id) && cu.UserDetail.Gender.Id == Constants.Gender.Male)
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync()
-                        :
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id && cu.UserDetail.Gender.Id == Constants.Gender.Male)
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync();
-                    break;
-                case Constants.Category.Womens:
-                    availableTeamPlayers = filterAvailablePlayers
-                        ?
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id && !assignedPlayerIds.Contains(cu.Id) && cu.UserDetail.Gender.Id == Constants.Gender.Female)
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync()
-                        :
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id && cu.UserDetail.Gender.Id == Constants.Gender.Female)
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync();
-                    break;
-                default:
-                    availableTeamPlayers = filterAvailablePlayers
-                        ?
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id && !assignedPlayerIds.Contains(cu.Id))
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync()
-                        :
-                            await _context.ClubUsers
-                                .Where(cu => cu.Club.Id == team.LeagueClub.Club.Id)
-                                .Select(cu => new SelectListItem { Value = cu.Id.ToString(), Text = String.Format("{0} {1}", cu.UserDetail.FirstName, cu.UserDetail.LastName) })
-                                .ToListAsync();
-                    break;
-            }
-            
+
+            var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(team.LeagueClub.Club.Id, team.Category.Id);
+
+            var availableTeamPlayers = clubPlayers
+                .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = String.Format("{0} {1}", cp.PlayerDetail.FirstName, cp.PlayerDetail.LastName) })
+                .ToList();
+
             var manageTeamPlayersViewModel = new ManageTeamPlayersViewModel
             {
                 GroupId = groupId,
@@ -221,25 +332,36 @@ namespace ProjectArcBlade.Controllers
                 Groups = groups,
                 AssignedTeamPlayers = assignedTeamPlayers,
                 AvailableTeamPlayers = availableTeamPlayers,
-                FilterAvailablePlayers = filterAvailablePlayers,
                 TeamStatus = team.TeamStatus
             };
 
             return View(manageTeamPlayersViewModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult RefreshAvailablePlayers(ManageTeamPlayersViewModel manageTeamPlayersViewModel)
+        private async Task<List<ClubPlayer>> GetClubPlayersByClubAndCategoryAsync(int clubId, int categoryId)
         {
-            TempData["groupId"] = manageTeamPlayersViewModel.GroupId;
-            return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+            //return all clubplayers if category is mixed
+            if (categoryId == Constants.Category.Mixed)
+            {
+                return await _context.ClubPlayers
+                    .Include(cp => cp.PlayerDetail)
+                    .Where(cp => cp.Club.Id == clubId && cp.IsActive)
+                    .OrderBy(cp => cp.PlayerDetail.FirstName)
+                    .ToListAsync();
+            }
+
+            // return just men / women otherwise.
+            var genderFilterId = categoryId == Constants.Category.Mens ? Constants.Gender.Male : Constants.Gender.Female;
+            return await _context.ClubPlayers
+                .Include(cp => cp.PlayerDetail)
+                .Where(cp => cp.Club.Id == clubId && cp.IsActive && cp.PlayerDetail.Gender.Id == genderFilterId)
+                .OrderBy(cp => cp.PlayerDetail.FirstName)
+                .ToListAsync();
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Assign(SettingsService settingsService, ManageTeamPlayersViewModel manageTeamPlayersViewModel)
+        public async Task<IActionResult> AssignToTeam(SettingsService settingsService, ManageTeamPlayersViewModel manageTeamPlayersViewModel)
         {
             TempData["groupId"] = manageTeamPlayersViewModel.GroupId;
 
@@ -264,7 +386,7 @@ namespace ProjectArcBlade.Controllers
                     if((currentTeamPlayerGroupCount + newTeamPlayersCount) > maxPlayersPerGroupRuleValue)
                     {
                         TempData["errorMessage"] = String.Format("The maximum amount of players allowed in each group is {0}", maxPlayersPerGroupRuleValue);
-                        return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+                        return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId });
                     }
 
                     //update the team status accordingly 
@@ -276,7 +398,7 @@ namespace ProjectArcBlade.Controllers
                     {
                         var newTeamPlayer = new TeamPlayer
                         {
-                            ClubUser = await _context.ClubUsers.FindAsync(id),
+                            ClubPlayer = await _context.ClubPlayers.FindAsync(id),
                             Group = group,
                             Team = team                                                        
                         };
@@ -286,14 +408,14 @@ namespace ProjectArcBlade.Controllers
                     await _context.SaveChangesAsync();
                 }
                 
-                return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+                return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId });
             }
-            return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+            return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reassign(ManageTeamPlayersViewModel manageTeamPlayersViewModel)
+        public async Task<IActionResult> ReassignFromTeam(ManageTeamPlayersViewModel manageTeamPlayersViewModel)
         {
             TempData["groupId"] = manageTeamPlayersViewModel.GroupId;
 
@@ -315,10 +437,11 @@ namespace ProjectArcBlade.Controllers
                 }
                 
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+                return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId });
             }
-            return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId, filterAvailablePlayers = manageTeamPlayersViewModel.FilterAvailablePlayers });
+            return RedirectToAction("Details", new { id = manageTeamPlayersViewModel.TeamId });
         }
+
         // GET: Team/Create
         public async Task<IActionResult> Create(int leagueClubId)
         {

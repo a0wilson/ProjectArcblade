@@ -10,6 +10,6 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public ClubSubscription ClubSubscription { get; set; }
-        public ClubUser ClubUser { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
     }
 }

@@ -1,0 +1,68 @@
+@model ProjectArcBlade.Models.TeamViewModels.OrganiseMatchTeamViewModel
+
+@{
+    ViewData["Title"] = "Organise";
+}
+
+<h2>Organise</h2>
+
+
+<form asp-action="Details">
+    <div class="form-horizontal">
+        <h4>Team</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <div class="col-md-10" >
+                <p class="form-control-static">@Model.Name</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Status" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <p class="form-control-static">@Model.Status</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="GroupId" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="GroupId" asp-items="Model.Groups" class="form-control"></select>
+                <span asp-validation-for="GroupId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="AvailableMatchPlayerIds" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="AvailableMatchPlayerIds" asp-items="Model.AvailableMatchlayers" class="form-control"></select>
+                <span asp-validation-for="AvailableMatchPlayerIds" class="text-danger"></span>                
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" asp-action="AssignToHomeMatch" value="Assign" class="btn btn-default" />
+                @if (Model.AssignedMatchPlayers.Count == 0)
+                {
+                    <input type="submit" asp-action="AssignNominatedPlayersToHomeMatch" value="Assign Nominated Players" class="btn btn-default" />
+                }
+                
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="AssignedMatchPlayerIds" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="AssignedMatchPlayerIds" asp-items="Model.AssignedMatchPlayers" class="form-control"></select>
+                <span asp-validation-for="AssignedMatchPlayerIds" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" asp-action="ReassignFromHomeMatch" value="Reassign" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    <input asp-for="HomeMatchTeamId" />
+</form>
+<div>    
+    <a asp-action="Dashboard" asp-route-id="@Model.HomeMatchTeamId">Back to Dashboard</a>
+</div>
