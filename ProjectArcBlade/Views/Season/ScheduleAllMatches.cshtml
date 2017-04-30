@@ -5,54 +5,69 @@
 }
 
 <h2>Schedule Matches</h2>
-<p>
-    <a asp-action="ScheduleAllMatches" asp-controller="Season" asp-route-seasonId=2>Reschedule</a>
-</p>
+
+<form asp-action="ScheduleAllMatches">
+    <div class="form-horizontal">        
+        <div class="form-group">
+            <div class="col-md-offset-10 col-md-1">
+                <input type="submit" value="Schedule All Macthes" asp-route-seasonId=4 class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</form>
+
 <ul class="nav nav-tabs">
     @{var i = 1; }
-    @foreach (var divisionName in Model.DivisionNames)
+    @foreach (var division in Model.Divisions)
     {
-        <li class= "@(i==1?"active":"")"><a data-toggle="tab" href="#division@(i)">@divisionName</a></li>
+        <li class= "@(i==1?"active":"")"><a data-toggle="tab" href="#division@(i)">@division.Name (@division.Value)</a></li>
         i++;
     }
 </ul>
 
 <div class="tab-content">
     @{i = 1; }
-    @foreach (var divisionName in Model.DivisionNames)
+    @foreach (var division in Model.Divisions)
     {
-        
+
         <div id="division@(i)" class="tab-pane fade @(i==1?"in active":"")">
-            <h3>@divisionName</h3>
+            <h3>@division.Name</h3>
             <div>
                 <table class="table">
                     <thead>
                         <tr>
                             <th>
-                                Match
+                                Match (Home vs Away)
                             </th>
                             <th>
-                                Venue
+                                Category
                             </th>
                             <th>
                                 Scheduled Date
                             </th>
+                            <th>
+                                Venue
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var match in Model.MatchSchedules)
+                        @foreach (var match in Model.Matches)
                         {
-                            @if (match.DivisionName == divisionName)
+                            @if (match.HomeMatchTeam.Team.Division.Name == division.Name)
                             {
                                 <tr>
                                     <td>
-                                        @match.HomeTeamName vs @match.AwayTeamName
+                                        @match.HomeMatchTeam.Team.LeagueClub.Club.Name - @match.HomeMatchTeam.Team.Name vs @match.AwayMatchTeam.Team.LeagueClub.Club.Name - @match.AwayMatchTeam.Team.Name
                                     </td>
                                     <td>
-                                        @match.VenueName
+                                        @match.HomeMatchTeam.Team.Category.Name
                                     </td>
                                     <td>
-                                        @match.DisplayDate
+                                        @match.StartDate
+                                    </td>
+                                    <td>
+                                        @match.Venue.Name
+                                        
                                     </td>
                                 </tr>
                             }

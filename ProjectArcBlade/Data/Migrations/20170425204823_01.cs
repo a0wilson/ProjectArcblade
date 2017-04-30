@@ -542,8 +542,8 @@ namespace ProjectArcBlade.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     MatchTypeId = table.Column<int>(nullable: true),
                     SeasonId = table.Column<int>(nullable: true),
-                    StartDate = table.Column<DateTime>(nullable: false),
-                    StartTime = table.Column<DateTime>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: true),
+                    StartTime = table.Column<DateTime>(nullable: true),
                     VenueId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>

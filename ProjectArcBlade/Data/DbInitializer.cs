@@ -187,7 +187,8 @@ namespace ProjectArcBlade.Data
                     new Venue{Name="Sport Wales National Centre", AddressLine1="Sophia Close",Postcode="CF11 9SW" },
                     new Venue{Name="Llantrisant Leisure Centre", AddressLine1="Llantrisant", Postcode="CF72 8DJ"},
                     new Venue{Name="Western Leisure Centre", AddressLine1="Caerau Lane", Postcode="CF5 5HJ"},
-                    new Venue{Name="Holm View Leisure Centre", AddressLine1="Skomer Road", Postcode="CF62 9DA"}
+                    new Venue{Name="Holm View Leisure Centre", AddressLine1="Skomer Road", Postcode="CF62 9DA"},
+                    new Venue{Name="Cardiff Medical Centre Sports and Social Site", AddressLine1="Heath Hospital", Postcode="CF14 4XW"}
                 };
                 foreach (Venue v in venues) context.Venues.Add(v);
                 context.SaveChanges();
@@ -279,7 +280,7 @@ namespace ProjectArcBlade.Data
                     {
                         Club = context.Clubs.Find(6),
                         Venue = context.Venues.Find(4),
-                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Tuesday),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Thursday),
                         StartTime = new DateTime(1,1,1,19,30,0),
                         EndTime = new DateTime(1,1,1,22,30,0),
                         MaxMatches = 3
@@ -287,11 +288,11 @@ namespace ProjectArcBlade.Data
                     new ClubVenue
                     {
                         Club = context.Clubs.Find(4),
-                        Venue = context.Venues.Find(1),
-                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Thursday),
+                        Venue = context.Venues.Find(5),
+                        DayOfTheWeek = context.DaysOfTheWeek.Find(Constants.DayOfTheWeek.Tuesday),
                         StartTime = new DateTime(1,1,1,19,30,0),
                         EndTime = new DateTime(1,1,1,22,30,0),
-                        MaxMatches = 1
+                        MaxMatches = 2
                     },
                     new ClubVenue
                     {
@@ -324,7 +325,7 @@ namespace ProjectArcBlade.Data
                         StartDate = new DateTime(2016,9,1),
                         EndDate = new DateTime(2017,6,1),
                         League = context.Leagues.Find(1),
-                        IsActive = true
+                        IsActive = false
 
                     },
                     new Season {
@@ -332,6 +333,14 @@ namespace ProjectArcBlade.Data
                         StartDate = new DateTime(2016,9,1),
                         EndDate = new DateTime(2017,6,1),
                         League = context.Leagues.Find(2),
+                        IsActive = false
+                    },
+                    new Season
+                    {
+                        Name ="2017-2018",
+                        StartDate = new DateTime(2017,9,1),
+                        EndDate = new DateTime(2018,6,1),
+                        League = context.Leagues.Find(1),
                         IsActive = true
                     }
                 };
@@ -524,7 +533,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(1),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -533,7 +542,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(1),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -542,7 +551,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(2),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -551,7 +560,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(2),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -560,7 +569,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(3),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -569,7 +578,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(1),
                         Category = context.Categories.Find(Constants.Category.Womens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -577,8 +586,17 @@ namespace ProjectArcBlade.Data
                         Name = "Mens A",
                         LeagueClub = context.LeagueClubs.Find(4),
                         Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(4),
+                        TeamStatus = context.TeamStatuses.Find(1)
+                    },
+                    new Team
+                    {
+                        Name = "Mens B",
+                        LeagueClub = context.LeagueClubs.Find(4),
+                        Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(2),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -587,7 +605,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(5),
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -595,8 +613,8 @@ namespace ProjectArcBlade.Data
                         Name = "Mens A",
                         LeagueClub = context.LeagueClubs.Find(6),
                         Category = context.Categories.Find(Constants.Category.Mens),
-                        Division = context.Divisions.Find(3),
-                        Season = context.Seasons.Find(2),
+                        Division = context.Divisions.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -605,7 +623,7 @@ namespace ProjectArcBlade.Data
                         LeagueClub = context.LeagueClubs.Find(2),
                         Category = context.Categories.Find(Constants.Category.Womens),
                         Division = context.Divisions.Find(1),
-                        Season = context.Seasons.Find(2),
+                        Season = context.Seasons.Find(4),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                 };

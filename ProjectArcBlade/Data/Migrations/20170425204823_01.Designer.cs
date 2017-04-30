@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170420163305_01")]
+    [Migration("20170425204823_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -802,9 +802,9 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("SeasonId");
 
-                    b.Property<DateTime>("StartDate");
+                    b.Property<DateTime?>("StartDate");
 
-                    b.Property<DateTime>("StartTime");
+                    b.Property<DateTime?>("StartTime");
 
                     b.Property<int?>("VenueId");
 

@@ -21,10 +21,106 @@ namespace ProjectArcBlade.Controllers
             _context = context;    
         }
 
+        // GET: Team/Dashboard/5
+        public async Task<ActionResult> Dashboard(int? id)
+        {
+            if (id == null) return NotFound();
+
+            Team team = await _context.Teams
+                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubUsers)
+                .Include(t => t.LeagueClub).ThenInclude(lc => lc.League)
+                .Include(t => t.TeamPlayers)
+                .Include(t => t.Category)
+                .Include(t => t.Season)
+                .Include(t => t.TeamStatus)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var allLeagueMatches = await _context.Matches
+                .Include(m => m.Venue)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Where(m => (m.AwayMatchTeam.Team.Id == team.Id || m.HomeMatchTeam.Team.Id == team.Id)
+                    && m.MatchType.Id == Constants.MatchType.League)
+                .ToListAsync();
+
+            //set unmapped property - isHomeTeam
+            foreach (Match m in allLeagueMatches) m.isHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
+
+            var upcomingMatches = allLeagueMatches.Where(m => m.StartDate >= DateTime.Now).ToList();
+
+            var recentMatches = allLeagueMatches.Where(m => m.StartDate < DateTime.Now).ToList();
+
+            var leaguePosition = 0;
+            var leaguePoints = 0;
+            var totalMatchesWon = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Win) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Win))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);                    
+            var totalMatchesLost = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Loss) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Loss))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatchesDrawn = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Draw) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Draw))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatchesConceded = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Conceded) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Conceded))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatchesForfeited = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Forfeit) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Forfeit))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatchesPlayed = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id != Constants.ResultType.NoEntry) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id != Constants.ResultType.NoEntry))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatchesRemaining = allLeagueMatches
+                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry) ||
+                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry))
+                .Select(m => new { count = 1 })
+                .Sum(m => m.count);
+            var totalMatches = allLeagueMatches.Count.ToString();
+
+
+            var overview = new List<NameValuePair>
+            {
+                new NameValuePair {Name=Constants.OverviewStrings.LeaguePostion, Value = leaguePosition.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.LeaguePoints, Value = leaguePoints.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalWon, Value = totalMatchesWon.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalLost, Value = totalMatchesLost.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalDrawn, Value = totalMatchesDrawn.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalConceded, Value = totalMatchesConceded.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalForfeited, Value = totalMatchesForfeited.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalPlayed, Value = totalMatchesPlayed.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalRemaining, Value = totalMatchesRemaining.ToString()},
+                new NameValuePair {Name=Constants.OverviewStrings.TotalMatches, Value = totalMatches.ToString()},
+            };
+            
+            var viewModel = new DashboardTeamViewModel
+            {
+                Team = team,
+                UpcomingMatches = upcomingMatches,
+                RecentMatches = recentMatches,
+                Overview = overview
+            };
+
+            return View(viewModel);
+        }
+
         // GET: Team
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Teams.Include(t=>t.LeagueClub).ThenInclude(lc=>lc.Club).ToListAsync());
+            return View(await _context.Teams.Include(t=>t.TeamStatus).Include(t=>t.LeagueClub).ThenInclude(lc=>lc.Club).ToListAsync());
         }
 
         // GET: Team/Details/5
@@ -173,7 +269,7 @@ namespace ProjectArcBlade.Controllers
 
                     //update the team status accordingly 
                     var teamStatusId = Constants.TeamStatus.New;
-                    teamStatusId = currentTeamPlayerCount + currentTeamPlayerGroupCount == completedTeamValue ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
+                    teamStatusId = currentTeamPlayerCount + newTeamPlayersCount == completedTeamValue ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
                     team.TeamStatus = _context.TeamStatuses.Find(teamStatusId);
                                         
                     foreach (int id in manageTeamPlayersViewModel.AvailableTeamPlayerIds)
@@ -206,7 +302,12 @@ namespace ProjectArcBlade.Controllers
 
                 if(!(manageTeamPlayersViewModel.AssignedTeamPlayerIds == null))
                 {
-                    foreach(int id in manageTeamPlayersViewModel.AssignedTeamPlayerIds)
+                    var team = await _context.Teams.FindAsync(manageTeamPlayersViewModel.TeamId);
+                    var currentTeamPlayers = await _context.TeamPlayers.Include(tp => tp.Group).Where(t => t.Team.Id == team.Id).ToListAsync();
+                    var teamStatusId = currentTeamPlayers.Count() - manageTeamPlayersViewModel.AssignedTeamPlayerIds.Count() == 0 ? Constants.TeamStatus.New : Constants.TeamStatus.InProgress;
+                    team.TeamStatus = _context.TeamStatuses.Find(teamStatusId);
+
+                    foreach (int id in manageTeamPlayersViewModel.AssignedTeamPlayerIds)
                     {
                         var teamPlayer = await _context.TeamPlayers.Where(tp => tp.Id == id).SingleOrDefaultAsync();
                         _context.TeamPlayers.Remove(teamPlayer);

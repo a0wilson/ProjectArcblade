@@ -68,20 +68,39 @@ namespace ProjectArcBlade.Controllers
             return View(season);
         }
 
-        public IActionResult ScheduleAllMatches (MatchSchedulingService matchSchedulingService, int seasonId)
+        //GET
+        public async Task<IActionResult> ScheduleAllMatches (int seasonId)
         {
+            var matches = await _context.Matches
+                .Include(m => m.Venue)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Division)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Category)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.Division)
+                .Include(m => m.AwayMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Category)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .ToListAsync();
 
-            var matchSchedules = matchSchedulingService.ScheduleMatches(_context, seasonId);
-            var divisionNames = matchSchedules.GroupBy(ms => ms.DivisionName).Select(ms => ms.First()).Select(ms => ms.DivisionName).ToList();
+            var divisions = matches
+                .GroupBy(ms => ms.HomeMatchTeam.Team.Division.Name)
+                .Select(ms => new NameValuePair { Name = ms.First().HomeMatchTeam.Team.Division.Name, Value = ms.Count().ToString() })
+                .ToList();
+
             var viewModel = new ScheduleAllMatchesViewModel
             {
-                MatchSchedules = matchSchedules,
-                DivisionNames = divisionNames
+                Matches = matches,
+                Divisions = divisions
             };
             
             return View(viewModel);
         }
 
+        [HttpPost]
+        public IActionResult ScheduleAllMatches(MatchSchedulingService matchSchedulingService, int seasonId)
+        {
+            var matchSchedules = matchSchedulingService.ScheduleMatches(_context, seasonId);
+            return RedirectToAction("ScheduleAllMatches", new { seasonId = seasonId });
+        }
         // GET: Seasons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

@@ -15,6 +15,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
+                <th>
+                    Status
+                </th>
             <th></th>
         </tr>
     </thead>
@@ -25,6 +28,10 @@
                 @item.LeagueClub.Club.Name - @item.Name
             </td>
             <td>
+                @item.TeamStatus.Name
+            </td>
+            <td>
+                <a asp-action="Dashboard" asp-route-id="@item.Id">Dashboard</a> |
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id" asp-route-filterAvailablePlayers=true>Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>

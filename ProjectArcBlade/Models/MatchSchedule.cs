@@ -11,13 +11,10 @@ namespace ProjectArcBlade.Models
     {
         public int HomeTeamId { get; set; }
         public int HomeClubId { get; set; }
-        public string HomeTeamName { get; set; }
-        public string VenueName { get; set; }
+        public int VenueId { get; set; }
         public int AwayTeamId { get; set; }
-        public string AwayTeamName { get; set; }
         public DateTime? ScheduledDate { get; set; }
-        public string DisplayDate { get; set; }
-        public string DivisionName { get; set; }
+        public DateTime StartTime { get; set; }
         public Data.Constants.MatchScheduleRange Range { get; set; }
     }
 }

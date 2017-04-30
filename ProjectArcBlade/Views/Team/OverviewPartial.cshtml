@@ -1,0 +1,16 @@
+@model IEnumerable<NameValuePair>
+
+<h2>Overview</h2>
+<hr />
+<div class="well">
+    <ul class="list-group">
+        @foreach (var item in Model)
+        {
+            <li class="list-group-item">
+                <span class="badge">@item.Value</span>
+            @item.Name
+        </li>
+        }
+    </ul>
+</div>
+

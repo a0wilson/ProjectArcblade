@@ -10,6 +10,7 @@ namespace ProjectArcBlade.Services
 {
     public class MatchSchedulingService
     {
+        private ApplicationDbContext _context;
         private List<DateTime> _availableDates;
         private List<ExclusionDate> _exclusionDates;
         private List<MatchSchedule> _matchSchedules;
@@ -22,21 +23,23 @@ namespace ProjectArcBlade.Services
             //create a random number generator.
             var rng = new Random();
 
+            _context = context;
+
             _matchSchedules = new List<MatchSchedule>();
             
             //get the season we are working with.
-            _season = context.Seasons
+            _season = _context.Seasons
                 .Include(s => s.League)
                 .Where(s => s.Id == seasonId).Single();
 
             //get all exclusion dates entered for this season.
-            _exclusionDates = context.ExclusionDates
+            _exclusionDates = _context.ExclusionDates
                 .Include(ed => ed.LeagueClub).ThenInclude(lc => lc.Club)
                 .Include(ed => ed.Season)
                 .Where(ed => ed.Season.Id == seasonId).ToList();
             
             //get all teams entered for this season - with complete teams.
-            _teams = context.Teams
+            _teams = _context.Teams
                 .Include(t => t.Season)
                 .Include(t => t.Category)
                 .Include(t => t.Division)
@@ -48,7 +51,7 @@ namespace ProjectArcBlade.Services
                 //    && t.Season.Id == seasonId)
                 .ToList();
 
-            _clubVenues = context.ClubVenues
+            _clubVenues = _context.ClubVenues
                 .Include(cv => cv.DayOfTheWeek)
                 .Include(cv => cv.Club)
                 .Include(cv => cv.Venue)
@@ -79,15 +82,14 @@ namespace ProjectArcBlade.Services
                     if (homeTeamIds.Count() == 0) break; // if no teams returned then break the loop.
 
                     //handle instances of 1 team being returned.
-                    if (homeTeamIds.Count() == 1)
-                    {
-                        var matchSchedule = new MatchSchedule { HomeTeamId = -1, AwayTeamId = -1, ScheduledDate = null };
-                        matchSchedule.Range = Constants.MatchScheduleRange.Initial; //initial match.
-                        matchSchedule.HomeTeamId = homeTeamIds[0]; //store the single team id;
-                        matchSchedule.DivisionName = _teams.Where(t => t.Id == matchSchedule.HomeTeamId).Select(t => t.Division.Name).Single();
-                        _matchSchedules.Add(matchSchedule);
-                        break;
-                    }
+                    //if (homeTeamIds.Count() == 1)
+                    //{
+                    //    var matchSchedule = new MatchSchedule { HomeTeamId = -1, AwayTeamId = -1, ScheduledDate = null };
+                    //    matchSchedule.Range = Constants.MatchScheduleRange.Initial; //initial match.
+                    //    matchSchedule.HomeTeamId = homeTeamIds[0]; //store the single team id;
+                    //    _matchSchedules.Add(matchSchedule);
+                    //    break;
+                    //}
 
                     //only  attempt to schedule matches when there is more than 1 team in the division.
                     if (homeTeamIds.Count() > 0)
@@ -95,91 +97,71 @@ namespace ProjectArcBlade.Services
                         //loop through each home team
                         for (var h = 0; h < homeTeamIds.Count(); h++)
                         {
-                            var matchSchedule = new MatchSchedule { HomeTeamId = -1, AwayTeamId = -1, ScheduledDate = null };
-                            matchSchedule.Range = Constants.MatchScheduleRange.Initial; //initial match.
-                            matchSchedule.HomeTeamId = homeTeamIds[h]; //store homeTeamId
-                            matchSchedule.HomeClubId = _teams.Where(t => t.Id == matchSchedule.HomeTeamId).Select(t => t.LeagueClub.Club.Id).Single(); //set homeTeamClubId            
-                            matchSchedule.DivisionName = _teams.Where(t => t.Id == matchSchedule.HomeTeamId).Select(t => t.Division.Name).Single();
-
-                            //select a random awayTeam to play against the current homeTeam.
-                            var rngFail = true;
-                            while (rngFail)
+                            //take a subset of awayTeams which excludes the current homeTeamId
+                            var filteredAwayTeamsIds = awayTeamIds.Where(id => id != homeTeamIds[h]).ToList();
+                            
+                            if (filteredAwayTeamsIds.Count() > 0)
                             {
-                                var a = rng.Next(0, (awayTeamIds.Count()));
-                                if (homeTeamIds[h] != awayTeamIds[a])
+                                //select a random awayTeam to play against the current homeTeam.
+                                var awayGamesAvailable = true;
+                                while (awayGamesAvailable)
                                 {
-                                    matchSchedule.AwayTeamId = awayTeamIds[a]; //store awayTeamId                            
-                                    awayTeamIds.RemoveAt(a); //remove entry from awayTeamIds
-                                    rngFail = false;
+                                    var f = rng.Next(0, (filteredAwayTeamsIds.Count())); //get a random team id to play.
+                                    var matchSchedule = new MatchSchedule
+                                    {
+                                        HomeTeamId = -1,
+                                        AwayTeamId = -1,
+                                        ScheduledDate = null,
+                                        Range = Constants.MatchScheduleRange.Initial
+                                    };
+
+                                    matchSchedule.HomeTeamId = homeTeamIds[h]; //store homeTeamId
+                                    matchSchedule.HomeClubId = _teams.Where(t => t.Id == matchSchedule.HomeTeamId).Select(t => t.LeagueClub.Club.Id).Single(); //set homeTeamClubId            
+                                    matchSchedule.AwayTeamId = filteredAwayTeamsIds[f]; //store awayTeamId                            
+
+                                    //check if these teams have played before - if they have set the match to be a return match.
+                                    if(_matchSchedules.Where(ms=>ms.AwayTeamId == matchSchedule.HomeTeamId && ms.HomeTeamId == matchSchedule.AwayTeamId).Any())
+                                    {
+                                        matchSchedule.Range = Constants.MatchScheduleRange.Return; //return match.
+                                    }
+                                    
+                                    filteredAwayTeamsIds.RemoveAt(f); //remove entry from awayTeamIds
+                                    _matchSchedules.Add(matchSchedule); //add match to the list 
+
+                                    if (filteredAwayTeamsIds.Count() == 0) awayGamesAvailable = false;
                                 }
                             }
-
-                            _matchSchedules.Add(matchSchedule);
                         }
                     }
                 }
             }
             
-            //setup all return matches.
-            var returnMatches = new List<MatchSchedule>();
-            foreach(MatchSchedule ms in _matchSchedules)
+            //perform 2 passes when trying to schedule matches... 
+            //the second pass is only performed if unable to find a match date on the first pass.
+            //the second pass searches the whole season for a suitable date range.
+            //the first pass will try to schedule initial matches in the first half of the season and return matches in the second half.
+            for( var pass=1; pass<3; pass++)
             {
-                //only arrange return if home and away are > 1
-                if (ms.HomeTeamId > 0 && ms.AwayTeamId > 0)
-                {
-                    var returnMatch = new MatchSchedule();
-                    returnMatch.HomeTeamId = ms.AwayTeamId;
-                    returnMatch.HomeClubId = _teams.Where(t => t.Id == returnMatch.HomeTeamId).Select(t => t.LeagueClub.Club.Id).Single(); //set homeTeamClubId
-                    returnMatch.AwayTeamId = ms.HomeTeamId;
-                    returnMatch.DivisionName = ms.DivisionName;
-                    returnMatch.Range = Constants.MatchScheduleRange.Return;
-                    returnMatches.Add(returnMatch);
-                }                
-            }
-                        
-            //include the return matches in the matchSchedules
-            foreach (MatchSchedule rm in returnMatches) _matchSchedules.Add(rm);
-
-            //update the teamname display.
-            foreach(MatchSchedule ms in _matchSchedules)
-            {
-                if( ms.AwayTeamId > 0)
-                {
-                    ms.AwayTeamName = _teams
-                        .Where(t => t.Id == ms.AwayTeamId)
-                        .Select(t => t.LeagueClub.Club.Name + " - " + t.Name + " (" + t.TeamStatus.Name + ")").Single();
-                }
-
-                if( ms.HomeTeamId > 0)
-                {
-                    ms.HomeTeamName = _teams
-                        .Where(t => t.Id == ms.HomeTeamId)
-                        .Select(t => t.LeagueClub.Club.Name + " - " + t.Name + " (" + t.TeamStatus.Name + ")").Single();
-                }
-            }
-
-            //get dates for each match - depending on range. if hometeamdid and awayteamid are populated.
-            foreach (MatchSchedule ms in _matchSchedules)
-            {
-                if( ms.HomeTeamId > 0 && ms.AwayTeamId > 0)
-                {
-                    ms.ScheduledDate = GetMatchDate(ms.HomeTeamId, ms.AwayTeamId, ms.Range);
-                    ms.DisplayDate = Convert.ToDateTime(ms.ScheduledDate).ToString(Constants.DateFormat.Long);
-                    ms.VenueName = GetClubVenueName(ms.HomeTeamId, Convert.ToDateTime(ms.ScheduledDate));
-                }
-            }
-
-            //if there are still null dates then try once more but this time use the entire season as a date range.
-            if(_matchSchedules.Any(ms => ms.ScheduledDate == null && ms.HomeTeamId > 0 && ms.AwayTeamId > 0))
-            {
+                if (pass == 2 && !(_matchSchedules.Any(ms => ms.ScheduledDate == null && ms.HomeTeamId > 0 && ms.AwayTeamId > 0))) break;
+                    
+                //get dates for each match - depending on range. if hometeamdid and awayteamid are populated.
                 foreach (MatchSchedule ms in _matchSchedules)
                 {
-                    ms.ScheduledDate = GetMatchDate(ms.HomeTeamId, ms.AwayTeamId, Constants.MatchScheduleRange.Any);
-                    ms.DisplayDate = Convert.ToDateTime(ms.ScheduledDate).ToString(Constants.DateFormat.Long);
-                    ms.VenueName = GetClubVenueName(ms.HomeTeamId, Convert.ToDateTime(ms.ScheduledDate));
+                    if (ms.HomeTeamId > 0 && ms.AwayTeamId > 0)
+                    {
+                        ms.ScheduledDate = pass==1 ? GetMatchDate(ms.HomeTeamId, ms.AwayTeamId, ms.Range) : GetMatchDate(ms.HomeTeamId, ms.AwayTeamId, Constants.MatchScheduleRange.Any);
+                        if (ms.ScheduledDate != null)
+                        {
+                            ms.VenueId = GetClubVenueId(ms.HomeTeamId, Convert.ToDateTime(ms.ScheduledDate));
+                            ms.StartTime = GetClubVenueStartTime(ms.HomeTeamId, Convert.ToDateTime(ms.ScheduledDate));
+                        }
+                    }
                 }
             }
 
+            //Finally... create/update the matches!
+            foreach (MatchSchedule ms in _matchSchedules) CreateMatch(ms);
+            
             return _matchSchedules;
         }
         
@@ -231,11 +213,102 @@ namespace ProjectArcBlade.Services
             return null;
         }
 
-        private string GetClubVenueName(int teamId, DateTime date)
+        private int GetClubVenueId(int teamId, DateTime date)
         {
             var day = date.DayOfWeek.ToString().ToLower();
             var clubId = _teams.Where(t => t.Id == teamId).Select(t => t.LeagueClub.Club.Id).Single();
-            return _clubVenues.Where(cv => cv.Club.Id == clubId && cv.DayOfTheWeek.Name.ToLower() == day).Select(cv => cv.Venue.Name).Single();
+            return _clubVenues.Where(cv => cv.Club.Id == clubId && cv.DayOfTheWeek.Name.ToLower() == day).Select(cv => cv.Venue.Id).Single();
+        }
+
+        private DateTime GetClubVenueStartTime(int teamId, DateTime date)
+        {
+            var day = date.DayOfWeek.ToString().ToLower();
+            var clubId = _teams.Where(t => t.Id == teamId).Select(t => t.LeagueClub.Club.Id).Single();
+            return _clubVenues.Where(cv => cv.Club.Id == clubId && cv.DayOfTheWeek.Name.ToLower() == day).Select(cv => cv.StartTime).Single();
+        }
+
+        private bool CreateMatch(MatchSchedule match)
+        {
+            //only create/update match if home and away team are populated and a match date has been found.
+            if (match.AwayTeamId > 0 && match.HomeTeamId > 0 )
+            {
+                //check if this match already exists.
+                var matchExists = _context.Matches
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team)
+                .Where(m => m.HomeMatchTeam.Team.Id == match.HomeTeamId
+                    && m.AwayMatchTeam.Team.Id == match.AwayTeamId
+                    && m.Season.Id == _season.Id).Any();
+
+                if (matchExists)
+                {
+                    UpdateMatch(match);
+                }
+                else
+                {
+
+                    var matchType = _context.MatchTypes.Find(Constants.MatchType.League);
+                    var season = _context.Seasons.Find(_season.Id);
+                    var venue = _context.Venues.Find(match.VenueId);
+
+                    var newLeagueMatch = new Match
+                    {
+                        MatchType = matchType,
+                        Season = season,
+                        Venue = venue,
+                        StartDate = Convert.ToDateTime(match.ScheduledDate),
+                        StartTime = match.StartTime
+                    };
+                    _context.Matches.Add(newLeagueMatch);
+                    //_context.SaveChanges();
+
+                    var homeMatchTeam = new HomeMatchTeam
+                    {
+                        Match = newLeagueMatch,
+                        ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
+                        Team = _context.Teams.Find(match.HomeTeamId)
+                    };
+                    _context.HomeMatchTeams.Add(homeMatchTeam);
+                    //_context.SaveChanges();
+
+                    var awayMatchTeam = new AwayMatchTeam
+                    {
+                        Match = newLeagueMatch,
+                        ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
+                        Team = _context.Teams.Find(match.AwayTeamId)
+                    };
+                    _context.AwayMatchTeams.Add(awayMatchTeam);
+                    _context.SaveChanges();
+
+                }
+            }
+            return true;
+        }
+
+        private bool UpdateMatch(MatchSchedule match)
+        {
+            var updateMatch = _context.Matches
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
+                .Where(m => m.HomeMatchTeam.Team.Id == match.HomeTeamId
+                    && m.AwayMatchTeam.Team.Id == match.AwayTeamId
+                    && m.Season.Id == _season.Id).Single();
+
+            //only update match if it not yet started.
+            if( updateMatch.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry 
+                    && updateMatch.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry )
+            {
+                updateMatch.Venue = _context.Venues.Find(match.VenueId);
+                updateMatch.StartDate = Convert.ToDateTime(match.ScheduledDate);
+                updateMatch.StartTime = match.StartTime;
+
+                _context.Matches.Update(updateMatch);
+                _context.SaveChanges();
+            }
+            
+            return true;
         }
     }
 }

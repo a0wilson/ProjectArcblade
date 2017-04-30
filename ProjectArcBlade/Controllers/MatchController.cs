@@ -37,8 +37,8 @@ namespace ProjectArcBlade.Controllers
                 .Select(m => new DisplayMatchViewModel
                 {
                     Id = m.Id,
-                    StartDate = m.StartDate.ToString(Constants.DateFormat.Long),
-                    StartTime = m.StartTime.ToString(Constants.TimeFormat.Short),
+                    StartDate = Convert.ToDateTime(m.StartDate).ToString(Constants.DateFormat.Long),
+                    StartTime = Convert.ToDateTime(m.StartTime).ToString(Constants.TimeFormat.Short),
                     HomeTeam = String.Format("{0} - {1}", m.HomeMatchTeam.Team.LeagueClub.Club.Name, m.HomeMatchTeam.Team.Name),
                     AwayTeam = String.Format("{0} - {1}", m.AwayMatchTeam.Team.LeagueClub.Club.Name, m.AwayMatchTeam.Team.Name)
                         

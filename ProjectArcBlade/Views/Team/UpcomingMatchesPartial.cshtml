@@ -1,0 +1,33 @@
+@model ProjectArcBlade.Models.TeamViewModels.DashboardTeamViewModel
+
+<h2>Upcoming Matches</h2>
+<hr />
+<div class="well">
+    @if (Model.UpcomingMatches.Count != 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Vs</th>
+                    <th>Venue</th>
+                    <th>Match Date</th>                                    
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.UpcomingMatches)
+                {
+                    var isHome = item.AwayMatchTeam.Team.Id == Model.Team.Id ? false : true;
+                    <tr>
+                        <td>@(isHome ? item.AwayMatchTeam.Team.LeagueClub.Club.Name + " - " + item.AwayMatchTeam.Team.Name : item.HomeMatchTeam.Team.LeagueClub.Club.Name + " - " + item.HomeMatchTeam.Team.Name)</td>
+                        <td>@item.Venue.Name</td>
+                        <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>
+                        <td>
+                            <a asp-action="Organise" asp-route-homeMatchTeamid="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())">Organise</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

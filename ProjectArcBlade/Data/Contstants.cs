@@ -66,6 +66,17 @@
             public const int Sunday = 7;
         }
 
+        public static class ResultType
+        {
+            public const int NoEntry = 1;
+            public const int Win = 2;
+            public const int Loss = 3;
+            public const int Draw = 4;
+            public const int Forfeit = 5;
+            public const int Pending = 6;
+            public const int Conceded = 7;
+        }
+
         public static class CreateMatchStrings
         {
             public const string MatchTypeId = "MatchTypeId";
@@ -80,6 +91,20 @@
             public const string AwayTeamHandicap = "AwayTeamHandicap";
             public const string StartTime = "StartTime";
             public const string ScheduledDate = "ScheduledDate";
+        }
+
+        public static class OverviewStrings
+        {
+            public const string LeaguePostion = "League Postition";
+            public const string LeaguePoints = "League Points";
+            public const string TotalWon = "Total Matches Won";
+            public const string TotalLost = "Total Matches Lost";
+            public const string TotalDrawn = "Total Matches Drawn ";
+            public const string TotalConceded = "Total Matches Conceded";
+            public const string TotalForfeited = "Total Matches Forfeited";
+            public const string TotalPlayed = "Total Matches Played";
+            public const string TotalRemaining = "Total Matches Remaining";
+            public const string TotalMatches = "Total Matches";
         }
     }
     

@@ -801,9 +801,9 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("SeasonId");
 
-                    b.Property<DateTime>("StartDate");
+                    b.Property<DateTime?>("StartDate");
 
-                    b.Property<DateTime>("StartTime");
+                    b.Property<DateTime?>("StartTime");
 
                     b.Property<int?>("VenueId");
 
