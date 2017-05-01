@@ -260,22 +260,22 @@ namespace ProjectArcBlade.Services
                         StartTime = match.StartTime
                     };
                     _context.Matches.Add(newLeagueMatch);
-                    //_context.SaveChanges();
 
                     var homeMatchTeam = new HomeMatchTeam
                     {
                         Match = newLeagueMatch,
                         ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
-                        Team = _context.Teams.Find(match.HomeTeamId)
+                        Team = _context.Teams.Find(match.HomeTeamId),
+                        TeamStatus = _context.TeamStatuses.Find(Constants.TeamStatus.New)
                     };
                     _context.HomeMatchTeams.Add(homeMatchTeam);
-                    //_context.SaveChanges();
 
                     var awayMatchTeam = new AwayMatchTeam
                     {
                         Match = newLeagueMatch,
                         ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
-                        Team = _context.Teams.Find(match.AwayTeamId)
+                        Team = _context.Teams.Find(match.AwayTeamId),
+                        TeamStatus = _context.TeamStatuses.Find(Constants.TeamStatus.New)
                     };
                     _context.AwayMatchTeams.Add(awayMatchTeam);
                     _context.SaveChanges();

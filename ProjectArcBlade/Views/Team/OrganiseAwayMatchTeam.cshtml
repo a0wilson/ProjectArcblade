@@ -47,10 +47,10 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" asp-action="AssignToHomeMatch" value="Assign" class="btn btn-default" />
+                <input type="submit" asp-action="AssignToAwayMatch" value="Assign" class="btn btn-default" />
                 @if (Model.AssignedMatchPlayers.Count == 0)
                 {
-                    <input type="submit" asp-action="AssignNominatedPlayersToHomeMatch" value="Assign Nominated Players" class="btn btn-default" />
+                    <input type="submit" asp-action="AssignNominatedPlayersToAwayMatch" value="Assign Nominated Players" class="btn btn-default" />
                 }
 
             </div>
@@ -64,7 +64,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" asp-action="ReassignFromHomeMatch" value="Reassign" class="btn btn-default" />
+                <input type="submit" asp-action="ReassignFromAwayMatch" value="Reassign" class="btn btn-default" />
             </div>
         </div>
         @if (Model.Warnings.Count > 0)
@@ -85,7 +85,7 @@
             </div>
         }
     </div>
-    <input asp-for="HomeMatchTeamId" />
+    <input asp-for="AwayMatchTeamId" />
 </form>
 <div>
     <a asp-action="Dashboard" asp-route-id="@Model.TeamId">Back to Dashboard</a>

@@ -19,7 +19,9 @@ namespace ProjectArcBlade.Models.TeamViewModels
         public int HomeMatchTeamId { get; set; }
         [HiddenInput]
         public int AwayMatchTeamId { get; set; }
+        public int TeamId { get; set; }
 
+        public List<NameValuePair> Warnings { get; set; }
         public List<SelectListItem> AvailableMatchlayers { get; set; }
         public List<SelectListItem> AssignedMatchPlayers { get; set; }
         public List<SelectListItem> Groups { get; set; }

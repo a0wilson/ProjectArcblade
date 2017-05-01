@@ -74,7 +74,7 @@ namespace ProjectArcBlade.Data
         public DbSet<CategoryRule> CategoryRules { get; set; }
 
         public DbSet<ExclusionDate> ExclusionDates { get; set; }
-        public DbSet<PointScore> PointScores { get; set; }        
+        public DbSet<PointScore> PointScores { get; set; }
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -116,6 +116,7 @@ namespace ProjectArcBlade.Data
                 .HasOne(m => m.HomeMatchTeam)
                 .WithOne(hmt => hmt.Match)
                 .HasForeignKey<HomeMatchTeam>(amt => amt.MatchId);
+
             builder.Entity<RescheduledStartDate>().ToTable("RescheduledStartDate");
 
             builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");

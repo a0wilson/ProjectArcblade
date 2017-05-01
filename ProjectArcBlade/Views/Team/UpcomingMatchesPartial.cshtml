@@ -8,10 +8,10 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Vs</th>
                     <th>Venue</th>
                     <th>Match Date</th>                                    
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -19,15 +19,21 @@
                 {
                     var isHome = item.AwayMatchTeam.Team.Id == Model.Team.Id ? false : true;
                     <tr>
-                        <td>@(isHome ? item.AwayMatchTeam.Team.LeagueClub.Club.Name + " - " + item.AwayMatchTeam.Team.Name : item.HomeMatchTeam.Team.LeagueClub.Club.Name + " - " + item.HomeMatchTeam.Team.Name)</td>
-                        <td>@item.Venue.Name</td>
-                        <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>
                         <td>
-                            <a asp-action="Organise" asp-route-homeMatchTeamId="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())">Organise</a>
+                            
+                            <a title="Organise" asp-action="Organise" asp-route-homeMatchTeamId="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())"><span class="glyphicon glyphicon-edit"></span> Organise</a> 
+                            | <a title="Preview" asp-action="Preview" asp-controller="Match" asp-route-id="@item.HomeMatchTeam.Match.Id"><span class="glyphicon glyphicon-play-circle"></span> Preview</a>
                         </td>
+                        <td>@(isHome ? item.AwayMatchTeam.Team.LeagueClub.Club.Name + " - " + item.AwayMatchTeam.Team.Name : item.HomeMatchTeam.Team.LeagueClub.Club.Name + " - " + item.HomeMatchTeam.Team.Name) @if (isHome) { <span class="label label-primary">Home</span> } else { <span class="label label-default">Away</span> }</td>
+                        <td>@item.Venue.Name</td>
+                        <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>                        
                     </tr>
                 }
             </tbody>
         </table>
+    }
+    else
+    {
+        <div>There are no upcoming matches</div>
     }
 </div>

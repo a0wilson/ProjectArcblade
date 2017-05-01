@@ -11,30 +11,26 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#overview">Overview</a></li>
-            <li><a data-toggle="tab" href="#upcomingMatches">Upcoming Matches <span class="badge">@Model.UpcomingMatches.Count()</span></a></li>
+            <li class="active"><a data-toggle="tab" href="#upcomingMatches">Upcoming Matches <span class="badge">@Model.UpcomingMatches.Count()</span></a></li>
             <li><a data-toggle="tab" href="#recentMatches">Recent Matches <span class="badge">@Model.RecentMatches.Count()</span></a></li>
+            <li><a data-toggle="tab" href="#overview">Overview</a></li>
             <li><a data-toggle="tab" href="#admin">Admin</a></li>
         </ul>
 
-        <div class="tab-content">
-            <div id="overview" class="tab-pane fade in active">
-                @Html.Partial("OverviewPartial", Model.Overview)
-            </div>
-            <div id="upcomingMatches" class="tab-pane fade">
+        <div class="tab-content">            
+            <div id="upcomingMatches" class="tab-pane fade in active">
                 @Html.Partial("UpcomingMatchesPartial", Model)
             </div>
             <div id="recentMatches" class="tab-pane fade">
                 @Html.Partial("RecentMatchesPartial", Model)
             </div>
+            <div id="overview" class="tab-pane fade">
+                @Html.Partial("OverviewPartial", Model.Overview)
+            </div>
             <div id="admin" class="tab-pane fade">
                 <h3>Admin</h3>
             </div>
-        </div>
-        
-        
-        
-        
+        </div>  
     </div>
 </div>
 

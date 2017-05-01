@@ -67,6 +67,41 @@ namespace ProjectArcBlade.Controllers
             return View(match);
         }
 
+        //GET: Match/Preview/5
+        public async Task<IActionResult> Preview( int id)
+        {
+            var match = await _context.Matches
+                .Include(m => m.Venue)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.TeamStatus)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Division)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Category)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.TeamStatus)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Where(m => m.Id == id)
+                .SingleAsync();
+
+            var awayTeamPlayers = await _context.AwayMatchTeamGroupPlayers
+                .Include(amtgp => amtgp.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
+                .Include(amtgp => amtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
+                .Where(amtgp => amtgp.AwayMatchTeamGroup.AwayMatchTeam.Match.Id == id)
+                .ToListAsync();
+
+            var homeTeamPlayers = await _context.HomeMatchTeamGroupPlayers
+                .Include(hmtgp => hmtgp.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
+                .Where(htmgp => htmgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == id)
+                .ToListAsync();
+
+            var viewModel = new PreviewMatchViewModel
+            {
+                Match = match,
+                AwayTeamPlayers = awayTeamPlayers,
+                HomeTeamPlayers = homeTeamPlayers
+            };
+
+            return View(viewModel);
+        }
 
         // GET: Match/CreateStep1
         public async Task<IActionResult> CreateStep1(int leagueId)

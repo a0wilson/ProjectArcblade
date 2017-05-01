@@ -106,6 +106,11 @@
             public const string TotalRemaining = "Total Matches Remaining";
             public const string TotalMatches = "Total Matches";
         }
+
+        public static class TeamStrings
+        {
+            public const string AssignedMultipleTimes = "{0} {1} has been assigned multiple times";
+        }
     }
     
 }
