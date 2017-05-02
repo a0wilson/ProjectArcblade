@@ -8,6 +8,9 @@ namespace ProjectArcBlade.Models
     public class AwayMatchTeamCaptain
     {
         public int Id { get; set; }
-        public AwayMatchTeamGroupPlayer AwayMatchTeamGroupPlayer { get; set; }
+        public AwayMatchTeam AwayMatchTeam { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
+
+        public int AwayMatchTeamId { get; set; }
     }
 }

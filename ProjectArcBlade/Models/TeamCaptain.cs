@@ -9,6 +9,9 @@ namespace ProjectArcBlade.Models
     public class TeamCaptain
     {
         public int Id { get; set; }
-        public TeamPlayer TeamPlayer { get; set; }
+        public Team Team { get; set; }
+        public ClubPlayer ClubPlayer { get; set; }
+        
+        public int TeamId { get; set; }
     }
 }

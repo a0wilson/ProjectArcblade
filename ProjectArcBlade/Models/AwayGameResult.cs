@@ -9,11 +9,11 @@ namespace ProjectArcBlade.Models
     public class AwayGameResult
     {
         public int Id { get; set; }
+        public Game Game { get; set; }        
         public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
-
-        [Display(Name = "Result")]
         public ResultType ResultType { get; set; }
 
+        public int GameId { get; set; }
         public ICollection<AwayGameResultScore> AwayGameResultScores { get; set; }
     }
 }

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class HomeMatchTeamGroupPlayer
+    public class Game
     {
         public int Id { get; set; }
+        public Match Match { get; set; }
+        public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
         public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
-        public ClubPlayer ClubPlayer { get; set; }
+
+        public AwayGameResult AwayGameResult { get; set; }
+        public HomeGameResult HomeGameResult { get; set; }
     }
 }

@@ -368,6 +368,16 @@ namespace ProjectArcBlade.Controllers
                     .Select(mp => new SelectListItem { Value = mp.Id.ToString(), Text = String.Format("{0} {1} ({2})", mp.ClubPlayer.PlayerDetail.FirstName, mp.ClubPlayer.PlayerDetail.LastName, mp.HomeMatchTeamGroup.Group.Name) })
                     .ToList();
 
+            var assignedClubPlayers = matchPlayers
+                    .Select(mp => new SelectListItem { Value = mp.ClubPlayer.Id.ToString(), Text = String.Format("{0} {1}", mp.ClubPlayer.PlayerDetail.FirstName, mp.ClubPlayer.PlayerDetail.LastName) })
+                    .ToList();
+            //set captain id
+            var captainId = await _context.HomeMatchTeamCaptains
+                .Include(hmtc => hmtc.ClubPlayer)
+                .Where(hmtc => hmtc.HomeMatchTeamId == homeMatchTeam.Id && hmtc.ClubPlayer != null)
+                .Select(hmtc => hmtc.ClubPlayer.Id)
+                .FirstOrDefaultAsync();
+            
             var assignedPlayerIds = matchPlayers                
                 .Select(mp => mp.ClubPlayer.Id)
                 .ToArray();
@@ -403,7 +413,9 @@ namespace ProjectArcBlade.Controllers
                 Status = homeMatchTeam.TeamStatus.Name,
                 Groups = groups,
                 GroupId = groupId,
-                AssignedMatchPlayers = assignedTeamPlayers,
+                AssignedClubPlayers = assignedClubPlayers,
+                CaptainId = captainId,
+                AssignedMatchPlayers = assignedTeamPlayers,                
                 AvailableMatchlayers = availablePlayers,
                 Warnings = warnings
             };
@@ -490,13 +502,29 @@ namespace ProjectArcBlade.Controllers
             return RedirectToAction("OrganiseHomeMatchTeam", new { id = organiseMatchTeamViewModel.HomeMatchTeamId });
 
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetTeamCaptain(TeamService teamService, OrganiseMatchTeamViewModel organiseMatchTeamViewModel)
+        {
+            TempData["groupId"] = organiseMatchTeamViewModel.GroupId;
+
+            if (ModelState.IsValid)
+            {
+                if (organiseMatchTeamViewModel.HomeMatchTeamId != 0) await teamService.UpdateMatchTeamCaptainAsync<HomeMatchTeam>(_context, organiseMatchTeamViewModel.HomeMatchTeamId, organiseMatchTeamViewModel.CaptainId);
+                if (organiseMatchTeamViewModel.AwayMatchTeamId != 0) await teamService.UpdateMatchTeamCaptainAsync<AwayMatchTeam>(_context, organiseMatchTeamViewModel.AwayMatchTeamId, organiseMatchTeamViewModel.CaptainId);
+            }
+            if (organiseMatchTeamViewModel.HomeMatchTeamId != 0) return RedirectToAction("OrganiseHomeMatchTeam", new { id = organiseMatchTeamViewModel.HomeMatchTeamId });
+            if (organiseMatchTeamViewModel.AwayMatchTeamId != 0) return RedirectToAction("OrganiseAwayMatchTeam", new { id = organiseMatchTeamViewModel.AwayMatchTeamId });
+
+            return NoContent();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ReassignFromHomeMatch(OrganiseMatchTeamViewModel organiseMatchTeamViewModel)
+        public async Task<IActionResult> ReassignFromHomeMatch(TeamService teamService, OrganiseMatchTeamViewModel organiseMatchTeamViewModel)
         {
             TempData["groupId"] = organiseMatchTeamViewModel.GroupId;
-            
+
             if (ModelState.IsValid)
             {   
                 if (!(organiseMatchTeamViewModel.AssignedMatchPlayerIds == null))
@@ -519,7 +547,14 @@ namespace ProjectArcBlade.Controllers
 
                     foreach (int id in organiseMatchTeamViewModel.AssignedMatchPlayerIds)
                     {
-                        var homeMatchTeamGroupPlayer = await _context.HomeMatchTeamGroupPlayers.Where(hmtgp => hmtgp.Id == id).SingleOrDefaultAsync();
+                        var homeMatchTeamGroupPlayer = await _context.HomeMatchTeamGroupPlayers
+                            .Include(hmtgp => hmtgp.ClubPlayer)
+                            .Where(hmtgp => hmtgp.Id == id)
+                            .SingleOrDefaultAsync();
+
+                        //clear the captain slot if the player is being removed from the team.
+                        if(homeMatchTeamGroupPlayer.ClubPlayer.Id == organiseMatchTeamViewModel.CaptainId) await teamService.UpdateMatchTeamCaptainAsync<HomeMatchTeam>(_context, homeMatchTeam.Id, 0);
+
                         _context.HomeMatchTeamGroupPlayers.Remove(homeMatchTeamGroupPlayer);
                     }
                 }

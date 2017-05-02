@@ -35,6 +35,7 @@
                                         <li class="list-group-item">
                                             <span class="badge">@player.HomeMatchTeamGroup.Group.Name</span>
                                             @player.ClubPlayer.PlayerDetail.FirstName  @player.ClubPlayer.PlayerDetail.LastName
+                                            @if(player.ClubPlayer.Id == Model.HomeTeamCaptainId) { <span class="label label-success">Captain</span>}
                                         </li>
                                     }
                                 </ul>

@@ -217,11 +217,16 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("AwayMatchTeamGroupId");
 
+                    b.Property<int>("GameId");
+
                     b.Property<int?>("ResultTypeId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AwayMatchTeamGroupId");
+
+                    b.HasIndex("GameId")
+                        .IsUnique();
 
                     b.HasIndex("ResultTypeId");
 
@@ -233,23 +238,23 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AwayGameResultId");
-
-                    b.Property<int?>("ClubPlayerId");
+                    b.Property<int?>("AwayGameResultId");
 
                     b.Property<DateTime>("DateSubmitted");
 
-                    b.Property<int?>("Score");
+                    b.Property<int>("Score");
 
                     b.Property<int?>("ScoreStatusId");
+
+                    b.Property<int?>("SubmittedByClubPlayerId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AwayGameResultId");
 
-                    b.HasIndex("ClubPlayerId");
-
                     b.HasIndex("ScoreStatusId");
+
+                    b.HasIndex("SubmittedByClubPlayerId");
 
                     b.ToTable("AwayGameResultScore");
                 });
@@ -286,11 +291,16 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("AwayMatchTeamGroupPlayerId");
+                    b.Property<int>("AwayMatchTeamId");
+
+                    b.Property<int?>("ClubPlayerId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AwayMatchTeamGroupPlayerId");
+                    b.HasIndex("AwayMatchTeamId")
+                        .IsUnique();
+
+                    b.HasIndex("ClubPlayerId");
 
                     b.ToTable("AwayMatchTeamCaptain");
                 });
@@ -600,6 +610,28 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("ExclusionDate");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.Game", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("AwayMatchTeamGroupId");
+
+                    b.Property<int?>("HomeMatchTeamGroupId");
+
+                    b.Property<int?>("MatchId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AwayMatchTeamGroupId");
+
+                    b.HasIndex("HomeMatchTeamGroupId");
+
+                    b.HasIndex("MatchId");
+
+                    b.ToTable("Game");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Gender", b =>
                 {
                     b.Property<int>("Id")
@@ -631,11 +663,16 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("GameId");
+
                     b.Property<int?>("HomeMatchTeamGroupId");
 
                     b.Property<int?>("ResultTypeId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GameId")
+                        .IsUnique();
 
                     b.HasIndex("HomeMatchTeamGroupId");
 
@@ -649,23 +686,23 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("ClubPlayerId");
-
                     b.Property<DateTime>("DateSubmitted");
 
-                    b.Property<int>("HomeGameResultId");
+                    b.Property<int?>("HomeGameResultId");
 
-                    b.Property<int?>("Score");
+                    b.Property<int>("Score");
 
                     b.Property<int?>("ScoreStatusId");
 
-                    b.HasKey("Id");
+                    b.Property<int?>("SubmittedByClubPlayerId");
 
-                    b.HasIndex("ClubPlayerId");
+                    b.HasKey("Id");
 
                     b.HasIndex("HomeGameResultId");
 
                     b.HasIndex("ScoreStatusId");
+
+                    b.HasIndex("SubmittedByClubPlayerId");
 
                     b.ToTable("HomeGameResultScore");
                 });
@@ -702,11 +739,16 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("HomeMatchTeamGroupPlayerId");
+                    b.Property<int?>("ClubPlayerId");
+
+                    b.Property<int>("HomeMatchTeamId");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HomeMatchTeamGroupPlayerId");
+                    b.HasIndex("ClubPlayerId");
+
+                    b.HasIndex("HomeMatchTeamId")
+                        .IsUnique();
 
                     b.ToTable("HomeMatchTeamCaptain");
                 });
@@ -1045,9 +1087,18 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int?>("ClubPlayerId");
+
+                    b.Property<int>("TeamId");
+
                     b.Property<int?>("TeamPlayerId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClubPlayerId");
+
+                    b.HasIndex("TeamId")
+                        .IsUnique();
 
                     b.HasIndex("TeamPlayerId");
 
@@ -1171,6 +1222,11 @@ namespace ProjectArcBlade.Data.Migrations
                         .WithMany("AwayGameResults")
                         .HasForeignKey("AwayMatchTeamGroupId");
 
+                    b.HasOne("ProjectArcBlade.Models.Game", "Game")
+                        .WithOne("AwayGameResult")
+                        .HasForeignKey("ProjectArcBlade.Models.AwayGameResult", "GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ProjectArcBlade.Models.ResultType", "ResultType")
                         .WithMany("AwayGameResults")
                         .HasForeignKey("ResultTypeId");
@@ -1180,16 +1236,15 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     b.HasOne("ProjectArcBlade.Models.AwayGameResult", "AwayGameResult")
                         .WithMany("AwayGameResultScores")
-                        .HasForeignKey("AwayGameResultId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "ClubPlayer")
-                        .WithMany("AwayGameResultScores")
-                        .HasForeignKey("ClubPlayerId");
+                        .HasForeignKey("AwayGameResultId");
 
                     b.HasOne("ProjectArcBlade.Models.ScoreStatus", "ScoreStatus")
                         .WithMany("AwayGameResultScores")
                         .HasForeignKey("ScoreStatusId");
+
+                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "SubmittedByClubPlayer")
+                        .WithMany("AwayGameResultScores")
+                        .HasForeignKey("SubmittedByClubPlayerId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.AwayMatchTeam", b =>
@@ -1214,9 +1269,14 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.AwayMatchTeamCaptain", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.AwayMatchTeamGroupPlayer", "AwayMatchTeamGroupPlayer")
-                        .WithMany("AwayMatchTeamCaptains")
-                        .HasForeignKey("AwayMatchTeamGroupPlayerId");
+                    b.HasOne("ProjectArcBlade.Models.AwayMatchTeam", "AwayMatchTeam")
+                        .WithOne("AwayMatchTeamCaptain")
+                        .HasForeignKey("ProjectArcBlade.Models.AwayMatchTeamCaptain", "AwayMatchTeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "ClubPlayer")
+                        .WithMany("AwayMatchTeamCaptaincies")
+                        .HasForeignKey("ClubPlayerId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.AwayMatchTeamGroup", b =>
@@ -1361,8 +1421,28 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasForeignKey("SeasonId");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.Game", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.AwayMatchTeamGroup", "AwayMatchTeamGroup")
+                        .WithMany("Games")
+                        .HasForeignKey("AwayMatchTeamGroupId");
+
+                    b.HasOne("ProjectArcBlade.Models.HomeMatchTeamGroup", "HomeMatchTeamGroup")
+                        .WithMany("Games")
+                        .HasForeignKey("HomeMatchTeamGroupId");
+
+                    b.HasOne("ProjectArcBlade.Models.Match", "Match")
+                        .WithMany()
+                        .HasForeignKey("MatchId");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.HomeGameResult", b =>
                 {
+                    b.HasOne("ProjectArcBlade.Models.Game", "Game")
+                        .WithOne("HomeGameResult")
+                        .HasForeignKey("ProjectArcBlade.Models.HomeGameResult", "GameId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ProjectArcBlade.Models.HomeMatchTeamGroup", "HomeMatchTeamGroup")
                         .WithMany("HomeGameResults")
                         .HasForeignKey("HomeMatchTeamGroupId");
@@ -1374,18 +1454,17 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeGameResultScore", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "ClubPlayer")
-                        .WithMany("HomeGameResultScores")
-                        .HasForeignKey("ClubPlayerId");
-
                     b.HasOne("ProjectArcBlade.Models.HomeGameResult", "HomeGameResult")
                         .WithMany("HomeGameResultScores")
-                        .HasForeignKey("HomeGameResultId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("HomeGameResultId");
 
                     b.HasOne("ProjectArcBlade.Models.ScoreStatus", "ScoreStatus")
                         .WithMany("HomeGameResultScores")
                         .HasForeignKey("ScoreStatusId");
+
+                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "SubmittedByClubPlayer")
+                        .WithMany("HomeGameResultScores")
+                        .HasForeignKey("SubmittedByClubPlayerId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeam", b =>
@@ -1410,9 +1489,14 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeamCaptain", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.HomeMatchTeamGroupPlayer", "HomeMatchTeamGroupPlayer")
-                        .WithMany("HomeMatchTeamCaptains")
-                        .HasForeignKey("HomeMatchTeamGroupPlayerId");
+                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "ClubPlayer")
+                        .WithMany("HomeMatchTeamCaptaincies")
+                        .HasForeignKey("ClubPlayerId");
+
+                    b.HasOne("ProjectArcBlade.Models.HomeMatchTeam", "HomeMatchTeam")
+                        .WithOne("HomeMatchTeamCaptain")
+                        .HasForeignKey("ProjectArcBlade.Models.HomeMatchTeamCaptain", "HomeMatchTeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeMatchTeamGroup", b =>
@@ -1546,7 +1630,16 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.TeamCaptain", b =>
                 {
-                    b.HasOne("ProjectArcBlade.Models.TeamPlayer", "TeamPlayer")
+                    b.HasOne("ProjectArcBlade.Models.ClubPlayer", "ClubPlayer")
+                        .WithMany("TeamCaptaincies")
+                        .HasForeignKey("ClubPlayerId");
+
+                    b.HasOne("ProjectArcBlade.Models.Team", "Team")
+                        .WithOne("TeamCaptain")
+                        .HasForeignKey("ProjectArcBlade.Models.TeamCaptain", "TeamId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("ProjectArcBlade.Models.TeamPlayer")
                         .WithMany("TeamCaptains")
                         .HasForeignKey("TeamPlayerId");
                 });

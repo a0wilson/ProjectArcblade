@@ -93,11 +93,25 @@ namespace ProjectArcBlade.Controllers
                 .Where(htmgp => htmgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == id)
                 .ToListAsync();
 
+            var homeTeamCaptainId = await _context.HomeMatchTeamCaptains
+                .Include(hmtc => hmtc.ClubPlayer)
+                .Where(hmtc => hmtc.HomeMatchTeam.Id == match.HomeMatchTeam.Id && hmtc.ClubPlayer != null)
+                .Select(hmtc => hmtc.ClubPlayer.Id)
+                .FirstOrDefaultAsync();
+
+            var awayTeamCaptainId = await _context.AwayMatchTeamCaptains
+                .Include(amtc => amtc.ClubPlayer)
+                .Where(amtc => amtc.AwayMatchTeam.Id == match.AwayMatchTeam.Id)
+                .Select(amtc => amtc.ClubPlayer.Id)
+                .FirstOrDefaultAsync();
+
             var viewModel = new PreviewMatchViewModel
             {
                 Match = match,
                 AwayTeamPlayers = awayTeamPlayers,
-                HomeTeamPlayers = homeTeamPlayers
+                HomeTeamPlayers = homeTeamPlayers,
+                HomeTeamCaptainId = homeTeamCaptainId,
+                AwayTeamCaptainId = awayTeamCaptainId
             };
 
             return View(viewModel);

@@ -38,8 +38,10 @@ namespace ProjectArcBlade.Data
                 
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueClub> LeagueClubs { get; set; }
-        public DbSet<Match> Matches { get; set; }
         public DbSet<RescheduledStartDate> RescheduledStartDates { get; set; }
+        public DbSet<Match> Matches { get; set; }
+        public DbSet<Game> Games { get; set; }
+
 
         public DbSet<HomeMatchTeam> HomeMatchTeams { get; set; }
         public DbSet<HomeMatchTeamCaptain> HomeMatchTeamCaptains { get; set; }
@@ -105,8 +107,9 @@ namespace ProjectArcBlade.Data
             
             builder.Entity<League>().ToTable("League");
             builder.Entity<LeagueClub>().ToTable("LeagueClub");
-            
-            //specify 1 to 1 relationships for match
+            builder.Entity<RescheduledStartDate>().ToTable("RescheduledStartDate");
+
+            //specify 1 to 1 relationships for match and teams
             builder.Entity<Match>().ToTable("Match");
             builder.Entity<Match>()
                 .HasOne(m => m.AwayMatchTeam)
@@ -117,9 +120,24 @@ namespace ProjectArcBlade.Data
                 .WithOne(hmt => hmt.Match)
                 .HasForeignKey<HomeMatchTeam>(amt => amt.MatchId);
 
-            builder.Entity<RescheduledStartDate>().ToTable("RescheduledStartDate");
+            //specifiy 1 to 1 relationship for game and results
+            builder.Entity<Game>().ToTable("Game");
+            builder.Entity<Game>()
+                .HasOne(g => g.HomeGameResult)
+                .WithOne(hgr => hgr.Game)
+                .HasForeignKey<HomeGameResult>(hgr => hgr.GameId);
+            builder.Entity<Game>()
+                .HasOne(g => g.AwayGameResult)
+                .WithOne(agr => agr.Game)
+                .HasForeignKey<AwayGameResult>(agr => agr.GameId);
+            
 
             builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");
+            builder.Entity<HomeMatchTeam>()
+                .HasOne(hmt => hmt.HomeMatchTeamCaptain)
+                .WithOne(hmtc => hmtc.HomeMatchTeam)
+                .HasForeignKey<HomeMatchTeamCaptain>(hmtc => hmtc.HomeMatchTeamId);
+
             builder.Entity<HomeMatchTeamCaptain>().ToTable("HomeMatchTeamCaptain");
             builder.Entity<HomeMatchTeamGroup>().ToTable("HomeMatchTeamGroup");
             builder.Entity<HomeMatchTeamGroupPlayer>().ToTable("HomeMatchTeamGroupPlayer");
@@ -127,6 +145,11 @@ namespace ProjectArcBlade.Data
             builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScore");
 
             builder.Entity<AwayMatchTeam>().ToTable("AwayMatchTeam");
+            builder.Entity<AwayMatchTeam>()
+                .HasOne(amt => amt.AwayMatchTeamCaptain)
+                .WithOne(amtc => amtc.AwayMatchTeam)
+                .HasForeignKey<AwayMatchTeamCaptain>(amtc => amtc.AwayMatchTeamId);
+
             builder.Entity<AwayMatchTeamCaptain>().ToTable("AwayMatchTeamCaptain");
             builder.Entity<AwayMatchTeamGroup>().ToTable("AwayMatchTeamGroup");
             builder.Entity<AwayMatchTeamGroupPlayer>().ToTable("AwayMatchTeamGroupPlayer");
@@ -137,7 +160,13 @@ namespace ProjectArcBlade.Data
             builder.Entity<ResultType>().ToTable("ResultType");
             builder.Entity<ScoreStatus>().ToTable("ScoreStatus");
             builder.Entity<Season>().ToTable("Season");
+
             builder.Entity<Team>().ToTable("Team");
+            builder.Entity<Team>()
+                .HasOne(t => t.TeamCaptain)
+                .WithOne(tc => tc.Team)
+                .HasForeignKey<TeamCaptain>(tc => tc.TeamId);
+
             builder.Entity<TeamCaptain>().ToTable("TeamCaptain");
             builder.Entity<TeamPlayer>().ToTable("TeamPlayer");
             builder.Entity<TeamStatus>().ToTable("TeamStatus");
@@ -152,7 +181,6 @@ namespace ProjectArcBlade.Data
 
             builder.Entity<ExclusionDate>().ToTable("ExclusionDate");
             builder.Entity<PointScore>().ToTable("PointScore");
-
         }
     }
 }

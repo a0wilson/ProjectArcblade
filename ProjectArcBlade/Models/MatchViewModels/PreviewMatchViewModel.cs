@@ -11,6 +11,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public Match Match { get; set; }
         public List<AwayMatchTeamGroupPlayer> AwayTeamPlayers { get; set; }
         public List<HomeMatchTeamGroupPlayer> HomeTeamPlayers { get; set; }
+        public int HomeTeamCaptainId { get; set; }
+        public int AwayTeamCaptainId { get; set; }
 
     }
 }

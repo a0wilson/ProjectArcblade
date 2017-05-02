@@ -67,6 +67,23 @@
                 <input type="submit" asp-action="ReassignFromHomeMatch" value="Reassign" class="btn btn-default" />
             </div>
         </div>
+        @if (Model.AssignedClubPlayers.Count > 0)
+        {
+            <div class="form-group">
+                <label asp-for="CaptainId" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <select asp-for="CaptainId" asp-items="Model.AssignedClubPlayers" class="form-control">
+                        <option value="0">Select Home Team Captain...</option>
+                    </select>
+                    <span asp-validation-for="CaptainId" class="text-danger"></span>                    
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" asp-action="SetTeamCaptain" asp-route-homeTeam="true" value="Set Team Captain" class="btn btn-default" />
+                </div>
+            </div>
+        }
         @if (Model.Warnings.Count > 0)
         {
             <div class="form-group">
