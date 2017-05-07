@@ -50,7 +50,7 @@ namespace ProjectArcBlade.Controllers
         }
 
         // GET: Match/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(MatchService matchService, int? id)
         {
             if (id == null)
             {
@@ -59,6 +59,9 @@ namespace ProjectArcBlade.Controllers
 
             var match = await _context.Matches
                 .SingleOrDefaultAsync(m => m.Id == id);
+
+            //await matchService.CreateMatchGamesByGroupAsync(_context, match.Id);
+
             if (match == null)
             {
                 return NotFound();

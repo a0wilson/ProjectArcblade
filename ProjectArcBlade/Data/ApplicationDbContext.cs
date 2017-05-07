@@ -14,9 +14,20 @@ namespace ProjectArcBlade.Data
             : base(options)
         {
         }
-
+        
+        //Templates
+        public DbSet<MatchTemplate> MatchTemplates { get; set; }
+        public DbSet<MatchTemplateCategory> MatchTemplateCategories { get; set; }
+        public DbSet<MatchTemplateSeason> MatchTemplateSeasons { get; set; }
+        public DbSet<GroupTemplate> GroupTemplates { get; set; }
+        public DbSet<RankTemplate> RankTemplates { get; set; }
+        public DbSet<GameTemplate> GameTemplates { get; set; }
+        public DbSet<HomeGroupTemplate> HomeGroupTemplates { get; set; }
+        public DbSet<AwayGroupTemplate> AwayGroupTemplates { get; set; }
+        
         public DbSet<MatchType> MatchTypes { get; set; }
         public DbSet<Venue> Venues { get; set; }
+        public DbSet<Rank> Ranks { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Division> Divisions { get; set; }
         public DbSet<Gender> Genders { get; set; }
@@ -85,12 +96,32 @@ namespace ProjectArcBlade.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);En
 
+            builder.Entity<MatchTemplate>().ToTable("MatchTemplate");
+            builder.Entity<MatchTemplateCategory>().ToTable("MatchTemplateCategory");
+            builder.Entity<MatchTemplateSeason>().ToTable("MatchTemplateSeason");
+            builder.Entity<GroupTemplate>().ToTable("GroupTemplate");
+            builder.Entity<RankTemplate>().ToTable("RankTemplate");
+
+            builder.Entity<GameTemplate>().ToTable("GameTemplate");
+            builder.Entity<GameTemplate>()
+                .HasOne(gt => gt.HomeGroupTemplate)
+                .WithOne(hgt => hgt.GameTemplate)
+                .HasForeignKey<HomeGroupTemplate>(hgt => hgt.GameTemplateId);
+            builder.Entity<GameTemplate>()
+                .HasOne(gt => gt.AwayGroupTemplate)
+                .WithOne(agt => agt.GameTemplate)
+                .HasForeignKey<AwayGroupTemplate>(agt => agt.GameTemplateId);
+
+            builder.Entity<AwayGroupTemplate>().ToTable("AwayGroupTemplate");
+            builder.Entity<HomeGroupTemplate>().ToTable("HomeGroupTemplate");
+            
             builder.Entity<MatchType>().ToTable("MatchType");
             builder.Entity<Venue>().ToTable("Venue");
             builder.Entity<Award>().ToTable("Award");
             builder.Entity<AwardNominee>().ToTable("AwardNominee");
             builder.Entity<DayOfTheWeek>().ToTable("DayOfTheWeek");
-            
+
+            builder.Entity<Rank>().ToTable("Rank");
             builder.Entity<Category>().ToTable("Category");
             builder.Entity<Club>().ToTable("Club");
             builder.Entity<ClubSubscriber>().ToTable("ClubSubscriber");
@@ -131,7 +162,6 @@ namespace ProjectArcBlade.Data
                 .WithOne(agr => agr.Game)
                 .HasForeignKey<AwayGameResult>(agr => agr.GameId);
             
-
             builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");
             builder.Entity<HomeMatchTeam>()
                 .HasOne(hmt => hmt.HomeMatchTeamCaptain)

@@ -15,5 +15,6 @@ namespace ProjectArcBlade.Models
         public ICollection<TeamPlayer> TeamPlayers { get; set; }
         public ICollection<HomeMatchTeamGroup> HomeMatchTeamGroups { get; set; }
         public ICollection<AwayMatchTeamGroup> AwayMatchTeamGroups { get; set; }
+        public ICollection<GroupTemplate> GroupTemplates { get; set; }
     }
 }

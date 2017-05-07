@@ -10,5 +10,6 @@ namespace ProjectArcBlade.Models
         public int Id { get; set; }
         public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
         public ClubPlayer ClubPlayer { get; set; }
+        public Rank Rank { get; set; }
     }
 }

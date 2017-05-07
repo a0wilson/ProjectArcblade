@@ -53,6 +53,7 @@ namespace ProjectArcBlade
             services.AddSingleton<SettingsService>();
             services.AddSingleton<MatchSchedulingService>();
             services.AddSingleton<TeamService>();
+            services.AddSingleton<MatchService>();
 
             services.AddMvc();
 

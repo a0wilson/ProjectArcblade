@@ -12,8 +12,6 @@ namespace ProjectArcBlade.Models
         public Team Team { get; set; }
         public ClubPlayer ClubPlayer { get; set; }
         public Group Group { get; set; }
-        
-        public ICollection<TeamCaptain> TeamCaptains { get; set; }
-
+        public Rank Rank { get; set; }        
     }
 }

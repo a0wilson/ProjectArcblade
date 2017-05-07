@@ -15,106 +15,28 @@ namespace ProjectArcBlade.Controllers
     public class TeamController : Controller
     {
         private readonly ApplicationDbContext _context;
-
+        
         public TeamController(ApplicationDbContext context)
         {
             _context = context;    
         }
 
         // GET: Team/Dashboard/5
-        public async Task<ActionResult> Dashboard(int? id)
+        public async Task<ActionResult> Dashboard(TeamService teamService, MatchService matchService, int? id)
         {
             if (id == null) return NotFound();
 
-            Team team = await _context.Teams
-                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubPlayers)
-                .Include(t => t.LeagueClub).ThenInclude(lc => lc.League)
-                .Include(t => t.TeamPlayers)
-                .Include(t => t.Category)
-                .Include(t => t.Season)
-                .Include(t => t.TeamStatus)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            var allLeagueMatches = await _context.Matches
-                .Include(m => m.Venue)
-                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
-                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
-                .Where(m => (m.AwayMatchTeam.Team.Id == team.Id || m.HomeMatchTeam.Team.Id == team.Id)
-                    && m.MatchType.Id == Constants.MatchType.League)
-                .ToListAsync();
-
-            //set unmapped property - isHomeTeam
-            foreach (Match m in allLeagueMatches) m.isHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
-
-            var upcomingMatches = allLeagueMatches.Where(m => m.StartDate >= DateTime.Now).ToList();
-
-            var recentMatches = allLeagueMatches.Where(m => m.StartDate < DateTime.Now).ToList();
-
-            var leaguePosition = 0;
-            var leaguePoints = 0;
-            var totalMatchesWon = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Win) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Win))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);                    
-            var totalMatchesLost = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Loss) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Loss))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatchesDrawn = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Draw) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Draw))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatchesConceded = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Conceded) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Conceded))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatchesForfeited = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Forfeit) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Forfeit))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatchesPlayed = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id != Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id != Constants.ResultType.NoEntry))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatchesRemaining = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry))
-                .Select(m => new { count = 1 })
-                .Sum(m => m.count);
-            var totalMatches = allLeagueMatches.Count.ToString();
-
-
-            var overview = new List<NameValuePair>
-            {
-                new NameValuePair {Name=Constants.OverviewStrings.LeaguePostion, Value = leaguePosition.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.LeaguePoints, Value = leaguePoints.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalWon, Value = totalMatchesWon.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalLost, Value = totalMatchesLost.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalDrawn, Value = totalMatchesDrawn.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalConceded, Value = totalMatchesConceded.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalForfeited, Value = totalMatchesForfeited.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalPlayed, Value = totalMatchesPlayed.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalRemaining, Value = totalMatchesRemaining.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalMatches, Value = totalMatches.ToString()},
-            };
-            
-            var viewModel = new DashboardTeamViewModel
-            {
-                Team = team,
-                UpcomingMatches = upcomingMatches,
-                RecentMatches = recentMatches,
-                Overview = overview
-            };
+            var viewModel = await teamService.GetTeamDashboardViewModelAsync(_context, matchService, Convert.ToInt32(id));
 
             return View(viewModel);
+        }
+
+        //POST: Team/ManageNominations
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Dashboard(TeamService teamService, TeamDashboardViewModel viewModel)
+        {
+            return RedirectToAction("Dashboard", new { id = viewModel.SelectedTeamId });
         }
 
         // GET: Team
@@ -123,6 +45,26 @@ namespace ProjectArcBlade.Controllers
             return View(await _context.Teams.Include(t=>t.TeamStatus).Include(t=>t.LeagueClub).ThenInclude(lc=>lc.Club).ToListAsync());
         }
         
+        //GET: Team/ManageNominations
+        public async Task<IActionResult> ManageNominations(TeamService teamService, MatchService matchService, int id)
+        {
+            var viewModel = await teamService.GetManageNominationsViewModelAsync(_context, matchService, id);
+            return View(viewModel);
+        }
+
+        //POST: Team/ManageNominations
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ManageNominations(TeamService teamService, ManageNominationsViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                await teamService.UpdateNominationsWithManageNominationsViewModelAsync(_context, viewModel);
+                TempData["successMessage"] = "Player nominations updated!";
+            }
+            return RedirectToAction("ManageNominations", new { id = viewModel.TeamId });
+        }
+
         //GET: Team/Organise/5
         public IActionResult Organise(int? awayMatchTeamId, int? homeMatchTeamId)
         {
@@ -137,6 +79,7 @@ namespace ProjectArcBlade.Controllers
         //GET: Team/OrganiseAwayMatchTeam/5
         public async Task<IActionResult> OrganiseAwayMatchTeam(SettingsService settingsService, int id)
         {
+            /*
             var awayMatchTeam = await _context.AwayMatchTeams
                 .Include(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubPlayers)
                 .Include(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.League)
@@ -157,7 +100,7 @@ namespace ProjectArcBlade.Controllers
             // set selected group id
             var groupId = TempData["groupId"] == null ? 0 : int.Parse(TempData["groupId"].ToString());
 
-            var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(awayMatchTeam.Team.LeagueClub.Club.Id, awayMatchTeam.Team.Category.Id);
+            //var clubPlayers =  GetClubPlayersByClubAndCategoryAsync(awayMatchTeam.Team.LeagueClub.Club.Id, awayMatchTeam.Team.Category.Id);
 
             var matchPlayers = await _context.AwayMatchTeamGroupPlayers
                 .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cu => cu.PlayerDetail)
@@ -210,6 +153,8 @@ namespace ProjectArcBlade.Controllers
             };
 
             return View(viewModel);
+            */
+            return View();
         }
         
         [HttpPost]
@@ -335,6 +280,7 @@ namespace ProjectArcBlade.Controllers
         //GET: Team/OrganiseHomeMatchTeam/5
         public async Task<IActionResult> OrganiseHomeMatchTeam(SettingsService settingsService, int id)
         {
+            /*
             var homeMatchTeam = await _context.HomeMatchTeams
                 .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club).ThenInclude(c => c.ClubPlayers)
                 .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.League)
@@ -421,6 +367,8 @@ namespace ProjectArcBlade.Controllers
             };
 
             return View(viewModel);
+            */
+            return View();
         }
         
         [HttpPost]
@@ -611,11 +559,11 @@ namespace ProjectArcBlade.Controllers
                 .Select(tp => tp.ClubPlayer.Id)
                 .ToListAsync();
 
-            var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(team.LeagueClub.Club.Id, team.Category.Id);
+            //var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(_context, team.LeagueClub.Club.Id, team.Category.Id);
 
-            var availableTeamPlayers = clubPlayers
-                .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = String.Format("{0} {1}", cp.PlayerDetail.FirstName, cp.PlayerDetail.LastName) })
-                .ToList();
+            //var availableTeamPlayers = clubPlayers
+            //    .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = String.Format("{0} {1}", cp.PlayerDetail.FirstName, cp.PlayerDetail.LastName) })
+            //    .ToList();
 
             var manageTeamPlayersViewModel = new ManageTeamPlayersViewModel
             {
@@ -623,33 +571,14 @@ namespace ProjectArcBlade.Controllers
                 Teams = teams,
                 Groups = groups,
                 AssignedTeamPlayers = assignedTeamPlayers,
-                AvailableTeamPlayers = availableTeamPlayers,
+                //AvailableTeamPlayers = availableTeamPlayers,
                 TeamStatus = team.TeamStatus
             };
 
             return View(manageTeamPlayersViewModel);
         }
 
-        private async Task<List<ClubPlayer>> GetClubPlayersByClubAndCategoryAsync(int clubId, int categoryId)
-        {
-            //return all clubplayers if category is mixed
-            if (categoryId == Constants.Category.Mixed)
-            {
-                return await _context.ClubPlayers
-                    .Include(cp => cp.PlayerDetail)
-                    .Where(cp => cp.Club.Id == clubId && cp.IsActive)
-                    .OrderBy(cp => cp.PlayerDetail.FirstName)
-                    .ToListAsync();
-            }
-
-            // return just men / women otherwise.
-            var genderFilterId = categoryId == Constants.Category.Mens ? Constants.Gender.Male : Constants.Gender.Female;
-            return await _context.ClubPlayers
-                .Include(cp => cp.PlayerDetail)
-                .Where(cp => cp.Club.Id == clubId && cp.IsActive && cp.PlayerDetail.Gender.Id == genderFilterId)
-                .OrderBy(cp => cp.PlayerDetail.FirstName)
-                .ToListAsync();
-        }
+        
 
         [HttpPost]
         [ValidateAntiForgeryToken]

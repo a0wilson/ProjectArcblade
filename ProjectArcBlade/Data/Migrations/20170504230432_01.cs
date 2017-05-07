@@ -110,6 +110,19 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MatchTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchTemplate", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MatchType",
                 columns: table => new
                 {
@@ -133,6 +146,19 @@ namespace ProjectArcBlade.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_MembershipType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rank",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Number = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rank", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,6 +271,78 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GameTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    MatchTemplateId = table.Column<int>(nullable: true),
+                    Order = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GameTemplate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GameTemplate_MatchTemplate_MatchTemplateId",
+                        column: x => x.MatchTemplateId,
+                        principalTable: "MatchTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GroupTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    GroupId = table.Column<int>(nullable: true),
+                    MatchTemplateId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupTemplate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GroupTemplate_Group_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Group",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GroupTemplate_MatchTemplate_MatchTemplateId",
+                        column: x => x.MatchTemplateId,
+                        principalTable: "MatchTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MatchTemplateCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CategoryId = table.Column<int>(nullable: true),
+                    MatchTemplateId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchTemplateCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateCategory_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateCategory_MatchTemplate_MatchTemplateId",
+                        column: x => x.MatchTemplateId,
+                        principalTable: "MatchTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Rule",
                 columns: table => new
                 {
@@ -302,6 +400,84 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_Club_Venue_VenueId",
                         column: x => x.VenueId,
                         principalTable: "Venue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AwayGroupTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    GameTemplateId = table.Column<int>(nullable: false),
+                    GroupTemplateId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AwayGroupTemplate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AwayGroupTemplate_GameTemplate_GameTemplateId",
+                        column: x => x.GameTemplateId,
+                        principalTable: "GameTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AwayGroupTemplate_GroupTemplate_GroupTemplateId",
+                        column: x => x.GroupTemplateId,
+                        principalTable: "GroupTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HomeGroupTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    GameTemplateId = table.Column<int>(nullable: false),
+                    GroupTemplateId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HomeGroupTemplate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HomeGroupTemplate_GameTemplate_GameTemplateId",
+                        column: x => x.GameTemplateId,
+                        principalTable: "GameTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HomeGroupTemplate_GroupTemplate_GroupTemplateId",
+                        column: x => x.GroupTemplateId,
+                        principalTable: "GroupTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RankTemplate",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    GroupTemplateId = table.Column<int>(nullable: true),
+                    RankId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RankTemplate", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RankTemplate_GroupTemplate_GroupTemplateId",
+                        column: x => x.GroupTemplateId,
+                        principalTable: "GroupTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RankTemplate_Rank_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Rank",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -565,6 +741,32 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_Match_Venue_VenueId",
                         column: x => x.VenueId,
                         principalTable: "Venue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MatchTemplateSeason",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    MatchTemplateId = table.Column<int>(nullable: true),
+                    SeasonId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchTemplateSeason", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateSeason_MatchTemplate_MatchTemplateId",
+                        column: x => x.MatchTemplateId,
+                        principalTable: "MatchTemplate",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateSeason_Season_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Season",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -858,6 +1060,32 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TeamCaptain",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ClubPlayerId = table.Column<int>(nullable: true),
+                    TeamId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeamCaptain", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeamCaptain_ClubPlayer_ClubPlayerId",
+                        column: x => x.ClubPlayerId,
+                        principalTable: "ClubPlayer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeamCaptain_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TeamPlayer",
                 columns: table => new
                 {
@@ -865,6 +1093,7 @@ namespace ProjectArcBlade.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ClubPlayerId = table.Column<int>(nullable: true),
                     GroupId = table.Column<int>(nullable: true),
+                    RankId = table.Column<int>(nullable: true),
                     TeamId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -880,6 +1109,12 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_TeamPlayer_Group_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Group",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TeamPlayer_Rank_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Rank",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1022,46 +1257,14 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TeamCaptain",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    TeamId = table.Column<int>(nullable: false),
-                    TeamPlayerId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TeamCaptain", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_TeamCaptain_ClubPlayer_ClubPlayerId",
-                        column: x => x.ClubPlayerId,
-                        principalTable: "ClubPlayer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_TeamCaptain_Team_TeamId",
-                        column: x => x.TeamId,
-                        principalTable: "Team",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TeamCaptain_TeamPlayer_TeamPlayerId",
-                        column: x => x.TeamPlayerId,
-                        principalTable: "TeamPlayer",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AwayMatchTeamGroupPlayer",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     AwayMatchTeamGroupId = table.Column<int>(nullable: true),
-                    ClubPlayerId = table.Column<int>(nullable: true)
+                    ClubPlayerId = table.Column<int>(nullable: true),
+                    RankId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1078,6 +1281,12 @@ namespace ProjectArcBlade.Data.Migrations
                         principalTable: "ClubPlayer",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AwayMatchTeamGroupPlayer_Rank_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Rank",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1088,7 +1297,8 @@ namespace ProjectArcBlade.Data.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     AwayMatchTeamGroupId = table.Column<int>(nullable: true),
                     HomeMatchTeamGroupId = table.Column<int>(nullable: true),
-                    MatchId = table.Column<int>(nullable: true)
+                    MatchId = table.Column<int>(nullable: true),
+                    Order = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1120,7 +1330,8 @@ namespace ProjectArcBlade.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ClubPlayerId = table.Column<int>(nullable: true),
-                    HomeMatchTeamGroupId = table.Column<int>(nullable: true)
+                    HomeMatchTeamGroupId = table.Column<int>(nullable: true),
+                    RankId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1135,6 +1346,12 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_HomeMatchTeamGroupPlayer_HomeMatchTeamGroup_HomeMatchTeamGroupId",
                         column: x => x.HomeMatchTeamGroupId,
                         principalTable: "HomeMatchTeamGroup",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_HomeMatchTeamGroupPlayer_Rank_RankId",
+                        column: x => x.RankId,
+                        principalTable: "Rank",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1328,6 +1545,17 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "SubmittedByClubPlayerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_AwayGroupTemplate_GameTemplateId",
+                table: "AwayGroupTemplate",
+                column: "GameTemplateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AwayGroupTemplate_GroupTemplateId",
+                table: "AwayGroupTemplate",
+                column: "GroupTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AwayMatchTeam_MatchId",
                 table: "AwayMatchTeam",
                 column: "MatchId",
@@ -1378,6 +1606,11 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_AwayMatchTeamGroupPlayer_ClubPlayerId",
                 table: "AwayMatchTeamGroupPlayer",
                 column: "ClubPlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AwayMatchTeamGroupPlayer_RankId",
+                table: "AwayMatchTeamGroupPlayer",
+                column: "RankId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CategoryRule_CategoryId",
@@ -1500,6 +1733,21 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "MatchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GameTemplate_MatchTemplateId",
+                table: "GameTemplate",
+                column: "MatchTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupTemplate_GroupId",
+                table: "GroupTemplate",
+                column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupTemplate_MatchTemplateId",
+                table: "GroupTemplate",
+                column: "MatchTemplateId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HomeGameResult_GameId",
                 table: "HomeGameResult",
                 column: "GameId",
@@ -1529,6 +1777,17 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_HomeGameResultScore_SubmittedByClubPlayerId",
                 table: "HomeGameResultScore",
                 column: "SubmittedByClubPlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HomeGroupTemplate_GameTemplateId",
+                table: "HomeGroupTemplate",
+                column: "GameTemplateId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HomeGroupTemplate_GroupTemplateId",
+                table: "HomeGroupTemplate",
+                column: "GroupTemplateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HomeMatchTeam_MatchId",
@@ -1583,6 +1842,11 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "HomeMatchTeamGroupId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_HomeMatchTeamGroupPlayer_RankId",
+                table: "HomeMatchTeamGroupPlayer",
+                column: "RankId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_League_SportId",
                 table: "League",
                 column: "SportId");
@@ -1623,6 +1887,26 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "VenueId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MatchTemplateCategory_CategoryId",
+                table: "MatchTemplateCategory",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchTemplateCategory_MatchTemplateId",
+                table: "MatchTemplateCategory",
+                column: "MatchTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchTemplateSeason_MatchTemplateId",
+                table: "MatchTemplateSeason",
+                column: "MatchTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchTemplateSeason_SeasonId",
+                table: "MatchTemplateSeason",
+                column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PlayerDetail_GenderId",
                 table: "PlayerDetail",
                 column: "GenderId");
@@ -1636,6 +1920,16 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_PointScore_SeasonId",
                 table: "PointScore",
                 column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RankTemplate_GroupTemplateId",
+                table: "RankTemplate",
+                column: "GroupTemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RankTemplate_RankId",
+                table: "RankTemplate",
+                column: "RankId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RescheduledStartDate_MatchId",
@@ -1689,11 +1983,6 @@ namespace ProjectArcBlade.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TeamCaptain_TeamPlayerId",
-                table: "TeamCaptain",
-                column: "TeamPlayerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_TeamPlayer_ClubPlayerId",
                 table: "TeamPlayer",
                 column: "ClubPlayerId");
@@ -1702,6 +1991,11 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_TeamPlayer_GroupId",
                 table: "TeamPlayer",
                 column: "GroupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeamPlayer_RankId",
+                table: "TeamPlayer",
+                column: "RankId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TeamPlayer_TeamId",
@@ -1716,6 +2010,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AwayGameResultScore");
+
+            migrationBuilder.DropTable(
+                name: "AwayGroupTemplate");
 
             migrationBuilder.DropTable(
                 name: "AwayMatchTeamCaptain");
@@ -1742,6 +2039,9 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "HomeGameResultScore");
 
             migrationBuilder.DropTable(
+                name: "HomeGroupTemplate");
+
+            migrationBuilder.DropTable(
                 name: "HomeMatchTeamCaptain");
 
             migrationBuilder.DropTable(
@@ -1751,13 +2051,25 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "LeagueRule");
 
             migrationBuilder.DropTable(
+                name: "MatchTemplateCategory");
+
+            migrationBuilder.DropTable(
+                name: "MatchTemplateSeason");
+
+            migrationBuilder.DropTable(
                 name: "PointScore");
+
+            migrationBuilder.DropTable(
+                name: "RankTemplate");
 
             migrationBuilder.DropTable(
                 name: "RescheduledStartDate");
 
             migrationBuilder.DropTable(
                 name: "TeamCaptain");
+
+            migrationBuilder.DropTable(
+                name: "TeamPlayer");
 
             migrationBuilder.DropTable(
                 name: "Award");
@@ -1781,10 +2093,19 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "ScoreStatus");
 
             migrationBuilder.DropTable(
+                name: "GameTemplate");
+
+            migrationBuilder.DropTable(
                 name: "Rule");
 
             migrationBuilder.DropTable(
-                name: "TeamPlayer");
+                name: "GroupTemplate");
+
+            migrationBuilder.DropTable(
+                name: "ClubPlayer");
+
+            migrationBuilder.DropTable(
+                name: "Rank");
 
             migrationBuilder.DropTable(
                 name: "Cup");
@@ -1796,13 +2117,7 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "Setting");
 
             migrationBuilder.DropTable(
-                name: "ClubPlayer");
-
-            migrationBuilder.DropTable(
-                name: "AwayMatchTeamGroup");
-
-            migrationBuilder.DropTable(
-                name: "HomeMatchTeamGroup");
+                name: "MatchTemplate");
 
             migrationBuilder.DropTable(
                 name: "ClubPlayerStatus");
@@ -1814,6 +2129,15 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "PlayerDetail");
 
             migrationBuilder.DropTable(
+                name: "AwayMatchTeamGroup");
+
+            migrationBuilder.DropTable(
+                name: "HomeMatchTeamGroup");
+
+            migrationBuilder.DropTable(
+                name: "Gender");
+
+            migrationBuilder.DropTable(
                 name: "AwayMatchTeam");
 
             migrationBuilder.DropTable(
@@ -1821,9 +2145,6 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "HomeMatchTeam");
-
-            migrationBuilder.DropTable(
-                name: "Gender");
 
             migrationBuilder.DropTable(
                 name: "Match");

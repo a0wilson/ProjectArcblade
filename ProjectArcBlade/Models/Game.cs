@@ -9,6 +9,7 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public Match Match { get; set; }
+        public int Order { get; set; }
         public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
         public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
 
