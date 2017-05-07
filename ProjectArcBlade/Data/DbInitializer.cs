@@ -492,7 +492,43 @@ namespace ProjectArcBlade.Data
                         LastName ="Walkley",
                         Gender=context.Genders.Find(2),
                         EmailAddress="test@yahoo.com"
-                    }
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Lee",
+                        LastName ="Williams",
+                        Gender=context.Genders.Find(1)
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Gareth",
+                        LastName ="Day",
+                        Gender=context.Genders.Find(1)
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Gareth",
+                        LastName ="Gooding",
+                        Gender=context.Genders.Find(1)
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Fraiser",
+                        LastName ="Nairn",
+                        Gender=context.Genders.Find(1)
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Peter",
+                        LastName ="O'Hanlon",
+                        Gender=context.Genders.Find(1)
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Tsung",
+                        LastName ="Mo",
+                        Gender=context.Genders.Find(1)
+                    },
 
                 };
                 foreach (PlayerDetail ud in playerDetails) context.PlayerDetails.Add(ud);
@@ -507,7 +543,7 @@ namespace ProjectArcBlade.Data
                 {
                     var clubPlayer = new ClubPlayer
                     {
-                        Club = context.Clubs.Find(1),
+                        Club = context.Clubs.Find(playerDetail.EmailAddress != null ? 1 : 2),
                         PlayerDetail = playerDetail,
                         IsActive = true,
                         ClubPlayerStatus = context.ClubPlayerStatuses.Find(1)

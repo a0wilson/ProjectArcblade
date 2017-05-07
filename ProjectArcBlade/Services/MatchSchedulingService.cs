@@ -11,6 +11,8 @@ namespace ProjectArcBlade.Services
     public class MatchSchedulingService
     {
         private ApplicationDbContext _context;
+        private MatchService _matchService;
+        private TeamService _teamService;
         private List<DateTime> _availableDates;
         private List<ExclusionDate> _exclusionDates;
         private List<MatchSchedule> _matchSchedules;
@@ -18,28 +20,32 @@ namespace ProjectArcBlade.Services
         private List<ClubVenue> _clubVenues;
         private Season _season;
 
-        public List<MatchSchedule> ScheduleMatches (ApplicationDbContext context, int seasonId)
+        public async Task<List<MatchSchedule>> ScheduleMatchesAsync (ApplicationDbContext context, MatchService matchService, TeamService teamService, int seasonId)
         {
             //create a random number generator.
             var rng = new Random();
 
             _context = context;
+            _matchService = matchService;
+            _teamService = teamService;
 
             _matchSchedules = new List<MatchSchedule>();
             
             //get the season we are working with.
-            _season = _context.Seasons
+            _season = await _context.Seasons
                 .Include(s => s.League)
-                .Where(s => s.Id == seasonId).Single();
+                .Where(s => s.Id == seasonId)
+                .SingleAsync();
 
             //get all exclusion dates entered for this season.
-            _exclusionDates = _context.ExclusionDates
+            _exclusionDates = await _context.ExclusionDates
                 .Include(ed => ed.LeagueClub).ThenInclude(lc => lc.Club)
                 .Include(ed => ed.Season)
-                .Where(ed => ed.Season.Id == seasonId).ToList();
+                .Where(ed => ed.Season.Id == seasonId)
+                .ToListAsync();
             
             //get all teams entered for this season - with complete teams.
-            _teams = _context.Teams
+            _teams = await _context.Teams
                 .Include(t => t.Season)
                 .Include(t => t.Category)
                 .Include(t => t.Division)
@@ -49,13 +55,13 @@ namespace ProjectArcBlade.Services
                 .Where(t=> t.Season.Id == seasonId)
                 //.Where(t => t.TeamStatus.Id == Constants.TeamStatus.Complete
                 //    && t.Season.Id == seasonId)
-                .ToList();
+                .ToListAsync();
 
-            _clubVenues = _context.ClubVenues
+            _clubVenues = await _context.ClubVenues
                 .Include(cv => cv.DayOfTheWeek)
                 .Include(cv => cv.Club)
                 .Include(cv => cv.Venue)
-                .ToList();
+                .ToListAsync();
 
             //get any dates which have been excluded globally this season. e.g. bank holidays.            
             var globalExclusionDates = _exclusionDates.Where(ed => ed.LeagueClub == null).Select(ed => ed.DateToExclude).ToList();
@@ -112,6 +118,7 @@ namespace ProjectArcBlade.Services
                                         HomeTeamId = -1,
                                         AwayTeamId = -1,
                                         ScheduledDate = null,
+                                        CategoryId = categoryIds[c],
                                         Range = Constants.MatchScheduleRange.Initial
                                     };
 
@@ -160,8 +167,14 @@ namespace ProjectArcBlade.Services
             }
 
             //Finally... create/update the matches!
-            foreach (MatchSchedule ms in _matchSchedules) CreateMatch(ms);
+            foreach (MatchSchedule ms in _matchSchedules) await CreateMatchAsync(ms);
             
+            if( await _context.Games.AnyAsync(g => g.Match.Season.Id == _season.Id) == false )
+            {
+                //if no games have been created for this season then create them!
+                foreach (MatchSchedule ms in _matchSchedules) await CreateMatchGamesAsync(ms);
+            }
+
             return _matchSchedules;
         }
         
@@ -227,88 +240,233 @@ namespace ProjectArcBlade.Services
             return _clubVenues.Where(cv => cv.Club.Id == clubId && cv.DayOfTheWeek.Name.ToLower() == day).Select(cv => cv.StartTime).Single();
         }
 
-        private bool CreateMatch(MatchSchedule match)
+        private async Task<bool> CreateMatchAsync(MatchSchedule matchSchedule)
         {
-            //only create/update match if home and away team are populated and a match date has been found.
-            if (match.AwayTeamId > 0 && match.HomeTeamId > 0 )
+            //only create/update match if home and away team are populated ignoring if a match date has been found.
+            if (matchSchedule.AwayTeamId > 0 && matchSchedule.HomeTeamId > 0 )
             {
                 //check if this match already exists.
-                var matchExists = _context.Matches
+                var matchExists = await _context.Matches
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team)
-                .Where(m => m.HomeMatchTeam.Team.Id == match.HomeTeamId
-                    && m.AwayMatchTeam.Team.Id == match.AwayTeamId
-                    && m.Season.Id == _season.Id).Any();
+                .Where(m => m.HomeMatchTeam.Team.Id == matchSchedule.HomeTeamId
+                    && m.AwayMatchTeam.Team.Id == matchSchedule.AwayTeamId
+                    && m.Season.Id == _season.Id).AnyAsync();
 
                 if (matchExists)
                 {
-                    UpdateMatch(match);
+                    await UpdateMatchAsync(matchSchedule);
                 }
                 else
                 {
-
-                    var matchType = _context.MatchTypes.Find(Constants.MatchType.League);
-                    var season = _context.Seasons.Find(_season.Id);
-                    var venue = _context.Venues.Find(match.VenueId);
+                    var matchType = await _context.MatchTypes.FindAsync(Constants.MatchType.League);
+                    var season = await _context.Seasons.FindAsync(_season.Id);
+                    var venue = await _context.Venues.FindAsync(matchSchedule.VenueId);
+                    var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
 
                     var newLeagueMatch = new Match
                     {
                         MatchType = matchType,
                         Season = season,
                         Venue = venue,
-                        StartDate = Convert.ToDateTime(match.ScheduledDate),
-                        StartTime = match.StartTime
+                        StartDate = Convert.ToDateTime(matchSchedule.ScheduledDate),
+                        StartTime = matchSchedule.StartTime
                     };
                     _context.Matches.Add(newLeagueMatch);
-
+                    
                     var homeMatchTeam = new HomeMatchTeam
                     {
                         Match = newLeagueMatch,
-                        ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
-                        Team = _context.Teams.Find(match.HomeTeamId),
-                        TeamStatus = _context.TeamStatuses.Find(Constants.TeamStatus.New)
+                        ResultType = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry),
+                        Team = await _context.Teams.FindAsync(matchSchedule.HomeTeamId),
+                        TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.New)
                     };
                     _context.HomeMatchTeams.Add(homeMatchTeam);
 
+                    foreach(var groupTemplate in matchTemplate.GroupTemplates)
+                    {
+                        // add home match team groups
+                        var homeMatchTeamGroup = new HomeMatchTeamGroup
+                        {
+                            Group = await _context.Groups.FindAsync(groupTemplate.Group.Id),
+                            HomeMatchTeam = homeMatchTeam
+                        };
+                        _context.HomeMatchTeamGroups.Add(homeMatchTeamGroup);
+
+                        foreach(var rankTemplate in groupTemplate.RankTemplates)
+                        {
+                            // add home match team players
+                            var homeMatchTeamGroupPlayer = new HomeMatchTeamGroupPlayer
+                            {
+                                HomeMatchTeamGroup = homeMatchTeamGroup,
+                                Rank = await _context.Ranks.FindAsync(rankTemplate.Rank.Id)
+                            };
+                            _context.HomeMatchTeamGroupPlayers.Add(homeMatchTeamGroupPlayer);
+                        }
+                    }
+                    
                     var awayMatchTeam = new AwayMatchTeam
                     {
                         Match = newLeagueMatch,
-                        ResultType = _context.ResultTypes.Find(Constants.ResultType.NoEntry),
-                        Team = _context.Teams.Find(match.AwayTeamId),
-                        TeamStatus = _context.TeamStatuses.Find(Constants.TeamStatus.New)
+                        ResultType = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry),
+                        Team = await _context.Teams.FindAsync(matchSchedule.AwayTeamId),
+                        TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.New)
                     };
                     _context.AwayMatchTeams.Add(awayMatchTeam);
-                    _context.SaveChanges();
 
+                    foreach (var groupTemplate in matchTemplate.GroupTemplates)
+                    {
+                        // add away match team groups
+                        var awayMatchTeamGroup = new AwayMatchTeamGroup
+                        {
+                            Group = await _context.Groups.FindAsync(groupTemplate.Group.Id),
+                            AwayMatchTeam = awayMatchTeam
+                        };
+                        _context.AwayMatchTeamGroups.Add(awayMatchTeamGroup);
+
+                        foreach (var rankTemplate in groupTemplate.RankTemplates)
+                        {
+                            // add away match team players
+                            var awayMatchTeamGroupPlayer = new AwayMatchTeamGroupPlayer
+                            {
+                                AwayMatchTeamGroup = awayMatchTeamGroup,
+                                Rank = await _context.Ranks.FindAsync(rankTemplate.Rank.Id)
+                            };
+                            _context.AwayMatchTeamGroupPlayers.Add(awayMatchTeamGroupPlayer);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
                 }
             }
             return true;
         }
 
-        private bool UpdateMatch(MatchSchedule match)
+        private async Task<bool> UpdateMatchAsync(MatchSchedule matchSchedule)
         {
-            var updateMatch = _context.Matches
+            var updateMatch = await _context.Matches
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team)
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
-                .Where(m => m.HomeMatchTeam.Team.Id == match.HomeTeamId
-                    && m.AwayMatchTeam.Team.Id == match.AwayTeamId
-                    && m.Season.Id == _season.Id).Single();
+                .Where(m => m.HomeMatchTeam.Team.Id == matchSchedule.HomeTeamId
+                    && m.AwayMatchTeam.Team.Id == matchSchedule.AwayTeamId
+                    && m.Season.Id == _season.Id).SingleAsync();
 
             //only update match if it not yet started.
             if( updateMatch.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry 
                     && updateMatch.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry )
             {
-                updateMatch.Venue = _context.Venues.Find(match.VenueId);
-                updateMatch.StartDate = Convert.ToDateTime(match.ScheduledDate);
-                updateMatch.StartTime = match.StartTime;
+                updateMatch.Venue = _context.Venues.Find(matchSchedule.VenueId);
+                updateMatch.StartDate = Convert.ToDateTime(matchSchedule.ScheduledDate);
+                updateMatch.StartTime = matchSchedule.StartTime;
 
                 _context.Matches.Update(updateMatch);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             
             return true;
+        }
+
+        private async Task CreateMatchGamesAsync(MatchSchedule matchSchedule)
+        {
+            var match = await _context.Matches
+            .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub)
+            .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub)
+            .Where(m => m.HomeMatchTeam.Team.Id == matchSchedule.HomeTeamId
+                && m.AwayMatchTeam.Team.Id == matchSchedule.AwayTeamId
+                && m.Season.Id == _season.Id)
+            .SingleOrDefaultAsync();
+
+            if (match != null) //only proceed if the match exists.
+            {
+                var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
+                var resultTypeNoEntry = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry);
+                var scoreStatusNoEntry = await _context.ScoreStatuses.FindAsync(Constants.ScoreStatus.NoEntry);
+
+                foreach (var matchGameTemplate in matchTemplate.MatchGameTemplates)
+                {   
+                    var homeMatchTeamGroup = await
+                        _context.HomeMatchTeamGroups
+                            .Where(hmtg => hmtg.HomeMatchTeam.Match.Id == match.Id &&
+                                hmtg.Group.Id == matchGameTemplate.HomeGroupTemplate.GroupTemplate.Group.Id)
+                            .SingleAsync();
+
+                    var awayMatchTeamGroup = await
+                        _context.AwayMatchTeamGroups
+                            .Where(amtg => amtg.AwayMatchTeam.Match.Id == match.Id &&
+                                amtg.Group.Id == matchGameTemplate.AwayGroupTemplate.GroupTemplate.Group.Id)
+                            .SingleAsync();
+
+                    var game = new Game
+                    {
+                        Match = match,
+                        Order = matchGameTemplate.Order,
+                        HomeMatchTeamGroup = homeMatchTeamGroup,
+                        AwayMatchTeamGroup = awayMatchTeamGroup                        
+                    };
+                    _context.Games.Add(game);
+
+                    // add home game result
+                    var homeGameResult = new HomeGameResult
+                    {
+                        Game = game,
+                        HomeMatchTeamGroup = homeMatchTeamGroup,
+                        ResultType = resultTypeNoEntry
+                    };
+                    _context.HomeGameResults.Add(homeGameResult);
+
+                    //add home game result score for home club
+                    var homeGameResultScoreByHome = new HomeGameResultScore
+                    {
+                        HomeGameResult = homeGameResult,
+                        Score = 0,
+                        ScoreStatus = scoreStatusNoEntry,
+                        SubmittedByLeagueClub = match.HomeMatchTeam.Team.LeagueClub
+                    };
+                    _context.HomeGameResultScores.Add(homeGameResultScoreByHome);
+
+                    //add home game result score for away club
+                    var homeGameResultScoreByAway = new HomeGameResultScore
+                    {
+                        HomeGameResult = homeGameResult,
+                        Score = 0,
+                        ScoreStatus = scoreStatusNoEntry,
+                        SubmittedByLeagueClub = match.AwayMatchTeam.Team.LeagueClub
+                    };
+                    _context.HomeGameResultScores.Add(homeGameResultScoreByAway);
+
+                    //add away game result
+                    var awayGameResult = new AwayGameResult
+                    {
+                        Game = game,
+                        AwayMatchTeamGroup = awayMatchTeamGroup,
+                        ResultType = resultTypeNoEntry
+                    };
+                    _context.AwayGameResults.Add(awayGameResult);
+
+                    //add away game result score for home club
+                    var awayGameResultScoreByHome = new AwayGameResultScore
+                    {
+                        AwayGameResult = awayGameResult,
+                        Score = 0,
+                        ScoreStatus = scoreStatusNoEntry,
+                        SubmittedByLeagueClub = match.HomeMatchTeam.Team.LeagueClub
+                    };
+                    _context.AwayGameResultScores.Add(awayGameResultScoreByHome);
+
+                    //add away game result score for away club
+                    var awayGameResultScoreByAway = new AwayGameResultScore
+                    {
+                        AwayGameResult = awayGameResult,
+                        Score = 0,
+                        ScoreStatus = scoreStatusNoEntry,
+                        SubmittedByLeagueClub = match.AwayMatchTeam.Team.LeagueClub
+                    };
+                    _context.AwayGameResultScores.Add(awayGameResultScoreByAway);
+                }
+
+                await _context.SaveChangesAsync();
+            }   
         }
     }
 }

@@ -1432,7 +1432,8 @@ namespace ProjectArcBlade.Data.Migrations
                     DateSubmitted = table.Column<DateTime>(nullable: false),
                     Score = table.Column<int>(nullable: false),
                     ScoreStatusId = table.Column<int>(nullable: true),
-                    SubmittedByClubPlayerId = table.Column<int>(nullable: true)
+                    SubmittedByClubPlayerId = table.Column<int>(nullable: true),
+                    SubmittedByLeagueClubId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1455,6 +1456,12 @@ namespace ProjectArcBlade.Data.Migrations
                         principalTable: "ClubPlayer",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AwayGameResultScore_LeagueClub_SubmittedByLeagueClubId",
+                        column: x => x.SubmittedByLeagueClubId,
+                        principalTable: "LeagueClub",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1467,7 +1474,8 @@ namespace ProjectArcBlade.Data.Migrations
                     HomeGameResultId = table.Column<int>(nullable: true),
                     Score = table.Column<int>(nullable: false),
                     ScoreStatusId = table.Column<int>(nullable: true),
-                    SubmittedByClubPlayerId = table.Column<int>(nullable: true)
+                    SubmittedByClubPlayerId = table.Column<int>(nullable: true),
+                    SubmittedByLeagueClubId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1488,6 +1496,12 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_HomeGameResultScore_ClubPlayer_SubmittedByClubPlayerId",
                         column: x => x.SubmittedByClubPlayerId,
                         principalTable: "ClubPlayer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_HomeGameResultScore_LeagueClub_SubmittedByLeagueClubId",
+                        column: x => x.SubmittedByLeagueClubId,
+                        principalTable: "LeagueClub",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -1543,6 +1557,11 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_AwayGameResultScore_SubmittedByClubPlayerId",
                 table: "AwayGameResultScore",
                 column: "SubmittedByClubPlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AwayGameResultScore_SubmittedByLeagueClubId",
+                table: "AwayGameResultScore",
+                column: "SubmittedByLeagueClubId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AwayGroupTemplate_GameTemplateId",
@@ -1777,6 +1796,11 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_HomeGameResultScore_SubmittedByClubPlayerId",
                 table: "HomeGameResultScore",
                 column: "SubmittedByClubPlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HomeGameResultScore_SubmittedByLeagueClubId",
+                table: "HomeGameResultScore",
+                column: "SubmittedByLeagueClubId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HomeGroupTemplate_GameTemplateId",

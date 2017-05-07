@@ -4,10 +4,7 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<br />
-
-<h1>Team Dashboard - @Model.Team.LeagueClub.Club.Name - @Model.Team.Name</h1>
-  
+<h1>Team Dashboard - @Model.Team.FullName</h1>
 <div class="panel panel-default">
     <div class="panel-body">
         
@@ -47,7 +44,7 @@
                 @Html.Partial("OverviewPartial", Model.Overview)
             </div>
             <div id="admin" class="tab-pane fade">
-                <h3>Admin</h3>
+                @Html.Partial("AdministrationPartial", Model)
             </div>
         </div>  
     </div>

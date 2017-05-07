@@ -96,11 +96,12 @@ namespace ProjectArcBlade.Controllers
         }
 
         [HttpPost]
-        public IActionResult ScheduleAllMatches(MatchSchedulingService matchSchedulingService, int seasonId)
+        public async Task<IActionResult> ScheduleAllMatches(MatchSchedulingService matchSchedulingService, MatchService matchService, TeamService teamService, int seasonId)
         {
-            var matchSchedules = matchSchedulingService.ScheduleMatches(_context, seasonId);
+            var matchSchedules = await matchSchedulingService.ScheduleMatchesAsync(_context, matchService, teamService, seasonId);
             return RedirectToAction("ScheduleAllMatches", new { seasonId = seasonId });
         }
+
         // GET: Seasons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

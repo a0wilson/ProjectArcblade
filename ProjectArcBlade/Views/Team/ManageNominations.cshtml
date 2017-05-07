@@ -3,53 +3,61 @@
 @{
     ViewData["Title"] = "ManageNominations";
 }
-
-
-
 <form asp-action="ManageNominations">
-    <br />
-    <h3><strong>Player Nominations for @Model.Team.FullName</strong></h3>
-    <hr />
-    
-    @Html.Partial("SuccessAlertPartial")
-
-    @{int i = 0;}
-    @foreach (var groupTemplate in Model.MatchTemplate.GroupTemplates)
-    {
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h5><strong>@groupTemplate.Group.Name</strong></h5>
-            </div>
-            <div class="panel-body">
-                        
-                <div class="form-group">
-                    @foreach (var rankTemplate in groupTemplate.RankTemplates)
-                    {
-                        if (Model.NominatedPlayerGroupIds[i] == groupTemplate.Group.Id)
-                        {
-                            <div class="col-md-1">
-                                <p class="form-control-static">Player @rankTemplate.Rank.Number</p>
-                            </div>
-                            <div class="col-md-5">
-                                <select asp-for="NominatedPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
-                                    <option value="0">Please nominate a Player</option>
-                                </select>
-                                <span asp-validation-for="NominatedPlayerIds[i]" class="text-danger"></span>
-                            </div>
-
-                            <input type="hidden" asp-for="NominatedPlayerTeamIds[i]" />
-                            <input type="hidden" asp-for="NominatedPlayerGroupIds[i]" />
-                            <input type="hidden" asp-for="NominatedPlayerRankIds[i]" />
-                            i++;
-                        }
-                    }
-                </div>
-
-            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <ol class="breadcrumb">
+                <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Dashboard</a></li>
+                <li>Manage Nominations</li>
+            </ol>
         </div>
-    }
-    <hr />
-    <input type="hidden" asp-for="TeamId" />
-    <input type="submit" value="Save" class="btn btn-lg btn-primary" />
+    </div>
+    <h1><strong>Manage Nominations for @Model.Team.FullName</strong></h1>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            @Html.Partial("SuccessAlertPartial")
+
+            @{int i = 0;}
+            @foreach (var groupTemplate in Model.MatchTemplate.GroupTemplates)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h5><strong>@groupTemplate.Group.Name</strong></h5>
+                    </div>
+                    <div class="panel-body">
+
+                        <div class="form-group">
+                            @foreach (var rankTemplate in groupTemplate.RankTemplates)
+                            {
+                                if (Model.NominatedPlayerGroupIds[i] == groupTemplate.Group.Id)
+                                {
+                                    <div class="col-md-1">
+                                        <p class="form-control-static">Player @rankTemplate.Rank.Number</p>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <select asp-for="NominatedPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
+                                            <option value="0">Please nominate a Player</option>
+                                        </select>
+                                        <span asp-validation-for="NominatedPlayerIds[i]" class="text-danger"></span>
+                                    </div>
+
+                                    <input type="hidden" asp-for="NominatedPlayerTeamIds[i]" />
+                                    <input type="hidden" asp-for="NominatedPlayerGroupIds[i]" />
+                                    <input type="hidden" asp-for="NominatedPlayerRankIds[i]" />
+                                    i++;
+                                }
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="panel-footer">
+            <input type="submit" value="Save" class=" text-right btn btn-lg btn-primary" />
+        </div>
+    </div>
     
+    
+    <input type="hidden" asp-for="TeamId" />
 </form>

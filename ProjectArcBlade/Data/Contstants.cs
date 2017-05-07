@@ -41,6 +41,13 @@
             public const int Inactive = 5;
         }
 
+        public static class ScoreStatus
+        {
+            public const int NoEntry = 1;
+            public const int Accepted = 2;
+            public const int Contested = 3;
+        }
+
         public static class Gender
         {
             public const int Male = 1;

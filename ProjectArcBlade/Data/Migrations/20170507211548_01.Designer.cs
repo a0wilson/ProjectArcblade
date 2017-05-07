@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170504230432_01")]
+    [Migration("20170507211548_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -249,6 +249,8 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("SubmittedByClubPlayerId");
 
+                    b.Property<int?>("SubmittedByLeagueClubId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AwayGameResultId");
@@ -256,6 +258,8 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("ScoreStatusId");
 
                     b.HasIndex("SubmittedByClubPlayerId");
+
+                    b.HasIndex("SubmittedByLeagueClubId");
 
                     b.ToTable("AwayGameResultScore");
                 });
@@ -756,6 +760,8 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("SubmittedByClubPlayerId");
 
+                    b.Property<int?>("SubmittedByLeagueClubId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HomeGameResultId");
@@ -763,6 +769,8 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("ScoreStatusId");
 
                     b.HasIndex("SubmittedByClubPlayerId");
+
+                    b.HasIndex("SubmittedByLeagueClubId");
 
                     b.ToTable("HomeGameResultScore");
                 });
@@ -1406,6 +1414,10 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.ClubPlayer", "SubmittedByClubPlayer")
                         .WithMany("AwayGameResultScores")
                         .HasForeignKey("SubmittedByClubPlayerId");
+
+                    b.HasOne("ProjectArcBlade.Models.LeagueClub", "SubmittedByLeagueClub")
+                        .WithMany("AwayGameResultScores")
+                        .HasForeignKey("SubmittedByLeagueClubId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.AwayGroupTemplate", b =>
@@ -1616,7 +1628,7 @@ namespace ProjectArcBlade.Data.Migrations
             modelBuilder.Entity("ProjectArcBlade.Models.GameTemplate", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.MatchTemplate", "MatchTemplate")
-                        .WithMany()
+                        .WithMany("MatchGameTemplates")
                         .HasForeignKey("MatchTemplateId");
                 });
 
@@ -1660,6 +1672,10 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.ClubPlayer", "SubmittedByClubPlayer")
                         .WithMany("HomeGameResultScores")
                         .HasForeignKey("SubmittedByClubPlayerId");
+
+                    b.HasOne("ProjectArcBlade.Models.LeagueClub", "SubmittedByLeagueClub")
+                        .WithMany("HomeGameResultScores")
+                        .HasForeignKey("SubmittedByLeagueClubId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.HomeGroupTemplate", b =>

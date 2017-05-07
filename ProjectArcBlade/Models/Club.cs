@@ -17,6 +17,5 @@ namespace ProjectArcBlade.Models
         public ICollection<ClubPlayer> ClubPlayers { get; set; }
         public ICollection<ClubSubscription> ClubSubscriptions { get; set; }
         public ICollection<ClubVenue> ClubVenues { get; set; }
-        
     }
 }

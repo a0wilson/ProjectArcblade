@@ -12,6 +12,7 @@ namespace ProjectArcBlade.Models
         public AwayGameResult AwayGameResult { get; set; }
         public int Score { get; set; }
         public ScoreStatus ScoreStatus { get; set; }
+        public LeagueClub SubmittedByLeagueClub { get; set; }
         public ClubPlayer SubmittedByClubPlayer { get; set; }
         public DateTime DateSubmitted { get; set; }
     }
