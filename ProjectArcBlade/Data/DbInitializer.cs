@@ -12,6 +12,18 @@ namespace ProjectArcBlade.Data
         {
             context.Database.EnsureCreated();
 
+            if (!context.MatchStatuses.Any())
+            {
+                var matchStatuses = new MatchStatus[]
+                {
+                    new MatchStatus{Name="New"},
+                    new MatchStatus{Name="In Progress"},
+                    new MatchStatus{Name="Complete"}
+                };
+                foreach (MatchStatus ms in matchStatuses) context.MatchStatuses.Add(ms);
+                context.SaveChanges();
+            }
+
             if (!context.MatchTypes.Any())
             {
                 var matchTypes = new MatchType[]
@@ -495,6 +507,27 @@ namespace ProjectArcBlade.Data
                     },
                     new PlayerDetail
                     {
+                        FirstName ="Alice",
+                        LastName ="Palmer",
+                        Gender=context.Genders.Find(2),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Carissa",
+                        LastName ="Turner",
+                        Gender=context.Genders.Find(2),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new PlayerDetail
+                    {
+                        FirstName ="Suzy",
+                        LastName ="Lloyd",
+                        Gender=context.Genders.Find(2),
+                        EmailAddress="test@yahoo.com"
+                    },
+                    new PlayerDetail
+                    {
                         FirstName ="Lee",
                         LastName ="Williams",
                         Gender=context.Genders.Find(1)
@@ -880,6 +913,5 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
         }
-                
     }
 }

@@ -71,52 +71,22 @@ namespace ProjectArcBlade.Controllers
         }
 
         //GET: Match/Preview/5
-        public async Task<IActionResult> Preview( int id)
+        public async Task<IActionResult> Preview(MatchService matchService, int matchId, int teamId)
         {
-            var match = await _context.Matches
-                .Include(m => m.Venue)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.TeamStatus)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Division)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Category)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
-                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.TeamStatus)
-                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
-                .Where(m => m.Id == id)
-                .SingleAsync();
+            var viewModel = await matchService.GetPreviewMatchViewModelAsync(_context, matchId, teamId);
+            return View(viewModel);
+        }
+               
+        public async Task<IActionResult> StartMatch( MatchService matchService, int matchId, int teamId)
+        {
+            await matchService.StartMatch(_context, matchId);
+            return RedirectToAction("MatchProgress", new { matchId = matchId, teamId = teamId });
+        }
 
-            var awayTeamPlayers = await _context.AwayMatchTeamGroupPlayers
-                .Include(amtgp => amtgp.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
-                .Include(amtgp => amtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
-                .Where(amtgp => amtgp.AwayMatchTeamGroup.AwayMatchTeam.Match.Id == id)
-                .ToListAsync();
-
-            var homeTeamPlayers = await _context.HomeMatchTeamGroupPlayers
-                .Include(hmtgp => hmtgp.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
-                .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
-                .Where(htmgp => htmgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == id)
-                .ToListAsync();
-
-            var homeTeamCaptainId = await _context.HomeMatchTeamCaptains
-                .Include(hmtc => hmtc.ClubPlayer)
-                .Where(hmtc => hmtc.HomeMatchTeam.Id == match.HomeMatchTeam.Id && hmtc.ClubPlayer != null)
-                .Select(hmtc => hmtc.ClubPlayer.Id)
-                .FirstOrDefaultAsync();
-
-            var awayTeamCaptainId = await _context.AwayMatchTeamCaptains
-                .Include(amtc => amtc.ClubPlayer)
-                .Where(amtc => amtc.AwayMatchTeam.Id == match.AwayMatchTeam.Id)
-                .Select(amtc => amtc.ClubPlayer.Id)
-                .FirstOrDefaultAsync();
-
-            var viewModel = new PreviewMatchViewModel
-            {
-                Match = match,
-                AwayTeamPlayers = awayTeamPlayers,
-                HomeTeamPlayers = homeTeamPlayers,
-                HomeTeamCaptainId = homeTeamCaptainId,
-                AwayTeamCaptainId = awayTeamCaptainId
-            };
-
+        // GET: Match/MatchProgress
+        public async Task<IActionResult> MatchProgress(MatchService matchService, int matchId, int teamId)
+        {
+            var viewModel = await matchService.GetMatchProgressViewModelAsync(_context, matchId, teamId);
             return View(viewModel);
         }
 

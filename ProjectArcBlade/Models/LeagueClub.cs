@@ -14,9 +14,7 @@ namespace ProjectArcBlade.Models
 
         public ICollection<Team> Teams { get; set; }
         public ICollection<ExclusionDate> ExclusionDates { get; set; }
-        public ICollection<AwayGameResultScore> AwayGameResultScores { get; set; }
-        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
-
+        
         public override string ToString()
         {
             return Club.Name;

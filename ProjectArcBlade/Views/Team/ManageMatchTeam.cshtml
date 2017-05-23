@@ -1,50 +1,52 @@
-@model ProjectArcBlade.Models.TeamViewModels.ManageNominationsViewModel
+@model ProjectArcBlade.Models.TeamViewModels.ManageMatchTeamViewModel
 
 @{
-    ViewData["Title"] = "ManageNominations";
+    ViewData["Title"] = "Manage Match Team";
 }
-<form asp-action="ManageNominations">
+
+<form asp-action="ManageMatchTeam">
     <div class="row">
         <div class="col-md-12">
             <ol class="breadcrumb">
                 <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Dashboard</a></li>
-                <li>Manage Nominations</li>
+                <li>Manage Match Team</li>
             </ol>
         </div>
     </div>
-    <h1><strong>Manage Nominations for @Model.Team.FullName</strong></h1>
+    <h1><strong>Manage Match Team for @Model.Team.FullName</strong></h1>
+    <h2>vs @Model.Opponents.FullName</h2>
     <div class="panel panel-default">
         <div class="panel-body">
             @Html.Partial("SuccessAlertPartial")
             @Html.Partial("DisplayWarningsPartial", Model.Warnings)
-            @Html.Partial("DisplayErrorsPartial", Model.Errors)
+
+
             <table class="table">
-                
+
                 @{int i = 0;}
-                @foreach (var item in Model.NominatedClubPlayerIds)
+                @foreach (var item in Model.MatchClubPlayerIds)
                 {
                     <tr>
                         <td style="border-top:none !important;">
                             <div class="form-group">
                                 <div class="col-md-2 text-right">
-                                    <h4 class="form-control-static"><strong>Player @Model.NominatedPlayerRankIds[i]</strong></h4>
+                                    <h4 class="form-control-static"><strong>Player @Model.MatchPlayerRankIds[i]</strong></h4>
                                 </div>
                                 <div class="col-md-10 input-group-lg">
-                                    <select asp-for="NominatedClubPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
+                                    <select asp-for="MatchClubPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
                                         <option value="0">Please nominate a Player</option>
                                     </select>
-                                    <span asp-validation-for="DuplicateEntries" class="text-danger"></span>
                                 </div>
 
-                                <input type="hidden" asp-for="NomintatedPLayerIds[i]" />
-                                <input type="hidden" asp-for="NominatedPlayerGroupIds[i]" />
-                                <input type="hidden" asp-for="NominatedPlayerRankIds[i]" />
+                                <input type="hidden" asp-for="MatchPlayerIds[i]" />
+                                <input type="hidden" asp-for="MatchPlayerGroupIds[i]" />
+                                <input type="hidden" asp-for="MatchPlayerRankIds[i]" />
                             </div>
                         </td>
-                    </tr>                            
+                    </tr>
                     i++;
                 }
-                              
+
                 <tr>
                     <td>
                         <div class="form-group">
@@ -52,20 +54,32 @@
                                 <h4 class="form-control-static"><strong>Team Captain</strong></h4>
                             </div>
                             <div class="col-md-10 input-group-lg">
-                                <select asp-for="CaptainId" asp-items="Model.TeamPlayers" class="form-control">
+                                <select asp-for="CaptainId" asp-items="Model.MatchPlayers" class="form-control">
                                     <option value="0">Please select a Player</option>
                                 </select>
                             </div>
                         </div>
                     </td>
-                </tr>                
+                </tr>
             </table>
         </div>
         <div class="panel-footer text-center">
+            <input type="submit" asp-action="BackToDashboard" asp-route-teamId="@Model.TeamId" value="Back" class="btn btn-lg btn-danger" />
             <input type="submit" value="Save" class=" text-right btn btn-lg btn-primary" />
+            @if (Model.TeamStatus.Name == "Complete")
+            {
+                if (Model.IsHomeMatch)
+                {
+                    <input type="submit" asp-action="ConfirmHomeMatchTeam" value="Submit" asp-route-homeMatchTeamId="@Model.HomeMatchTeamId" class="text-right btn btn-lg btn-success" />
+                }
+                else
+                {
+                    <input type="submit" asp-action="ConfirmAwayMatchTeam" value="Submit" asp-route-awayMatchTeamId="@Model.AwayMatchTeamId" class="text-right btn btn-lg btn-success" />
+                }
+            }
         </div>
     </div>
-    
-    
+    <input type="hidden" asp-for="HomeMatchTeamId" />
+    <input type="hidden" asp-for="AwayMatchTeamId" />
     <input type="hidden" asp-for="TeamId" />
 </form>

@@ -12,8 +12,9 @@ namespace ProjectArcBlade.Models
         public Game Game { get; set; }
         public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
         public ResultType ResultType { get; set; }
+        
+        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
 
         public int GameId { get; set; }
-        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
     }
 }

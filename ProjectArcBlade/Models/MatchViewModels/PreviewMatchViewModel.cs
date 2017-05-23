@@ -7,7 +7,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
 {
     public class PreviewMatchViewModel
     {
-        public int referrerTeamId { get; set; }
+        public Team Team { get; set; }
         public Match Match { get; set; }
         public List<AwayMatchTeamGroupPlayer> AwayTeamPlayers { get; set; }
         public List<HomeMatchTeamGroupPlayer> HomeTeamPlayers { get; set; }

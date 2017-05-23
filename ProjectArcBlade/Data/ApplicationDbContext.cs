@@ -25,6 +25,7 @@ namespace ProjectArcBlade.Data
         public DbSet<HomeGroupTemplate> HomeGroupTemplates { get; set; }
         public DbSet<AwayGroupTemplate> AwayGroupTemplates { get; set; }
         
+        public DbSet<MatchStatus> MatchStatuses { get; set; }
         public DbSet<MatchType> MatchTypes { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Rank> Ranks { get; set; }
@@ -60,6 +61,8 @@ namespace ProjectArcBlade.Data
         public DbSet<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }
         public DbSet<HomeGameResult> HomeGameResults { get; set; }
         public DbSet<HomeGameResultScore> HomeGameResultScores { get; set; }
+        public DbSet<HomeGameResultScoreFromHomeTeam> HomeGameResultScoresFromHomeTeam { get; set; }
+        public DbSet<HomeGameResultScoreFromAwayTeam> HomeGameResultScoresFromAwayTeam { get; set; }
 
         public DbSet<AwayMatchTeam> AwayMatchTeams { get; set; }
         public DbSet<AwayMatchTeamCaptain> AwayMatchTeamCaptains { get; set; }
@@ -67,6 +70,9 @@ namespace ProjectArcBlade.Data
         public DbSet<AwayMatchTeamGroupPlayer> AwayMatchTeamGroupPlayers { get; set; }
         public DbSet<AwayGameResult> AwayGameResults { get; set; }
         public DbSet<AwayGameResultScore> AwayGameResultScores { get; set; }
+        public DbSet<AwayGameResultScoreFromHomeTeam> AwayGameResultScoresFromHomeTeam { get; set; }
+        public DbSet<AwayGameResultScoreFromAwayTeam> AwayGameResultScoresFromAwayTeam { get; set; }
+
 
         public DbSet<MembershipType> MembershipTypes { get; set; }
         public DbSet<ResultType> ResultTypes { get; set; }
@@ -114,7 +120,8 @@ namespace ProjectArcBlade.Data
 
             builder.Entity<AwayGroupTemplate>().ToTable("AwayGroupTemplate");
             builder.Entity<HomeGroupTemplate>().ToTable("HomeGroupTemplate");
-            
+
+            builder.Entity<MatchStatus>().ToTable("MatchStatus");
             builder.Entity<MatchType>().ToTable("MatchType");
             builder.Entity<Venue>().ToTable("Venue");
             builder.Entity<Award>().ToTable("Award");
@@ -173,6 +180,8 @@ namespace ProjectArcBlade.Data
             builder.Entity<HomeMatchTeamGroupPlayer>().ToTable("HomeMatchTeamGroupPlayer");
             builder.Entity<HomeGameResult>().ToTable("HomeGameResult");
             builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScore");
+            builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScoreFromHomeTeam");
+            builder.Entity<HomeGameResultScore>().ToTable("HomeGameResultScoreFromAwayTeam");
 
             builder.Entity<AwayMatchTeam>().ToTable("AwayMatchTeam");
             builder.Entity<AwayMatchTeam>()

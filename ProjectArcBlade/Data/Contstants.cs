@@ -9,6 +9,12 @@
             Any
         }
 
+        public enum TeamType
+        {
+            Home,
+            Away
+        }
+
         public static class DateFormat
         {
             public static string Long = "dddd, MMM dd, yyyy";
@@ -23,6 +29,13 @@
         {
             public const int MaxGroupsPerTeam = 1;
             public const int MaxPlayersPerGroup = 2;
+        }
+
+        public static class MatchStatus
+        {
+            public const int New = 1;
+            public const int InProgress = 2;
+            public const int Complete = 3;
         }
 
         public static class MatchType
@@ -116,7 +129,7 @@
 
         public static class TeamStrings
         {
-            public const string AssignedMultipleTimes = "{0} {1} has been assigned multiple times";
+            public const string AssignedMultipleTimes = "{0} has been assigned multiple times";
         }
     }
     

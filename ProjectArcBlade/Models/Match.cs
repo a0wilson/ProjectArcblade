@@ -16,6 +16,7 @@ namespace ProjectArcBlade.Models
         public DateTime? StartDate { get; set; }
         public Venue Venue { get; set; }
         public MatchType MatchType { get; set;}
+        public MatchStatus MatchStatus { get; set; }
 
         //Navigation properties
         public AwayMatchTeam AwayMatchTeam { get; set; }
@@ -23,6 +24,7 @@ namespace ProjectArcBlade.Models
         public ICollection<RescheduledStartDate> RescheduledStartDates { get; set; }
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
+        public ICollection<Game> Games { get; set; }
 
         //unmapped properites
         [NotMapped]

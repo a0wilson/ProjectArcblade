@@ -262,11 +262,13 @@ namespace ProjectArcBlade.Services
                     var matchType = await _context.MatchTypes.FindAsync(Constants.MatchType.League);
                     var season = await _context.Seasons.FindAsync(_season.Id);
                     var venue = await _context.Venues.FindAsync(matchSchedule.VenueId);
+                    var matchStatusNew = await _context.MatchStatuses.FindAsync(Constants.MatchStatus.New);
                     var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
 
                     var newLeagueMatch = new Match
                     {
                         MatchType = matchType,
+                        MatchStatus = matchStatusNew,
                         Season = season,
                         Venue = venue,
                         StartDate = Convert.ToDateTime(matchSchedule.ScheduledDate),
@@ -415,25 +417,25 @@ namespace ProjectArcBlade.Services
                     };
                     _context.HomeGameResults.Add(homeGameResult);
 
-                    //add home game result score for home club
-                    var homeGameResultScoreByHome = new HomeGameResultScore
+                    //add home game result score for home team
+                    var homeGameResultScoreFromHomeTeam = new HomeGameResultScoreFromHomeTeam
                     {
                         HomeGameResult = homeGameResult,
                         Score = 0,
                         ScoreStatus = scoreStatusNoEntry,
-                        SubmittedByLeagueClub = match.HomeMatchTeam.Team.LeagueClub
+                        HomeMatchTeam = match.HomeMatchTeam
                     };
-                    _context.HomeGameResultScores.Add(homeGameResultScoreByHome);
+                    _context.HomeGameResultScores.Add(homeGameResultScoreFromHomeTeam);
 
-                    //add home game result score for away club
-                    var homeGameResultScoreByAway = new HomeGameResultScore
+                    //add home game result score for away match team
+                    var homeGameResultFromAwayTeam = new HomeGameResultScoreFromAwayTeam
                     {
                         HomeGameResult = homeGameResult,
                         Score = 0,
                         ScoreStatus = scoreStatusNoEntry,
-                        SubmittedByLeagueClub = match.AwayMatchTeam.Team.LeagueClub
+                        AwayMatchTeam = match.AwayMatchTeam
                     };
-                    _context.HomeGameResultScores.Add(homeGameResultScoreByAway);
+                    _context.HomeGameResultScores.Add(homeGameResultFromAwayTeam);
 
                     //add away game result
                     var awayGameResult = new AwayGameResult
@@ -444,25 +446,25 @@ namespace ProjectArcBlade.Services
                     };
                     _context.AwayGameResults.Add(awayGameResult);
 
-                    //add away game result score for home club
-                    var awayGameResultScoreByHome = new AwayGameResultScore
+                    //add away game result score from home club
+                    var awayGameResultScoreForHome = new AwayGameResultScoreFromHomeTeam
                     {
                         AwayGameResult = awayGameResult,
                         Score = 0,
                         ScoreStatus = scoreStatusNoEntry,
-                        SubmittedByLeagueClub = match.HomeMatchTeam.Team.LeagueClub
+                        HomeMatchTeam = match.HomeMatchTeam
                     };
-                    _context.AwayGameResultScores.Add(awayGameResultScoreByHome);
+                    _context.AwayGameResultScores.Add(awayGameResultScoreForHome);
 
-                    //add away game result score for away club
-                    var awayGameResultScoreByAway = new AwayGameResultScore
+                    //add away game result score from away club
+                    var awayGameResultScoreForAway = new AwayGameResultScoreFromAwayTeam
                     {
                         AwayGameResult = awayGameResult,
                         Score = 0,
                         ScoreStatus = scoreStatusNoEntry,
-                        SubmittedByLeagueClub = match.AwayMatchTeam.Team.LeagueClub
+                        AwayMatchTeam = match.AwayMatchTeam
                     };
-                    _context.AwayGameResultScores.Add(awayGameResultScoreByAway);
+                    _context.AwayGameResultScores.Add(awayGameResultScoreForAway);
                 }
 
                 await _context.SaveChangesAsync();

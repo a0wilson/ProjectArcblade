@@ -13,7 +13,8 @@ namespace ProjectArcBlade.Models
         public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
         public ResultType ResultType { get; set; }
 
-        public int GameId { get; set; }
         public ICollection<AwayGameResultScore> AwayGameResultScores { get; set; }
+
+        public int GameId { get; set; }
     }
 }

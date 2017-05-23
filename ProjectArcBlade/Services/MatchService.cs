@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectArcBlade.Data;
 using ProjectArcBlade.Models;
+using ProjectArcBlade.Models.MatchViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,15 +105,18 @@ namespace ProjectArcBlade.Services
             return groupTemplates;
         }
 
-        public async Task<List<Match>> GetAllLeagueMatchesByTeamAsycn(ApplicationDbContext context, int teamId)
+        public async Task<List<Match>> GetAllLeagueMatchesByTeamAsync(ApplicationDbContext context, int teamId)
         {
             if (_context == null) _context = context;
 
             var allLeagueMatches = await _context.Matches
                 .Include(m => m.Venue)
+                .Include(m => m.MatchStatus)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.TeamStatus)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.TeamStatus)
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
                 .Where(m => (m.AwayMatchTeam.Team.Id == teamId || m.HomeMatchTeam.Team.Id == teamId)
                     && m.MatchType.Id == Constants.MatchType.League)
@@ -121,6 +125,133 @@ namespace ProjectArcBlade.Services
             return allLeagueMatches;
         }
 
+        public async Task<PreviewMatchViewModel>GetPreviewMatchViewModelAsync(ApplicationDbContext context, int matchId, int teamId)
+        {
+            if (_context == null) _context = context;
 
+            var match = await _context.Matches
+                .Include(m => m.Venue)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.TeamStatus)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Division)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.Category)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.TeamStatus)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Where(m => m.Id == matchId)
+                .SingleAsync();
+
+            var awayTeamPlayers = await _context.AwayMatchTeamGroupPlayers
+                .Include(amtgp => amtgp.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
+                .Include(amtgp => amtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
+                .Where(amtgp => amtgp.AwayMatchTeamGroup.AwayMatchTeam.Match.Id == matchId)
+                .ToListAsync();
+
+            var homeTeamPlayers = await _context.HomeMatchTeamGroupPlayers
+                .Include(hmtgp => hmtgp.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Include(hmtgp => hmtgp.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
+                .Where(htmgp => htmgp.HomeMatchTeamGroup.HomeMatchTeam.Match.Id == matchId)
+                .ToListAsync();
+
+            var homeTeamCaptainId = await _context.HomeMatchTeamCaptains
+                .Include(hmtc => hmtc.ClubPlayer)
+                .Where(hmtc => hmtc.HomeMatchTeam.Id == match.HomeMatchTeam.Id && hmtc.ClubPlayer != null)
+                .Select(hmtc => hmtc.ClubPlayer.Id)
+                .FirstOrDefaultAsync();
+
+            var awayTeamCaptainId = await _context.AwayMatchTeamCaptains
+                .Include(amtc => amtc.ClubPlayer)
+                .Where(amtc => amtc.AwayMatchTeam.Id == match.AwayMatchTeam.Id && amtc.ClubPlayer != null)
+                .Select(amtc => amtc.ClubPlayer.Id)
+                .FirstOrDefaultAsync();
+
+            var team = await _context.Teams
+                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .SingleAsync(t => t.Id == teamId);
+
+            var viewModel = new PreviewMatchViewModel
+            {
+                Team = team,
+                Match = match,
+                AwayTeamPlayers = awayTeamPlayers,
+                HomeTeamPlayers = homeTeamPlayers,
+                HomeTeamCaptainId = homeTeamCaptainId,
+                AwayTeamCaptainId = awayTeamCaptainId
+            };
+
+            return viewModel;
+        }
+
+        public async Task StartMatch(ApplicationDbContext context, int matchId)
+        {
+            if (_context == null) _context = context;
+
+            var match = await _context.Matches
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
+                .Where(m => m.Id == matchId)
+                .SingleAsync();
+
+            var resultTypePending = await _context.ResultTypes.FindAsync(Constants.ResultType.Pending);
+            var matchStatusInProgress = await _context.MatchStatuses.FindAsync(Constants.MatchStatus.InProgress);
+
+            match.AwayMatchTeam.ResultType = resultTypePending;
+            match.HomeMatchTeam.ResultType = resultTypePending;
+            match.MatchStatus = matchStatusInProgress;
+
+            _context.Matches.Update(match);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<Match> GetMatchByIdAsync(int matchId)
+        {
+            var match = await  _context.Matches
+                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Where(m => m.Id == matchId)
+                .SingleAsync();
+
+            await _context.Entry(match)
+                .Collection(m => m.Games)
+                .Query()
+                .Include(g => g.HomeGameResult).ThenInclude(hgr => hgr.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Include(g => g.AwayGameResult).ThenInclude(agr => agr.AwayMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .ToListAsync();
+
+            foreach (var game in match.Games)
+            {
+                await _context.Entry(game.HomeGameResult)
+                    .Collection(hgr => hgr.HomeGameResultScores)
+                    .Query()
+                    .Include(hgrs => hgrs.ScoreStatus)
+                    .ToListAsync();
+
+                await _context.Entry(game.AwayGameResult)
+                    .Collection(g => g.AwayGameResultScores)
+                    .Query()
+                    .Include(agrs => agrs.ScoreStatus)
+                    .ToListAsync();
+            }
+
+            return match;
+        }
+
+        public async Task<MatchProgressViewModel> GetMatchProgressViewModelAsync( ApplicationDbContext context, int matchId, int teamId)
+        {
+            if (_context == null) _context = context;
+
+            var match = await GetMatchByIdAsync(matchId);
+
+            var team = await _context.Teams
+                .Include(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .SingleAsync(t => t.Id == teamId);
+
+            var viewModel = new MatchProgressViewModel
+            {
+                Match = match,
+                Team = team
+            };
+
+            return viewModel;
+        }
     }
 }

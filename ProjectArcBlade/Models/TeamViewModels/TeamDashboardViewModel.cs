@@ -9,6 +9,7 @@ namespace ProjectArcBlade.Models.TeamViewModels
     public class TeamDashboardViewModel
     {
         public Team Team { get; set; }
+        public ICollection<Match> InProgressMatches { get; set; }
         public ICollection<Match> UpcomingMatches { get; set; }
         public ICollection<Match> RecentMatches { get; set; }
         public ICollection<NameValuePair> Overview { get; set; }

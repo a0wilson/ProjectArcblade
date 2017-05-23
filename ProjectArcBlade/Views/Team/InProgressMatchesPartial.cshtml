@@ -1,0 +1,40 @@
+@model ProjectArcBlade.Models.TeamViewModels.TeamDashboardViewModel
+
+<h2>In Progress Matches</h2>
+<hr />
+<div class="well">
+    @if (Model.InProgressMatches.Count != 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Vs</th>
+                    <th>Venue</th>
+                    <th>Match Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.InProgressMatches)
+                {
+                    var isHome = item.AwayMatchTeam.Team.Id == Model.Team.Id ? false : true;
+                    <tr>
+                        <td>
+                            <a title="Update" asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@item.HomeMatchTeam.Match.Id" asp-route-teamId="@Model.Team.Id"><span class="glyphicon glyphicon-play-circle"></span> Update</a>
+                        </td>
+                        <td>@(isHome ? item.AwayMatchTeam.Team.LeagueClub.Club.Name + " - " + item.AwayMatchTeam.Team.Name : item.HomeMatchTeam.Team.LeagueClub.Club.Name + " - " + item.HomeMatchTeam.Team.Name) @if (isHome)
+                        { <span class="label label-primary">Home</span> }
+                        else
+                        { <span class="label label-default">Away</span> }</td>
+                        <td>@item.Venue.Name</td>
+                        <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div>There are no matches in progress</div>
+    }
+</div>

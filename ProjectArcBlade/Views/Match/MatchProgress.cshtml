@@ -1,0 +1,92 @@
+@model ProjectArcBlade.Models.MatchViewModels.MatchProgressViewModel
+@{
+    ViewData["Title"] = "MatchProgress";
+}
+
+<h2>MatchProgress</h2>
+
+<form asp-action="MatchProgress">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr style="background-color:lightgray">
+                        <td>
+                            <div class="col-md-offset-1 col-md-4 text-center">
+                                <h3 class="form-control-static"><strong>Home</strong></h3>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <h3 class="form-control-static"><strong>vs</strong></h3>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <h3 class="form-control-static"><strong>Away</strong></h3>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @foreach (var game in Model.Match.Games)
+                    {
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <div class="col-md-offset-1 col-md-2 text-right">
+                                        <h4 class="form-control-static"><strong>@game.HomeMatchTeamGroup.Group.Name</strong></h4>
+                                    </div>
+                                    <div class="col-md-2 input-group-lg">
+                                        @foreach (var homeScore in game.HomeGameResult.HomeGameResultScores)
+                                        {
+                                            @if (Model.IsHomeTeam)
+                                            {
+                                                @if (homeScore.GetType() == typeof(HomeGameResultScoreFromHomeTeam))
+                                                {
+                                                    <input class="form-control" asp-for="@homeScore.Score" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @if (homeScore.GetType() == typeof(HomeGameResultScoreFromAwayTeam))
+                                                {
+                                                    <input class="form-control" asp-for="@homeScore.Score" />
+                                                }
+                                            }
+                                        }                                        
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4 class="form-control-static"><strong>@game.Order</strong></h4>
+                                    </div>
+                                    <div class="col-md-2 input-group-lg">
+                                        @foreach (var awayScore in game.AwayGameResult.AwayGameResultScores)
+                                        {
+                                            @if (Model.IsHomeTeam)
+                                            {
+                                                @if (awayScore.GetType() == typeof(AwayGameResultScoreFromHomeTeam))
+                                                {
+                                                    <input class="form-control" asp-for="@awayScore.Score" />
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @if (awayScore.GetType() == typeof(AwayGameResultScoreFromAwayTeam))
+                                                {
+                                                    <input class="form-control" asp-for="@awayScore.Score" />
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                    <div class="col-md-2 text-left">
+                                        <h4 class="form-control-static"><strong>@game.AwayMatchTeamGroup.Group.Name</strong></h4>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">
+
+        </div>
+    </div>
+</form>
+
