@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class MatchStatus : Status
+    public class MatchHomeResult : HomeResult
     {
-        public ICollection<Match> Matches { get; set; }
+        public Match Match { get; set; }
+
+        public int MatchId { get; set; }
     }
 }

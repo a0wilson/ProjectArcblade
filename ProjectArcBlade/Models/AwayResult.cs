@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class CategoryRule
+    public class AwayResult
     {
         public int Id { get; set; }
-        public Rule Rule { get; set; }
-        public Category Category { get; set; }
+        public ResultType ResultType { get; set; }
     }
 }

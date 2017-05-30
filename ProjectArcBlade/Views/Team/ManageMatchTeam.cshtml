@@ -8,12 +8,12 @@
     <div class="row">
         <div class="col-md-12">
             <ol class="breadcrumb">
-                <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Dashboard</a></li>
+                <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Team Dashboard - @Model.Team.FullName</a></li>
                 <li>Manage Match Team</li>
             </ol>
         </div>
     </div>
-    <h1><strong>Manage Match Team for @Model.Team.FullName</strong></h1>
+    <h1>Manage Match Team for @Model.Team.FullName</h1>
     <h2>vs @Model.Opponents.FullName</h2>
     <div class="panel panel-default">
         <div class="panel-body">

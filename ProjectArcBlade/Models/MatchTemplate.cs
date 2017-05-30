@@ -13,6 +13,6 @@ namespace ProjectArcBlade.Models
         public ICollection<GroupTemplate> GroupTemplates { get; set; }
         public ICollection<MatchTemplateSeason> MatchTemplateSeasons { get; set; }
         public ICollection<MatchTemplateCategory> MatchTemplateCategories { get; set; }
-        public ICollection<GameTemplate> MatchGameTemplates { get; set; }
+        public ICollection<SetTemplate> SetTemplates { get; set; }
     }
 }

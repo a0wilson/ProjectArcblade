@@ -13,7 +13,6 @@ namespace ProjectArcBlade.Models
         public HomeMatchTeam HomeMatchTeam { get; set; }
 
         public ICollection<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }
-        public ICollection<HomeGameResult> HomeGameResults { get; set; }
-        public ICollection<Game> Games { get; set; }
+        public ICollection<Set> Sets { get; set; }
     }
 }

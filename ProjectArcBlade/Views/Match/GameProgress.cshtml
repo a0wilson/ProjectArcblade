@@ -1,0 +1,121 @@
+@model ProjectArcBlade.Models.MatchViewModels.GameProgressViewModel
+@{
+    ViewData["Title"] = "Game Progress";
+}
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+            <li><a asp-action="Dashboard" asp-controller="Team" asp-route-id="@Model.TeamId">Team Dashboard - @Model.TeamName</a></li>
+            <li><a asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@Model.MatchId" asp-route-teamId="@Model.TeamId">Match Progress</a></li>
+            <li>Game Progress</li>
+        </ol>
+    </div>
+</div>
+<h1>Game Progress</h1>
+<form asp-action="GameProgress">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr style="background-color:lightgray">
+                        <td>
+                            <div class="col-md-offset-1 col-md-4 text-right">
+                                <h3 class="form-control-static"><strong>@Model.HomeTeamName</strong></h3>
+                                <h3 class="form-control-static"><strong>@Model.HomeGroup</strong></h3>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <p>&nbsp;</p>
+                                <h3 class="form-control-static"><strong>vs</strong></h3>
+                            </div>
+                            <div class="col-md-4 text-left">
+                                <h3 class="form-control-static"><strong>@Model.AwayTeamName</strong></h3>
+                                <h3 class="form-control-static"><strong>@Model.AwayGroup</strong></h3>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @for (var index = 0; index < Model.GameTotal; index++)
+                    {
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <input type="hidden" asp-for="@Model.GameId[index]" />
+
+                                    <div class="col-md-offset-1 col-md-2 text-right">
+                                        <h4 class="form-control-static"><strong>Home Score</strong></h4>
+                                    </div>
+                                    <div class="col-md-2 input-group-lg">
+                                        @if (Model.IsHomeTeam)
+                                        {
+                                            <input class="form-control" asp-for="HomeHomeSore[index]" />
+                                            @if (Model.HomeHomeSoreStatus[index] == "Contested")
+                                            {
+                                                <span class="badge">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                </span>
+                                            }
+                                            <i>Away Team entry : @Model.AwayHomeSore[index]</i>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" asp-for="AwayHomeSore[index]" />
+                                            @if (Model.AwayHomeSoreStatus[index] == "Contested")
+                                            {
+                                                <span class="badge">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                </span>
+                                            }
+                                            <i>Home Team entry : @Model.HomeHomeSore[index]</i>
+                                        }
+                                    </div>
+                                    <div class="col-md-2">
+                                        <h4 class="form-control-static"><strong>@Model.GameNumber[index]</strong></h4>
+                                    </div>
+                                    <div class="col-md-2 input-group-lg">
+                                        @if (Model.IsHomeTeam)
+                                        {
+                                            <input class="form-control" asp-for="HomeAwaySore[index]" />
+                                            @if (Model.HomeAwaySoreStatus[index] == "Contested")
+                                            {
+                                                <span class="badge">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                </span>
+                                            }
+                                            <i>Away Team entry : @Model.AwayAwaySore[index]</i>
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control" asp-for="AwayAwaySore[index]" />
+                                            @if (Model.AwayAwaySoreStatus[index] == "Contested")
+                                            {
+                                                <span class="badge">
+                                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                                </span>
+                                            }
+                                            <i>Home Team entry : @Model.HomeAwaySore[index]</i>
+                                        }
+                                    </div>
+                                    <div class="col-md-2 text-left">
+                                        <h4 class="form-control-static">
+                                            <strong>Away Score</strong>
+                                        </h4>
+                                       
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer text-center">
+            <input type="submit" value="Save" class="btn btn-lg btn-primary" />
+            <input type="hidden" asp-for="@Model.IsHomeTeam" />
+            <input type="hidden" asp-for="@Model.MatchId" />
+            <input type="hidden" asp-for="@Model.TeamId" />
+            <input type="hidden" asp-for="@Model.SetId" />
+        </div>
+    </div>
+</form>
+

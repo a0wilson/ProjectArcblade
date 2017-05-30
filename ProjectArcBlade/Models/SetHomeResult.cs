@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class LeagueRule
+    public class SetHomeResult : HomeResult
     {
-        public int Id { get; set; }
-        public Rule Rule { get; set; }
-        public League League { get; set; }
+        public Set Set { get; set; }
+
+        public int SetId { get; set; }
     }
 }

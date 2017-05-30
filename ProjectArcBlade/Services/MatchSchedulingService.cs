@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjectArcBlade.Data;
+using ProjectArcBlade.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ProjectArcBlade.Models;
 using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Services
@@ -169,7 +169,7 @@ namespace ProjectArcBlade.Services
             //Finally... create/update the matches!
             foreach (MatchSchedule ms in _matchSchedules) await CreateMatchAsync(ms);
             
-            if( await _context.Games.AnyAsync(g => g.Match.Season.Id == _season.Id) == false )
+            if( await _context.Games.AnyAsync(game => game.Set.Match.Season.Id == _season.Id) == false )
             {
                 //if no games have been created for this season then create them!
                 foreach (MatchSchedule ms in _matchSchedules) await CreateMatchGamesAsync(ms);
@@ -255,16 +255,17 @@ namespace ProjectArcBlade.Services
 
                 if (matchExists)
                 {
-                    await UpdateMatchAsync(matchSchedule);
+                    await UpdateMatchAsync(matchSchedule); 
                 }
                 else
                 {
-                    var matchType = await _context.MatchTypes.FindAsync(Constants.MatchType.League);
+                    var matchType = await _matchService.GetMatchTypeAsync(_context, Constants.MatchType.League);
                     var season = await _context.Seasons.FindAsync(_season.Id);
                     var venue = await _context.Venues.FindAsync(matchSchedule.VenueId);
-                    var matchStatusNew = await _context.MatchStatuses.FindAsync(Constants.MatchStatus.New);
+                    var matchStatusNew = await _matchService.GetMatchStatusAsync(_context, Constants.MatchStatus.New);
                     var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
-
+                    var resultNoEntry = await _matchService.GetResultTypeAsync(_context, Constants.ResultType.NoEntry);
+                    
                     var newLeagueMatch = new Match
                     {
                         MatchType = matchType,
@@ -275,13 +276,26 @@ namespace ProjectArcBlade.Services
                         StartTime = matchSchedule.StartTime
                     };
                     _context.Matches.Add(newLeagueMatch);
-                    
+
+                    var matchHomeResult = new MatchHomeResult
+                    {
+                        Match = newLeagueMatch,
+                        ResultType = resultNoEntry
+                    };
+                    _context.MatchHomeResults.Add(matchHomeResult);
+
+                    var matchAwayResult = new MatchAwayResult
+                    {
+                        Match = newLeagueMatch,
+                        ResultType = resultNoEntry
+                    };
+                    _context.MatchAwayResults.Add(matchAwayResult);
+
                     var homeMatchTeam = new HomeMatchTeam
                     {
                         Match = newLeagueMatch,
-                        ResultType = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry),
                         Team = await _context.Teams.FindAsync(matchSchedule.HomeTeamId),
-                        TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.New)
+                        TeamStatus = await _teamService.GetTeamStatusAsync(_context, Constants.TeamStatus.New)
                     };
                     _context.HomeMatchTeams.Add(homeMatchTeam);
 
@@ -310,9 +324,8 @@ namespace ProjectArcBlade.Services
                     var awayMatchTeam = new AwayMatchTeam
                     {
                         Match = newLeagueMatch,
-                        ResultType = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry),
                         Team = await _context.Teams.FindAsync(matchSchedule.AwayTeamId),
-                        TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.New)
+                        TeamStatus = await _teamService.GetTeamStatusAsync(_context, Constants.TeamStatus.New)
                     };
                     _context.AwayMatchTeams.Add(awayMatchTeam);
 
@@ -348,15 +361,15 @@ namespace ProjectArcBlade.Services
             var updateMatch = await _context.Matches
                 .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team)
                 .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team)
-                .Include(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.ResultType)
-                .Include(m => m.AwayMatchTeam).ThenInclude(amt => amt.ResultType)
+                .Include(m => m.MatchHomeResult).ThenInclude(hmt => hmt.ResultType)
+                .Include(m => m.MatchAwayResult).ThenInclude(amt => amt.ResultType)
                 .Where(m => m.HomeMatchTeam.Team.Id == matchSchedule.HomeTeamId
                     && m.AwayMatchTeam.Team.Id == matchSchedule.AwayTeamId
                     && m.Season.Id == _season.Id).SingleAsync();
 
             //only update match if it not yet started.
-            if( updateMatch.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry 
-                    && updateMatch.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry )
+            if( updateMatch.MatchHomeResult.ResultType.Name == Constants.ResultType.NoEntry 
+                    && updateMatch.MatchAwayResult.ResultType.Name == Constants.ResultType.NoEntry )
             {
                 updateMatch.Venue = _context.Venues.Find(matchSchedule.VenueId);
                 updateMatch.StartDate = Convert.ToDateTime(matchSchedule.ScheduledDate);
@@ -382,91 +395,104 @@ namespace ProjectArcBlade.Services
             if (match != null) //only proceed if the match exists.
             {
                 var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
-                var resultTypeNoEntry = await _context.ResultTypes.FindAsync(Constants.ResultType.NoEntry);
-                var scoreStatusNoEntry = await _context.ScoreStatuses.FindAsync(Constants.ScoreStatus.NoEntry);
+                var resultTypeNoEntry = await _matchService.GetResultTypeAsync(_context, Constants.ResultType.NoEntry);
+                var scoreStatusNoEntry = await _matchService.GetScoreStatusAsync(_context, Constants.ScoreStatus.NoEntry);
+                var setStatusNew = await _matchService.GetSetStatusAsync(_context, Constants.SetStatus.New);
 
-                foreach (var matchGameTemplate in matchTemplate.MatchGameTemplates)
+                foreach (var setTemplate in matchTemplate.SetTemplates)
                 {   
                     var homeMatchTeamGroup = await
                         _context.HomeMatchTeamGroups
                             .Where(hmtg => hmtg.HomeMatchTeam.Match.Id == match.Id &&
-                                hmtg.Group.Id == matchGameTemplate.HomeGroupTemplate.GroupTemplate.Group.Id)
+                                hmtg.Group.Id == setTemplate.HomeGroupTemplate.GroupTemplate.Group.Id)
                             .SingleAsync();
 
                     var awayMatchTeamGroup = await
                         _context.AwayMatchTeamGroups
                             .Where(amtg => amtg.AwayMatchTeam.Match.Id == match.Id &&
-                                amtg.Group.Id == matchGameTemplate.AwayGroupTemplate.GroupTemplate.Group.Id)
+                                amtg.Group.Id == setTemplate.AwayGroupTemplate.GroupTemplate.Group.Id)
                             .SingleAsync();
 
-                    var game = new Game
+                    var set = new Set
                     {
-                        Match = match,
-                        Order = matchGameTemplate.Order,
-                        HomeMatchTeamGroup = homeMatchTeamGroup,
-                        AwayMatchTeamGroup = awayMatchTeamGroup                        
-                    };
-                    _context.Games.Add(game);
-
-                    // add home game result
-                    var homeGameResult = new HomeGameResult
-                    {
-                        Game = game,
-                        HomeMatchTeamGroup = homeMatchTeamGroup,
-                        ResultType = resultTypeNoEntry
-                    };
-                    _context.HomeGameResults.Add(homeGameResult);
-
-                    //add home game result score for home team
-                    var homeGameResultScoreFromHomeTeam = new HomeGameResultScoreFromHomeTeam
-                    {
-                        HomeGameResult = homeGameResult,
-                        Score = 0,
-                        ScoreStatus = scoreStatusNoEntry,
-                        HomeMatchTeam = match.HomeMatchTeam
-                    };
-                    _context.HomeGameResultScores.Add(homeGameResultScoreFromHomeTeam);
-
-                    //add home game result score for away match team
-                    var homeGameResultFromAwayTeam = new HomeGameResultScoreFromAwayTeam
-                    {
-                        HomeGameResult = homeGameResult,
-                        Score = 0,
-                        ScoreStatus = scoreStatusNoEntry,
-                        AwayMatchTeam = match.AwayMatchTeam
-                    };
-                    _context.HomeGameResultScores.Add(homeGameResultFromAwayTeam);
-
-                    //add away game result
-                    var awayGameResult = new AwayGameResult
-                    {
-                        Game = game,
                         AwayMatchTeamGroup = awayMatchTeamGroup,
+                        HomeMatchTeamGroup = homeMatchTeamGroup,
+                        Match = match,
+                        SetStatus = setStatusNew,
+                        Number = setTemplate.Number                       
+                    };
+                    _context.Sets.Add(set);
+
+                    var setHomeResult = new SetHomeResult
+                    {
+                        Set = set,
                         ResultType = resultTypeNoEntry
                     };
-                    _context.AwayGameResults.Add(awayGameResult);
+                    _context.SetHomeResults.Add(setHomeResult);
 
-                    //add away game result score from home club
-                    var awayGameResultScoreForHome = new AwayGameResultScoreFromHomeTeam
+                    var setAwayResult = new SetAwayResult
                     {
-                        AwayGameResult = awayGameResult,
-                        Score = 0,
-                        ScoreStatus = scoreStatusNoEntry,
-                        HomeMatchTeam = match.HomeMatchTeam
+                        Set = set,
+                        ResultType = resultTypeNoEntry
                     };
-                    _context.AwayGameResultScores.Add(awayGameResultScoreForHome);
+                    _context.SetAwayResults.Add(setAwayResult);
 
-                    //add away game result score from away club
-                    var awayGameResultScoreForAway = new AwayGameResultScoreFromAwayTeam
+                    foreach(var gameTemplate in setTemplate.GameTemplates)
                     {
-                        AwayGameResult = awayGameResult,
-                        Score = 0,
-                        ScoreStatus = scoreStatusNoEntry,
-                        AwayMatchTeam = match.AwayMatchTeam
-                    };
-                    _context.AwayGameResultScores.Add(awayGameResultScoreForAway);
+                        var game = new Game
+                        {
+                            Set = set,
+                            Number = gameTemplate.Number                            
+                        };
+                        _context.Games.Add(game);
+
+                        var gameHomeResult = new GameHomeResult
+                        {
+                            Game = game,
+                            ResultType = resultTypeNoEntry
+                        };
+                        _context.GameHomeResults.Add(gameHomeResult);
+
+                        var gameAwayResult = new GameAwayResult
+                        {
+                            Game = game,
+                            ResultType = resultTypeNoEntry
+                        };
+                        _context.GameAwayResults.Add(gameAwayResult);
+                        
+                        var homeTeamHomeTeamScore = new HomeTeamHomeTeamScore
+                        {
+                            Score = 0,
+                            Game = game,
+                            ScoreStatus = scoreStatusNoEntry,
+                        };
+                        _context.HomeTeamHomeTeamScores.Add(homeTeamHomeTeamScore);
+
+                        var awayTeamHomeTeamScore = new AwayTeamHomeTeamScore
+                        {
+                            Score = 0,
+                            Game = game,
+                            ScoreStatus = scoreStatusNoEntry,
+                        };
+                        _context.AwayTeamHomeTeamScores.Add(awayTeamHomeTeamScore);
+
+                        var homeTeamAwayTeamScore = new HomeTeamAwayTeamScore
+                        {
+                            Score = 0,
+                            Game = game,
+                            ScoreStatus = scoreStatusNoEntry,
+                        };
+                        _context.HomeTeamAwayTeamScores.Add(homeTeamAwayTeamScore);
+
+                        var awayTeamAwayTeamScore = new AwayTeamAwayTeamScore
+                        {
+                            Score = 0,
+                            Game = game,
+                            ScoreStatus = scoreStatusNoEntry,
+                        };
+                        _context.AwayTeamAwayTeamScores.Add(awayTeamAwayTeamScore);
+                    }                    
                 }
-
                 await _context.SaveChangesAsync();
             }   
         }

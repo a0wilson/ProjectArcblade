@@ -25,42 +25,55 @@
             public static string Short = "HH:mm";
         }
 
-        public static class Setting
+        public static class ResultType
         {
-            public const int MaxGroupsPerTeam = 1;
-            public const int MaxPlayersPerGroup = 2;
-        }
-
-        public static class MatchStatus
-        {
-            public const int New = 1;
-            public const int InProgress = 2;
-            public const int Complete = 3;
+            
+            public const string Win = "Win";
+            public const string Loss = "Loss";
+            public const string Draw = "Draw";
+            public const string Forfeit = "Forfeit";
+            public const string Pending = "Pending";
+            public const string NoEntry = "No Entry";
+            public const string Conceded = "Concdeded";
         }
 
         public static class MatchType
         {
-            public const int League = 1;
-            public const int Cup = 2;
-            public const int Casual = 3;
+            public const string League = "League";
+            public const string Cup = "Cup";
+            public const string Casual = "Casual";
+        }
+
+        public static class MatchStatus
+        {
+            public const string New = "New";
+            public const string InProgress = "In Progress";
+            public const string Complete = "Complete";
+        }
+
+        public static class SetStatus
+        {
+            public const string New = "New";
+            public const string InProgress = "In Progress";
+            public const string Complete = "Complete";
         }
 
         public static class TeamStatus
         {
-            public const int New = 1;
-            public const int InProgress = 2;
-            public const int Complete = 3;
-            public const int Active = 4;
-            public const int Inactive = 5;
+            public const string New = "New";
+            public const string InProgress = "In Progress";
+            public const string Complete = "Complete";
+            public const string Active = "Active";
+            public const string Inactive = "Inactive";
         }
 
         public static class ScoreStatus
         {
-            public const int NoEntry = 1;
-            public const int Accepted = 2;
-            public const int Contested = 3;
+            public const string NoEntry = "No Entry";
+            public const string Accepted = "Accepted";
+            public const string Contested = "Contested";
         }
-
+        
         public static class Gender
         {
             public const int Male = 1;
@@ -85,18 +98,7 @@
             public const int Saturday = 6;
             public const int Sunday = 7;
         }
-
-        public static class ResultType
-        {
-            public const int NoEntry = 1;
-            public const int Win = 2;
-            public const int Loss = 3;
-            public const int Draw = 4;
-            public const int Forfeit = 5;
-            public const int Pending = 6;
-            public const int Conceded = 7;
-        }
-
+        
         public static class CreateMatchStrings
         {
             public const string MatchTypeId = "MatchTypeId";

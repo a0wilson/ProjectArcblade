@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class HomeGameResultScoreFromAwayTeam : HomeGameResultScore
+    public class SetStatus : Status
     {
-        public AwayMatchTeam AwayMatchTeam { get; set; }
+        public ICollection<Set> Sets { get; set; }
     }
 }

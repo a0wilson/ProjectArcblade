@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class HomeGameResult
+    public class HomeResult
     {
         public int Id { get; set; }
-        public Game Game { get; set; }
-        public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
         public ResultType ResultType { get; set; }
-        
-        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
-
-        public int GameId { get; set; }
     }
 }

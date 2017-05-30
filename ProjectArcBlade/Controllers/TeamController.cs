@@ -147,7 +147,7 @@ namespace ProjectArcBlade.Controllers
         }
 
         // GET: Team/Details/5
-        public async Task<IActionResult> Details(SettingsService settingsService, int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -171,12 +171,9 @@ namespace ProjectArcBlade.Controllers
 
             var teams = new List<SelectListItem> { new SelectListItem { Value = team.Id.ToString(), Text = team.Name } };
 
-            //check rules
-            var maxGroupRuleValue = settingsService.GetSettingValue(_context, Constants.Setting.MaxGroupsPerTeam, team.LeagueClub.League.Id, team.Category.Id).Value;
-
+            
             var groups = 
                 await _context.Groups
-                    .Where(g => g.Id <= maxGroupRuleValue)
                     .Select(g => new SelectListItem { Value = g.Id.ToString(), Text = g.Name })
                     .ToListAsync();
             // set selected group id
@@ -192,20 +189,13 @@ namespace ProjectArcBlade.Controllers
                 .Where(tp => tp.Team.Id == id)
                 .Select(tp => tp.ClubPlayer.Id)
                 .ToListAsync();
-
-            //var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(_context, team.LeagueClub.Club.Id, team.Category.Id);
-
-            //var availableTeamPlayers = clubPlayers
-            //    .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = String.Format("{0} {1}", cp.PlayerDetail.FirstName, cp.PlayerDetail.LastName) })
-            //    .ToList();
-
+            
             var manageTeamPlayersViewModel = new ManageTeamPlayersViewModel
             {
                 GroupId = groupId,
                 Teams = teams,
                 Groups = groups,
                 AssignedTeamPlayers = assignedTeamPlayers,
-                //AvailableTeamPlayers = availableTeamPlayers,
                 TeamStatus = team.TeamStatus
             };
 

@@ -1,19 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
     public class Game
     {
-        public int Id { get; set; }
-        public Match Match { get; set; }
-        public int Order { get; set; }
-        public AwayMatchTeamGroup AwayMatchTeamGroup { get; set; }
-        public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
+        public int Id { get; set; }        
+        public int Number { get; set; }
+        public Set Set { get; set; }
+        public GameAwayResult GameAwayResult { get; set; }
+        public GameHomeResult GameHomeResult { get; set; }
+        public HomeTeamAwayTeamScore HomeTeamAwayTeamScore { get; set; }
+        public HomeTeamHomeTeamScore HomeTeamHomeTeamScore { get; set; }
+        public AwayTeamAwayTeamScore AwayTeamAwayTeamScore { get; set; }
+        public AwayTeamHomeTeamScore AwayTeamHomeTeamScore { get; set; }
 
-        public AwayGameResult AwayGameResult { get; set; }
-        public HomeGameResult HomeGameResult { get; set; }
+        public int HomeTeamAwayTeamScoreId { get; set; }
+        public int HomeTeamHomeTeamScoreId { get; set; }
+        public int AwayTeamAwayTeamScoreId { get; set; }
+        public int AwayTeamHomeTeamScoreId { get; set; }
     }
 }

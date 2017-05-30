@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ProjectArcBlade.Models
 {
-    public class HomeGameResultScoreFromHomeTeam : HomeGameResultScore
+    public class HomeTeamAwayTeamScore : AwayTeamScore
     {
-        public HomeMatchTeam HomeMatchTeam { get; set; }
+        public Game Game { get; set; }
     }
 }

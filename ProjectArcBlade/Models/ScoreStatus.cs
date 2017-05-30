@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
-    public class ScoreStatus
+    public class ScoreStatus : Status
     {
-        public int Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-
-        public ICollection<AwayGameResultScore> AwayGameResultScores { get; set; }
-        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
+        public ICollection<AwayTeamScore> AwayTeamScores { get; set; }
+        public ICollection<HomeTeamScore> HomeTeamScores { get; set; }
     }
 }

@@ -24,6 +24,32 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
+            if (!context.SetStatuses.Any())
+            {
+                var setStasuses = new SetStatus[]
+                {
+                    new SetStatus{Name="New"},
+                    new SetStatus{Name="In Progress"},
+                    new SetStatus{Name="Complete"}
+                };
+                foreach (SetStatus ss in setStasuses) context.SetStatuses.Add(ss);
+                context.SaveChanges();
+            }
+
+            if (!context.TeamStatuses.Any())
+            {
+                var teamStatuses = new TeamStatus[]
+                {
+                    new TeamStatus{Name="New"},
+                    new TeamStatus{Name="In Progress"},
+                    new TeamStatus{Name="Complete"},
+                    new TeamStatus{Name="Active"},
+                    new TeamStatus{Name="Inactive"}
+                };
+                foreach (TeamStatus ts in teamStatuses) context.TeamStatuses.Add(ts);
+                context.SaveChanges();
+            }
+
             if (!context.MatchTypes.Any())
             {
                 var matchTypes = new MatchType[]
@@ -98,21 +124,7 @@ namespace ProjectArcBlade.Data
                 foreach (MembershipType mt in membershipTypes) context.MembershipTypes.Add(mt);
                 context.SaveChanges();
             }
-
-            if (!context.TeamStatuses.Any())
-            {
-                var teamStatuses = new TeamStatus[]
-                {
-                    new TeamStatus{Name="New"},
-                    new TeamStatus{Name="In Progress"},
-                    new TeamStatus{Name="Complete"},
-                    new TeamStatus{Name="Active"},
-                    new TeamStatus{Name="Inactive"}
-                };
-                foreach (TeamStatus ts in teamStatuses) context.TeamStatuses.Add(ts);
-                context.SaveChanges();
-            }
-
+            
             if (!context.Divisions.Any())
             {
                 var divisions = new Division[]
@@ -714,51 +726,7 @@ namespace ProjectArcBlade.Data
                 foreach (Team t in teams) context.Teams.Add(t);
                 context.SaveChanges();
             }
-
-            if (!context.Settings.Any())
-            {
-                var settings = new Setting[]
-                {
-                    new Setting{Name="MaxGroupsPerTeam" },
-                    new Setting{Name="MaxPlayersPerGroup"}
-                };
-                foreach (Setting s in settings) context.Settings.Add(s);
-                context.SaveChanges();
-            }
-
-            if(!context.Rules.Any())
-            {
-                var rules = new Rule[]
-                {
-                    new Rule{Setting=context.Settings.Find(1), Value=3 },
-                    new Rule{Setting=context.Settings.Find(2), Value=2}
-                };
-                foreach (Rule r in rules) context.Rules.Add(r);
-                context.SaveChanges();
-            }
-                       
-            if (!context.LeagueRules.Any())
-            {
-                var leagueRules = new LeagueRule[]
-                {
-                    new LeagueRule{League=context.Leagues.Find(1), Rule=context.Rules.Find(1)},
-                    new LeagueRule{League=context.Leagues.Find(1), Rule=context.Rules.Find(2)}
-                };
-                foreach (LeagueRule lr in leagueRules) context.LeagueRules.Add(lr);
-                context.SaveChanges();
-            }
-
-            if (!context.CategoryRules.Any())
-            {
-                var categoryRules = new CategoryRule[]
-                {
-                    new CategoryRule{Category=context.Categories.Find(1), Rule=context.Rules.Find(1)},
-                    new CategoryRule{Category=context.Categories.Find(1), Rule=context.Rules.Find(2)}
-                };
-                foreach (CategoryRule lr in categoryRules) context.CategoryRules.Add(lr);
-                context.SaveChanges();
-            }
-
+            
             //Setup Templates.
             if(!context.MatchTemplates.Any())
             {
@@ -812,27 +780,85 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
+            if(!context.SetTemplates.Any())
+            {
+                var setTemplates = new SetTemplate[]
+                {
+                    //mens
+                    new SetTemplate { Number=1, MatchTemplate=context.MatchTemplates.Find(1) },//1
+                    new SetTemplate { Number=2, MatchTemplate=context.MatchTemplates.Find(1) },//2
+                    new SetTemplate { Number=3, MatchTemplate=context.MatchTemplates.Find(1) },//3
+                    new SetTemplate { Number=4, MatchTemplate=context.MatchTemplates.Find(1) },//4
+                    new SetTemplate { Number=5, MatchTemplate=context.MatchTemplates.Find(1) },//5
+                    new SetTemplate { Number=6, MatchTemplate=context.MatchTemplates.Find(1) },//6
+                    new SetTemplate { Number=7, MatchTemplate=context.MatchTemplates.Find(1) },//7
+                    new SetTemplate { Number=8, MatchTemplate=context.MatchTemplates.Find(1) },//8
+                    new SetTemplate { Number=9, MatchTemplate=context.MatchTemplates.Find(1) },//9
+                    //womens
+                    new SetTemplate { Number=1, MatchTemplate=context.MatchTemplates.Find(2) },//10
+                    new SetTemplate { Number=2, MatchTemplate=context.MatchTemplates.Find(2) },//11
+                    new SetTemplate { Number=3, MatchTemplate=context.MatchTemplates.Find(2) },//12
+                    new SetTemplate { Number=4, MatchTemplate=context.MatchTemplates.Find(2) },//13
+                    new SetTemplate { Number=5, MatchTemplate=context.MatchTemplates.Find(2) },//14
+                    new SetTemplate { Number=6, MatchTemplate=context.MatchTemplates.Find(2) },//15
+                };
+                foreach (SetTemplate st in setTemplates) context.SetTemplates.Add(st);
+                context.SaveChanges();
+            }
+
             if(!context.GameTemplates.Any())
             {
                 var gameTemplates = new GameTemplate[]
                 {
                     //mens
-                    new GameTemplate { Order=1, MatchTemplate=context.MatchTemplates.Find(1) },//1
-                    new GameTemplate { Order=2, MatchTemplate=context.MatchTemplates.Find(1) },//2
-                    new GameTemplate { Order=3, MatchTemplate=context.MatchTemplates.Find(1) },//3
-                    new GameTemplate { Order=4, MatchTemplate=context.MatchTemplates.Find(1) },//4
-                    new GameTemplate { Order=5, MatchTemplate=context.MatchTemplates.Find(1) },//5
-                    new GameTemplate { Order=6, MatchTemplate=context.MatchTemplates.Find(1) },//6
-                    new GameTemplate { Order=7, MatchTemplate=context.MatchTemplates.Find(1) },//7
-                    new GameTemplate { Order=8, MatchTemplate=context.MatchTemplates.Find(1) },//8
-                    new GameTemplate { Order=9, MatchTemplate=context.MatchTemplates.Find(1) },//9
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(1) },//1
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(1) },//1
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(1) },//1
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(2) },//2
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(2) },//2
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(2) },//2
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(3) },//3
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(3) },//3
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(3) },//3
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(4) },//4
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(4) },//4
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(4) },//4
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(5) },//5
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(5) },//5
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(5) },//5
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(6) },//6
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(6) },//6
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(6) },//6
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(7) },//7
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(7) },//7
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(7) },//7
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(8) },//8
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(8) },//8
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(8) },//8
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(9) },//9
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(9) },//9
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(9) },//9
+                    
                     //womens
-                    new GameTemplate { Order=1, MatchTemplate=context.MatchTemplates.Find(2) },//10
-                    new GameTemplate { Order=2, MatchTemplate=context.MatchTemplates.Find(2) },//11
-                    new GameTemplate { Order=3, MatchTemplate=context.MatchTemplates.Find(2) },//12
-                    new GameTemplate { Order=4, MatchTemplate=context.MatchTemplates.Find(2) },//13
-                    new GameTemplate { Order=5, MatchTemplate=context.MatchTemplates.Find(2) },//14
-                    new GameTemplate { Order=6, MatchTemplate=context.MatchTemplates.Find(2) },//15
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(10) },//10
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(10) },//10
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(10) },//10
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(11) },//11
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(11) },//11
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(11) },//11
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(12) },//12
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(12) },//12
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(12) },//12
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(13) },//13
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(13) },//13
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(13) },//13
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(14) },//14
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(14) },//14
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(14) },//14
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(15) },//15
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(15) },//15
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(15) },//15
+                    
                 };
                 foreach (GameTemplate gt in gameTemplates) context.GameTemplates.Add(gt);
                 context.SaveChanges();
@@ -843,22 +869,22 @@ namespace ProjectArcBlade.Data
                 var homeGroupTemplates = new HomeGroupTemplate[]
                 {
                     //mens
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(1), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(2), GroupTemplate = context.GroupTemplates.Find(2) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(3), GroupTemplate = context.GroupTemplates.Find(3) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(4), GroupTemplate = context.GroupTemplates.Find(2) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(5), GroupTemplate = context.GroupTemplates.Find(3) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(6), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(7), GroupTemplate = context.GroupTemplates.Find(3) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(8), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(9), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(1), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(2), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(3), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(4), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(5), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(6), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(7), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(8), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(9), GroupTemplate = context.GroupTemplates.Find(2) },
                     //womens
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(10), GroupTemplate = context.GroupTemplates.Find(4) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(11), GroupTemplate = context.GroupTemplates.Find(5) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(12), GroupTemplate = context.GroupTemplates.Find(5) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(13), GroupTemplate = context.GroupTemplates.Find(4) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(14), GroupTemplate = context.GroupTemplates.Find(6) },
-                    new HomeGroupTemplate{ GameTemplate = context.GameTemplates.Find(15), GroupTemplate = context.GroupTemplates.Find(7) }
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(10), GroupTemplate = context.GroupTemplates.Find(4) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(11), GroupTemplate = context.GroupTemplates.Find(5) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(12), GroupTemplate = context.GroupTemplates.Find(5) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(13), GroupTemplate = context.GroupTemplates.Find(4) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(14), GroupTemplate = context.GroupTemplates.Find(6) },
+                    new HomeGroupTemplate{ SetTemplate = context.SetTemplates.Find(15), GroupTemplate = context.GroupTemplates.Find(7) }
                 };
                 foreach (HomeGroupTemplate hgt in homeGroupTemplates) context.HomeGroupTemplates.Add(hgt);
                 context.SaveChanges();
@@ -869,22 +895,22 @@ namespace ProjectArcBlade.Data
                 var awayGroupTemplates = new AwayGroupTemplate[]
                 {
                     //mens
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(1), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(2), GroupTemplate = context.GroupTemplates.Find(2) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(3), GroupTemplate = context.GroupTemplates.Find(3) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(4), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(5), GroupTemplate = context.GroupTemplates.Find(2) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(6), GroupTemplate = context.GroupTemplates.Find(3) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(7), GroupTemplate = context.GroupTemplates.Find(1) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(8), GroupTemplate = context.GroupTemplates.Find(2) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(9), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(1), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(2), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(3), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(4), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(5), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(6), GroupTemplate = context.GroupTemplates.Find(3) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(7), GroupTemplate = context.GroupTemplates.Find(1) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(8), GroupTemplate = context.GroupTemplates.Find(2) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(9), GroupTemplate = context.GroupTemplates.Find(3) },
                     //womens
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(10), GroupTemplate = context.GroupTemplates.Find(4) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(11), GroupTemplate = context.GroupTemplates.Find(5) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(12), GroupTemplate = context.GroupTemplates.Find(4) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(13), GroupTemplate = context.GroupTemplates.Find(5) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(14), GroupTemplate = context.GroupTemplates.Find(6) },
-                    new AwayGroupTemplate{ GameTemplate = context.GameTemplates.Find(15), GroupTemplate = context.GroupTemplates.Find(7) }
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(10), GroupTemplate = context.GroupTemplates.Find(4) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(11), GroupTemplate = context.GroupTemplates.Find(5) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(12), GroupTemplate = context.GroupTemplates.Find(4) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(13), GroupTemplate = context.GroupTemplates.Find(5) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(14), GroupTemplate = context.GroupTemplates.Find(6) },
+                    new AwayGroupTemplate{ SetTemplate = context.SetTemplates.Find(15), GroupTemplate = context.GroupTemplates.Find(7) }
                 };
                 foreach (AwayGroupTemplate agt in awayGroupTemplates) context.AwayGroupTemplates.Add(agt);
                 context.SaveChanges();

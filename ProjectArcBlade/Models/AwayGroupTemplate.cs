@@ -9,8 +9,8 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public GroupTemplate GroupTemplate { get; set; }
-        public GameTemplate GameTemplate { get; set; }
+        public SetTemplate SetTemplate { get; set; }
 
-        public int GameTemplateId { get; set; }
+        public int SetTemplateId { get; set; }
     }
 }

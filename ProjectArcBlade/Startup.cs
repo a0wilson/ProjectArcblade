@@ -50,7 +50,6 @@ namespace ProjectArcBlade
 
             // add services to store application data.
             services.AddSingleton<AppData>();
-            services.AddSingleton<SettingsService>();
             services.AddSingleton<MatchSchedulingService>();
             services.AddSingleton<TeamService>();
             services.AddSingleton<MatchService>();

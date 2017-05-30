@@ -7,10 +7,8 @@ namespace ProjectArcBlade.Models
 {
     public class GameTemplate
     { 
-        public int Id { get; set; } 
-        public int Order { get; set; }
-        public HomeGroupTemplate HomeGroupTemplate { get; set; }
-        public AwayGroupTemplate AwayGroupTemplate { get; set; }
-        public MatchTemplate MatchTemplate { get; set; }
+        public int Id { get; set; }
+        public SetTemplate SetTemplate { get; set; }
+        public int Number { get; set; }        
     }
 }

@@ -2,11 +2,15 @@
 @{
     ViewData["Title"] = "Preview";
 }
-<br />
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <div class="panel-title">League Match Preview</div>
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+            <li><a asp-action="Dashboard" asp-controller="Team" asp-route-id="@Model.Team.Id">Dashboard</a></li>
+            <li>Preview Match</li>
+        </ol>
     </div>
+</div>
+<div class="panel panel-default">
     <div class="panel-body">
         <div class="jumbotron text-center">
             <h1><strong>@Model.Match.HomeMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.HomeMatchTeam.Team.Name</strong></h1>

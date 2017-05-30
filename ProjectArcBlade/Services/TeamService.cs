@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectArcBlade.Data;
-using ProjectArcBlade.Interfaces;
 using ProjectArcBlade.Models;
 using ProjectArcBlade.Models.TeamViewModels;
 using System;
@@ -16,7 +15,13 @@ namespace ProjectArcBlade.Services
     {
         private ApplicationDbContext _context;
         private MatchService _matchService;
-         
+
+        public async Task<Models.TeamStatus> GetTeamStatusAsync(ApplicationDbContext context, string value)
+        {
+            if (_context == null) _context = context;
+            return await _context.TeamStatuses.SingleAsync(lookup => lookup.Name == value);
+        }
+
         private async Task UpdateHomeMatchTeamCaptainAsync(int homeMatchTeamId, int captainId)
         {
             var homeMatchTeam = await _context.HomeMatchTeams.FindAsync(homeMatchTeamId);
@@ -204,16 +209,16 @@ namespace ProjectArcBlade.Services
                 .Where(hmt => hmt.Id == viewModel.AwayMatchTeamId)
                 .SingleAsync();
 
-            int teamStatusId;
+            string teamStatusName;
             if (viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value == 0))
             {
-                teamStatusId = Constants.TeamStatus.New;
+                teamStatusName = Constants.TeamStatus.New;
             }
             else
             {
-                teamStatusId = viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value != 0) ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
+                teamStatusName = viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value != 0) ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
             }
-            var teamStatus = await _context.TeamStatuses.FindAsync(teamStatusId);
+            var teamStatus = await GetTeamStatusAsync(_context, teamStatusName);
             awayMatchTeam.TeamStatus = teamStatus;
             _context.AwayMatchTeams.Update(awayMatchTeam);
 
@@ -271,15 +276,15 @@ namespace ProjectArcBlade.Services
                 .Where(hmt => hmt.Id == viewModel.HomeMatchTeamId)
                 .SingleAsync();
 
-            int teamStatusId;
+            string teamStatusName;
             if (viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value == 0))
             {
-                teamStatusId = Constants.TeamStatus.New;
+                teamStatusName = Constants.TeamStatus.New;
             }else
             {
-                teamStatusId = viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value != 0) ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
+                teamStatusName = viewModel.MatchClubPlayerIds.Count() == viewModel.MatchClubPlayerIds.Count(value => value != 0) ? Constants.TeamStatus.Complete : Constants.TeamStatus.InProgress;
             }            
-            var teamStatus = await _context.TeamStatuses.FindAsync(teamStatusId);
+            var teamStatus = await GetTeamStatusAsync(_context, teamStatusName);
             homeMatchTeam.TeamStatus = teamStatus;
             _context.HomeMatchTeams.Update(homeMatchTeam);
             
@@ -648,51 +653,51 @@ namespace ProjectArcBlade.Services
             var team = await GetTeamByIdAsync(teamId);
             var allLeagueMatches = await matchService.GetAllLeagueMatchesByTeamAsync(_context, teamId);
             var availableTeams = (await GetAllTeamsAsync()).Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.FullName }).ToList();
-
+            
             //set unmapped property - isHomeTeam
             foreach (Match m in allLeagueMatches) m.isHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
 
-            var inProgressMatches = allLeagueMatches.Where(m => m.MatchStatus.Id == Constants.MatchStatus.InProgress).ToList();
+            var inProgressMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.InProgress).ToList();
 
-            var upcomingMatches = allLeagueMatches.Where(m => m.MatchStatus.Id == Constants.MatchStatus.New).ToList();
+            var upcomingMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.New).ToList();
 
-            var recentMatches = allLeagueMatches.Where(m => m.MatchStatus.Id == Constants.MatchStatus.Complete).ToList();
+            var recentMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.Complete).ToList();
 
             var leaguePosition = 0;
             var leaguePoints = 0;
             var totalMatchesWon = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Win) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Win))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Win) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Win))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesLost = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Loss) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Loss))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Loss) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Loss))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesDrawn = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Draw) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Draw))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Draw) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Draw))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesConceded = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Conceded) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Conceded))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Conceded) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Conceded))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesForfeited = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.Forfeit) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.Forfeit))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Forfeit) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Forfeit))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesPlayed = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id != Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id != Constants.ResultType.NoEntry))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name != Constants.ResultType.NoEntry) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name != Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesRemaining = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.HomeMatchTeam.ResultType.Id == Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.AwayMatchTeam.ResultType.Id == Constants.ResultType.NoEntry))
+                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.NoEntry) ||
+                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatches = allLeagueMatches.Count.ToString();
@@ -700,16 +705,16 @@ namespace ProjectArcBlade.Services
 
             var overview = new List<NameValuePair>
             {
-                new NameValuePair {Name=Constants.OverviewStrings.LeaguePostion, Value = leaguePosition.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.LeaguePoints, Value = leaguePoints.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalWon, Value = totalMatchesWon.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalLost, Value = totalMatchesLost.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalDrawn, Value = totalMatchesDrawn.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalConceded, Value = totalMatchesConceded.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalForfeited, Value = totalMatchesForfeited.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalPlayed, Value = totalMatchesPlayed.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalRemaining, Value = totalMatchesRemaining.ToString()},
-                new NameValuePair {Name=Constants.OverviewStrings.TotalMatches, Value = totalMatches.ToString()},
+                new NameValuePair {Name=OverviewStrings.LeaguePostion, Value = leaguePosition.ToString()},
+                new NameValuePair {Name=OverviewStrings.LeaguePoints, Value = leaguePoints.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalWon, Value = totalMatchesWon.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalLost, Value = totalMatchesLost.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalDrawn, Value = totalMatchesDrawn.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalConceded, Value = totalMatchesConceded.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalForfeited, Value = totalMatchesForfeited.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalPlayed, Value = totalMatchesPlayed.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalRemaining, Value = totalMatchesRemaining.ToString()},
+                new NameValuePair {Name=OverviewStrings.TotalMatches, Value = totalMatches.ToString()},
             };
 
             var viewModel = new TeamDashboardViewModel
@@ -824,9 +829,9 @@ namespace ProjectArcBlade.Services
                 .Where(hmt => hmt.Id == homeMatchTeamId)
                 .SingleAsync();
 
-            if( homeMatchTeam.TeamStatus.Id == Constants.TeamStatus.Complete )
+            if( homeMatchTeam.TeamStatus.Name == Constants.TeamStatus.Complete )
             {
-                homeMatchTeam.TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.Active);
+                homeMatchTeam.TeamStatus = await GetTeamStatusAsync(context, Constants.TeamStatus.Active);
                 _context.HomeMatchTeams.Update(homeMatchTeam);
                 await _context.SaveChangesAsync();
                 return true;
@@ -844,9 +849,9 @@ namespace ProjectArcBlade.Services
                 .Where(amt => amt.Id == awayMatchTeamId)
                 .SingleAsync();
 
-            if (awayMatchTeam.TeamStatus.Id == Constants.TeamStatus.Complete)
+            if (awayMatchTeam.TeamStatus.Name == Constants.TeamStatus.Complete)
             {
-                awayMatchTeam.TeamStatus = await _context.TeamStatuses.FindAsync(Constants.TeamStatus.Active);
+                awayMatchTeam.TeamStatus = await GetTeamStatusAsync(context, Constants.TeamStatus.Active);
                 _context.AwayMatchTeams.Update(awayMatchTeam);
                 await _context.SaveChangesAsync();
                 return true;

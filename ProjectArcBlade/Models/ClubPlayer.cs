@@ -23,8 +23,8 @@ namespace ProjectArcBlade.Models
         public ICollection<TeamPlayer> TeamPlayers { get; set; }
         public ICollection<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }
         public ICollection<AwayMatchTeamGroupPlayer> AwayMatchTeamGroupPlayers { get; set; }
-        public ICollection<AwayGameResultScore> AwayGameResultScores { get; set; }
-        public ICollection<HomeGameResultScore> HomeGameResultScores { get; set; }
+        public ICollection<AwayTeamScore> AwayGameResultScores { get; set; }
+        public ICollection<HomeTeamScore> HomeGameResultScores { get; set; }
         public ICollection<ClubSubscriber> ClubSubscribers { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
         public ICollection<HomeMatchTeamCaptain> HomeMatchTeamCaptaincies { get; set; }

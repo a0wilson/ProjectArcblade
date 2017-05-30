@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
-    public class MembershipType
+    public class MembershipType : Type
     {
-        public int Id { get; set; }
-        [Required]
-        public string Name { get; set; }
-
         public ICollection<ClubPlayer> ClubPlayers { get; set; }
     }
 }

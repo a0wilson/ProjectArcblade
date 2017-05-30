@@ -90,6 +90,31 @@ namespace ProjectArcBlade.Controllers
             return View(viewModel);
         }
 
+        //GET: Match/GameProgress
+        public async Task<IActionResult> GameProgress(MatchService matchService, int setId, int teamId)
+        {
+            var viewModel = await matchService.GetGameProgressViewModelAsync(_context, setId, teamId);
+            return View(viewModel);
+        }
+
+        //POST: Match/GameProgress
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GameProgress(MatchService matchService, GameProgressViewModel viewModel)
+        {
+            await matchService.UpdateGameProgressAsync(_context, viewModel);
+            return RedirectToAction("GameProgress", new { setId = viewModel.SetId, teamId = viewModel.TeamId });
+        }
+
+        // POST: Match/CreateStep1
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel)
+        {
+            await matchService.UpdateMatchProgress(_context, viewModel);
+            return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+        }
+
         // GET: Match/CreateStep1
         public async Task<IActionResult> CreateStep1(int leagueId)
         {
@@ -134,7 +159,7 @@ namespace ProjectArcBlade.Controllers
                 TempData[Constants.CreateMatchStrings.DivisionId] = createStep1ViewModel.DivisionId;
                 TempData[Constants.CreateMatchStrings.SeasonId] = createStep1ViewModel.SeasonId;
                 TempData[Constants.CreateMatchStrings.MatchTypeId] = createStep1ViewModel.MatchTypeId;
-                TempData[Constants.CreateMatchStrings.IsCupMatch] = createStep1ViewModel.MatchTypeId == Constants.MatchType.Cup;
+                //TempData[Constants.CreateMatchStrings.IsCupMatch] = createStep1ViewModel.MatchTypeId == Constants.MatchType.Cup;
                 TempData.Keep();
                 
                 return RedirectToAction("CreateStep2");
@@ -284,7 +309,7 @@ namespace ProjectArcBlade.Controllers
                 StartTime = startTime.ToString(Constants.TimeFormat.Short),
                 ScheduledDate = scheduledDate.ToString(Constants.DateFormat.Long),
                 MatchType = matchType.Name,
-                IsCupMatch = matchType.Id == Constants.MatchType.Cup
+                IsCupMatch = matchType.Name == Constants.MatchType.Cup
             };
 
             return View(viewModel);
