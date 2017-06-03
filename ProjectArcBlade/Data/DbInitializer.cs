@@ -12,6 +12,43 @@ namespace ProjectArcBlade.Data
         {
             context.Database.EnsureCreated();
 
+            if (!context.JoinConditions.Any())
+            {
+                var joinConditions = new JoinCondition[]
+                {
+                    new JoinCondition{Name="and"},
+                    new JoinCondition{Name="or"}
+                };
+                foreach (JoinCondition jc in joinConditions) context.JoinConditions.Add(jc);
+                context.SaveChanges();
+            }
+
+            if (!context.Conditions.Any())
+            {
+                var conditions = new Condition[]
+                {
+                    new Condition{Name="equal"},
+                    new Condition{Name="not equal"},
+                    new Condition{Name="greater than"},
+                    new Condition{Name="less than"}                    
+                };
+                foreach (Condition c in conditions) context.Conditions.Add(c);
+                context.SaveChanges();
+            }
+
+            if (!context.Operators.Any())
+            {
+                var operators = new Operator[]
+                {
+                    new Operator{Name="add"},
+                    new Operator{Name="subtract"},
+                    new Operator{Name="divide"},
+                    new Operator{Name="multiply"}
+                };
+                foreach (Operator o in operators) context.Operators.Add(o);
+                context.SaveChanges();
+            }
+            
             if (!context.MatchStatuses.Any())
             {
                 var matchStatuses = new MatchStatus[]
@@ -213,7 +250,8 @@ namespace ProjectArcBlade.Data
                     new ResultType{Name="Draw"},
                     new ResultType{Name="Forfeit"},
                     new ResultType{Name="Pending"},
-                    new ResultType{Name="Conceded"}
+                    new ResultType{Name="Conceded"},
+                    new ResultType{Name="Invalid"}
                 };
                 foreach (ResultType rt in resultTpyes) context.ResultTypes.Add(rt);
                 context.SaveChanges();
@@ -243,7 +281,7 @@ namespace ProjectArcBlade.Data
                 foreach (League l in leagues) context.Leagues.Add(l);
                 context.SaveChanges();
             }
-
+            
             if (!context.Clubs.Any())
             {
                 var clubs = new Club[]
@@ -732,14 +770,145 @@ namespace ProjectArcBlade.Data
             {
                 var matchTemplates = new MatchTemplate[]
                 {
-                    new MatchTemplate { Name="Mens Match (2010)" },
-                    new MatchTemplate { Name="Womens Match (2014)" }
+                    new MatchTemplate { Name="Mens Match (2010)", DefaultGameWinScore=21 },
+                    new MatchTemplate { Name="Womens Match (2014)", DefaultGameWinScore=21 }
                 };
                 foreach (MatchTemplate mt in matchTemplates) context.MatchTemplates.Add(mt);
                 context.SaveChanges();                
             }
 
-            if(!context.GroupTemplates.Any())
+            if(!context.Rules.Any())
+            {
+                var rules = new Rule[]
+                {
+                    new Rule {Name="Badminton-Default"}
+                };
+                foreach (var r in rules) context.Rules.Add(r);
+                context.SaveChanges();
+            }
+            
+            if (!context.ResultRules.Any())
+            {
+                var resultRules = new ResultRule[]
+                {
+                    //Win Rules
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 20,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 31,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Operator = context.Operators.Single(o => o.Name == Constants.Operator.Subtract),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 1,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+
+                    //Draw rules
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 20,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 31,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Operator = context.Operators.Single(o => o.Name == Constants.Operator.Subtract),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.Equal),
+                        Value = 0,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+
+                    //Loss rules
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 20,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 31,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Operator = context.Operators.Single(o => o.Name == Constants.Operator.Subtract),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 0,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    },
+
+                    //Invalid rules
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 30,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 0,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    }
+                };
+                foreach (ResultRule rr in resultRules) context.ResultRules.Add(rr);
+                context.SaveChanges();
+            }
+
+            if (!context.GroupTemplates.Any())
             {
                 var groupTemplates = new GroupTemplate[]
                 {
@@ -916,26 +1085,15 @@ namespace ProjectArcBlade.Data
                 context.SaveChanges();
             }
 
-            if(!context.MatchTemplateCategories.Any())
+            if(!context.MatchTemplateLinks.Any())
             {
-                var matchTemplateCategories = new MatchTemplateCategory[]
+                var matchTemplateLinks = new MatchTemplateLink[]
                 {
-                    new MatchTemplateCategory{ Category = context.Categories.Find(1), MatchTemplate = context.MatchTemplates.Find(1) },
-                    new MatchTemplateCategory{ Category = context.Categories.Find(3), MatchTemplate = context.MatchTemplates.Find(1) },
-                    new MatchTemplateCategory{ Category = context.Categories.Find(2), MatchTemplate = context.MatchTemplates.Find(2) }
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(1), MatchTemplate = context.MatchTemplates.Find(1), Rule = context.Rules.Find(1) },
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(3), MatchTemplate = context.MatchTemplates.Find(1), Rule = context.Rules.Find(1)  },
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(2), MatchTemplate = context.MatchTemplates.Find(2), Rule = context.Rules.Find(1)  }
                 };
-                foreach (MatchTemplateCategory mtc in matchTemplateCategories) context.MatchTemplateCategories.Add(mtc);
-                context.SaveChanges();
-            }
-
-            if(!context.MatchTemplateSeasons.Any())
-            {
-                var matchTemplateSeaons = new MatchTemplateSeason[]
-                {
-                    new MatchTemplateSeason { Season = context.Seasons.Find(4), MatchTemplate = context.MatchTemplates.Find(1) },
-                    new MatchTemplateSeason { Season = context.Seasons.Find(4), MatchTemplate = context.MatchTemplates.Find(2) }
-                };
-                foreach (MatchTemplateSeason mts in matchTemplateSeaons) context.MatchTemplateSeasons.Add(mts);
+                foreach (MatchTemplateLink mtl in matchTemplateLinks) context.MatchTemplateLinks.Add(mtl);
                 context.SaveChanges();
             }
         }

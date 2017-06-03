@@ -17,5 +17,30 @@ namespace ProjectArcBlade.Models
         public HomeMatchTeamGroup HomeMatchTeamGroup { get; set; }
 
         public ICollection<Game> Games { get; set; }
+
+        public int MinimumGamesToWinSet
+        {
+            get
+            {
+                if (Games != null)
+                {
+                    if (Games.Count == 1) return 1;
+
+                    if (Games.Count > 1)
+                    {
+                        var rem = Games.Count % 2;
+                        if (rem == 0)
+                        {
+                            return (Games.Count / 2) + 1;
+                        }
+                        else
+                        {
+                            return (Games.Count + 1) / 2;
+                        }
+                    }
+                }
+                return 0;
+            }
+        }
     }
 }

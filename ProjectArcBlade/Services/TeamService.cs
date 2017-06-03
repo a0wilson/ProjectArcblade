@@ -655,7 +655,7 @@ namespace ProjectArcBlade.Services
             var availableTeams = (await GetAllTeamsAsync()).Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.FullName }).ToList();
             
             //set unmapped property - isHomeTeam
-            foreach (Match m in allLeagueMatches) m.isHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
+            foreach (Match m in allLeagueMatches) m.IsHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
 
             var inProgressMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.InProgress).ToList();
 
@@ -666,38 +666,38 @@ namespace ProjectArcBlade.Services
             var leaguePosition = 0;
             var leaguePoints = 0;
             var totalMatchesWon = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Win) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Win))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Win) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Win))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesLost = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Loss) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Loss))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Loss) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Loss))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesDrawn = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Draw) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Draw))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Draw) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Draw))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesConceded = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Conceded) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Conceded))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Conceded) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Conceded))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesForfeited = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Forfeit) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Forfeit))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Forfeit) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Forfeit))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesPlayed = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name != Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name != Constants.ResultType.NoEntry))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name != Constants.ResultType.NoEntry) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name != Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatchesRemaining = allLeagueMatches
-                .Where(m => (m.isHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.NoEntry) ||
-                    ((!m.isHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.NoEntry))
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.NoEntry) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatches = allLeagueMatches.Count.ToString();

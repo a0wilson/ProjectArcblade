@@ -118,6 +118,7 @@ namespace ProjectArcBlade.Services
                                         HomeTeamId = -1,
                                         AwayTeamId = -1,
                                         ScheduledDate = null,
+                                        DivisionId = divisionIds[d],
                                         CategoryId = categoryIds[c],
                                         Range = Constants.MatchScheduleRange.Initial
                                     };
@@ -261,39 +262,43 @@ namespace ProjectArcBlade.Services
                 {
                     var matchType = await _matchService.GetMatchTypeAsync(_context, Constants.MatchType.League);
                     var season = await _context.Seasons.FindAsync(_season.Id);
+                    var division = await _context.Divisions.FindAsync(matchSchedule.DivisionId);
+                    var category = await _context.Categories.FindAsync(matchSchedule.CategoryId);
                     var venue = await _context.Venues.FindAsync(matchSchedule.VenueId);
                     var matchStatusNew = await _matchService.GetMatchStatusAsync(_context, Constants.MatchStatus.New);
                     var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, _season.Id, matchSchedule.CategoryId);
                     var resultNoEntry = await _matchService.GetResultTypeAsync(_context, Constants.ResultType.NoEntry);
                     
-                    var newLeagueMatch = new Match
+                    var match = new Match
                     {
                         MatchType = matchType,
                         MatchStatus = matchStatusNew,
                         Season = season,
+                        Division = division,
+                        Category = category,
                         Venue = venue,
                         StartDate = Convert.ToDateTime(matchSchedule.ScheduledDate),
                         StartTime = matchSchedule.StartTime
                     };
-                    _context.Matches.Add(newLeagueMatch);
+                    _context.Matches.Add(match);
 
                     var matchHomeResult = new MatchHomeResult
                     {
-                        Match = newLeagueMatch,
+                        Match = match,
                         ResultType = resultNoEntry
                     };
                     _context.MatchHomeResults.Add(matchHomeResult);
 
                     var matchAwayResult = new MatchAwayResult
                     {
-                        Match = newLeagueMatch,
+                        Match = match,
                         ResultType = resultNoEntry
                     };
                     _context.MatchAwayResults.Add(matchAwayResult);
 
                     var homeMatchTeam = new HomeMatchTeam
                     {
-                        Match = newLeagueMatch,
+                        Match = match,
                         Team = await _context.Teams.FindAsync(matchSchedule.HomeTeamId),
                         TeamStatus = await _teamService.GetTeamStatusAsync(_context, Constants.TeamStatus.New)
                     };
@@ -323,7 +328,7 @@ namespace ProjectArcBlade.Services
                     
                     var awayMatchTeam = new AwayMatchTeam
                     {
-                        Match = newLeagueMatch,
+                        Match = match,
                         Team = await _context.Teams.FindAsync(matchSchedule.AwayTeamId),
                         TeamStatus = await _teamService.GetTeamStatusAsync(_context, Constants.TeamStatus.New)
                     };
@@ -462,7 +467,6 @@ namespace ProjectArcBlade.Services
                         
                         var homeTeamHomeTeamScore = new HomeTeamHomeTeamScore
                         {
-                            Score = 0,
                             Game = game,
                             ScoreStatus = scoreStatusNoEntry,
                         };
@@ -470,7 +474,6 @@ namespace ProjectArcBlade.Services
 
                         var awayTeamHomeTeamScore = new AwayTeamHomeTeamScore
                         {
-                            Score = 0,
                             Game = game,
                             ScoreStatus = scoreStatusNoEntry,
                         };
@@ -478,7 +481,6 @@ namespace ProjectArcBlade.Services
 
                         var homeTeamAwayTeamScore = new HomeTeamAwayTeamScore
                         {
-                            Score = 0,
                             Game = game,
                             ScoreStatus = scoreStatusNoEntry,
                         };
@@ -486,7 +488,6 @@ namespace ProjectArcBlade.Services
 
                         var awayTeamAwayTeamScore = new AwayTeamAwayTeamScore
                         {
-                            Score = 0,
                             Game = game,
                             ScoreStatus = scoreStatusNoEntry,
                         };

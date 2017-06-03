@@ -51,7 +51,7 @@
                                             <input class="form-control" asp-for="HomeHomeSore[index]" />
                                             @if (Model.HomeHomeSoreStatus[index] == "Contested")
                                             {
-                                                <span class="badge">
+                                                <span class="label label-warning">
                                                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                                 </span>
                                             }
@@ -62,7 +62,7 @@
                                             <input class="form-control" asp-for="AwayHomeSore[index]" />
                                             @if (Model.AwayHomeSoreStatus[index] == "Contested")
                                             {
-                                                <span class="badge">
+                                                <span class="label label-warning">
                                                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                                 </span>
                                             }
@@ -78,7 +78,7 @@
                                             <input class="form-control" asp-for="HomeAwaySore[index]" />
                                             @if (Model.HomeAwaySoreStatus[index] == "Contested")
                                             {
-                                                <span class="badge">
+                                                <span class="label label-warning">
                                                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                                 </span>
                                             }
@@ -89,7 +89,7 @@
                                             <input class="form-control" asp-for="AwayAwaySore[index]" />
                                             @if (Model.AwayAwaySoreStatus[index] == "Contested")
                                             {
-                                                <span class="badge">
+                                                <span class="label label-warning">
                                                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                                                 </span>
                                             }
@@ -110,9 +110,16 @@
             </table>
         </div>
         <div class="panel-footer text-center">
-            <input type="submit" value="Save" class="btn btn-lg btn-primary" />
+            <button type="submit" name="btnBack" class="btn btn-lg btn-danger" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
+            </button>
+            <button type="submit" name="btnSave" class="btn btn-lg btn-primary" title="Save" value="Save">
+                <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+            </button>
             <input type="hidden" asp-for="@Model.IsHomeTeam" />
             <input type="hidden" asp-for="@Model.MatchId" />
+            <input type="hidden" asp-for="@Model.CategoryId" />
+            <input type="hidden" asp-for="@Model.SeasonId" />
             <input type="hidden" asp-for="@Model.TeamId" />
             <input type="hidden" asp-for="@Model.SetId" />
         </div>

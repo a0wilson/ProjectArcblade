@@ -14,6 +14,7 @@ namespace ProjectArcBlade.Models
         public int HomeClubId { get; set; }
         public int VenueId { get; set; }
         public int CategoryId { get; set; }
+        public int DivisionId { get; set; }
         public int AwayTeamId { get; set; }
         public DateTime? ScheduledDate { get; set; }
         public DateTime StartTime { get; set; }

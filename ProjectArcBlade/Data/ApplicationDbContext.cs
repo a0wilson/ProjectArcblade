@@ -18,8 +18,7 @@ namespace ProjectArcBlade.Data
         
         //Templates
         public DbSet<MatchTemplate> MatchTemplates { get; set; }
-        public DbSet<MatchTemplateCategory> MatchTemplateCategories { get; set; }
-        public DbSet<MatchTemplateSeason> MatchTemplateSeasons { get; set; }
+        public DbSet<MatchTemplateLink> MatchTemplateLinks { get; set; }
         public DbSet<GroupTemplate> GroupTemplates { get; set; }
         public DbSet<RankTemplate> RankTemplates { get; set; }
         public DbSet<GameTemplate> GameTemplates { get; set; }
@@ -41,6 +40,16 @@ namespace ProjectArcBlade.Data
         public DbSet<ResultType> ResultTypes { get; set; }
         public DbSet<MatchType> MatchTypes { get; set; }
 
+        //lookup
+        public DbSet<Lookup> Lookups { get; set; }
+        public DbSet<Condition> Conditions { get; set; }
+        public DbSet<Operator> Operators { get; set; }
+        public DbSet<JoinCondition> JoinConditions { get; set; }
+
+        //rules
+        public DbSet<Rule> Rules { get; set; }
+        public DbSet<ResultRule> ResultRules { get; set; }
+
         public DbSet<Audit> Audits { get; set; }        
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Rank> Ranks { get; set; }
@@ -58,7 +67,6 @@ namespace ProjectArcBlade.Data
         public DbSet<ClubVenue> ClubVenues { get; set; }
         public DbSet<ClubPlayer> ClubPlayers { get; set; }
         
-
         public DbSet<Cup> Cups { get; set; }
         public DbSet<CupMatch> CupMatches { get; set; }
         public DbSet<CupMatchHandicap> CupMatchHandicaps { get; set; }
@@ -113,8 +121,7 @@ namespace ProjectArcBlade.Data
             // Add your customizations after calling base.OnModelCreating(builder);En
 
             builder.Entity<MatchTemplate>().ToTable("MatchTemplate");
-            builder.Entity<MatchTemplateCategory>().ToTable("MatchTemplateCategory");
-            builder.Entity<MatchTemplateSeason>().ToTable("MatchTemplateSeason");
+            builder.Entity<MatchTemplateLink>().ToTable("MatchTemplateLink");
             builder.Entity<GroupTemplate>().ToTable("GroupTemplate");
             builder.Entity<RankTemplate>().ToTable("RankTemplate");
             builder.Entity<GameTemplate>().ToTable("GameTemplate");
@@ -144,6 +151,16 @@ namespace ProjectArcBlade.Data
             builder.Entity<MatchType>().ToTable("MatchType");
             builder.Entity<MembershipType>().ToTable("MembershipType");
             builder.Entity<ResultType>().ToTable("ResultType");
+
+            //lookup
+            builder.Entity<Lookup>().ToTable("Lookup");
+            builder.Entity<Condition>().ToTable("Condition");
+            builder.Entity<Operator>().ToTable("Operator");
+            builder.Entity<JoinCondition>().ToTable("JoinCondition");
+
+            //result rule
+            builder.Entity<Rule>().ToTable("Rule");
+            builder.Entity<ResultRule>().ToTable("ResultRule");
 
             builder.Entity<Audit>().ToTable("Audit");
             builder.Entity<Venue>().ToTable("Venue");

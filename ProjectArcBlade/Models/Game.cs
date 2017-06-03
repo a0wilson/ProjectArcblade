@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ProjectArcBlade.Data;
+using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
@@ -18,5 +19,10 @@ namespace ProjectArcBlade.Models
         public int HomeTeamHomeTeamScoreId { get; set; }
         public int AwayTeamAwayTeamScoreId { get; set; }
         public int AwayTeamHomeTeamScoreId { get; set; }
+
+        public bool HomeTeamAwayTeamScoreAccepted { get { return HomeTeamAwayTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
+        public bool HomeTeamHomeTeamScoreAccepted { get { return HomeTeamHomeTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
+        public bool AwayTeamAwayTeamScoreAccepted { get { return AwayTeamAwayTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
+        public bool AwayTeamHomeTeamScoreAccepted { get { return AwayTeamHomeTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
     }
 }

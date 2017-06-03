@@ -13,6 +13,7 @@ namespace ProjectArcBlade.Models
         public string Name { get; set; }
 
         public ICollection<Team> Teams { get; set; }
+        public ICollection<Match> Matches { get; set; }
 
         public override string ToString()
         {

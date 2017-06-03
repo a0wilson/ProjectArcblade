@@ -100,9 +100,12 @@ namespace ProjectArcBlade.Controllers
         //POST: Match/GameProgress
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GameProgress(MatchService matchService, GameProgressViewModel viewModel)
+        public async Task<IActionResult> GameProgress(MatchService matchService, GameProgressViewModel viewModel, string btnSave, string btnBack)
         {
-            await matchService.UpdateGameProgressAsync(_context, viewModel);
+            if( btnSave != null ) await matchService.UpdateGameProgressAsync(_context, viewModel);
+                
+            if( btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+            
             return RedirectToAction("GameProgress", new { setId = viewModel.SetId, teamId = viewModel.TeamId });
         }
 

@@ -9,6 +9,6 @@ namespace ProjectArcBlade.Models
     { 
         public int Id { get; set; }
         public SetTemplate SetTemplate { get; set; }
-        public int Number { get; set; }        
+        public int Number { get; set; }
     }
 }

@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170529182542_01")]
+    [Migration("20170603124420_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -363,7 +363,7 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<int>("Score");
+                    b.Property<int?>("Score");
 
                     b.Property<int?>("ScoreStatusId");
 
@@ -846,7 +846,7 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<string>("Discriminator")
                         .IsRequired();
 
-                    b.Property<int>("Score");
+                    b.Property<int?>("Score");
 
                     b.Property<int?>("ScoreStatusId");
 
@@ -898,10 +898,32 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("LeagueClub");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.Lookup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Lookup");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("Lookup");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("CategoryId");
+
+                    b.Property<int?>("DivisionId");
 
                     b.Property<int?>("MatchStatusId");
 
@@ -916,6 +938,10 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int?>("VenueId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("DivisionId");
 
                     b.HasIndex("MatchStatusId");
 
@@ -933,6 +959,10 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("DefaultGameLossScore");
+
+                    b.Property<int>("DefaultGameWinScore");
+
                     b.Property<string>("Name");
 
                     b.HasKey("Id");
@@ -940,7 +970,7 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("MatchTemplate");
                 });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateCategory", b =>
+            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateLink", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -949,31 +979,21 @@ namespace ProjectArcBlade.Data.Migrations
 
                     b.Property<int?>("MatchTemplateId");
 
+                    b.Property<int?>("RuleId");
+
+                    b.Property<int?>("SeasonId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("MatchTemplateId");
 
-                    b.ToTable("MatchTemplateCategory");
-                });
-
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateSeason", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("MatchTemplateId");
-
-                    b.Property<int?>("SeasonId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MatchTemplateId");
+                    b.HasIndex("RuleId");
 
                     b.HasIndex("SeasonId");
 
-                    b.ToTable("MatchTemplateSeason");
+                    b.ToTable("MatchTemplateLink");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.PlayerDetail", b =>
@@ -1068,6 +1088,54 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasIndex("MatchId");
 
                     b.ToTable("RescheduledStartDate");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ResultRule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("ConditionId");
+
+                    b.Property<int?>("JoinConditionId");
+
+                    b.Property<int?>("OperatorId");
+
+                    b.Property<int?>("ResultTypeId");
+
+                    b.Property<int?>("RuleId");
+
+                    b.Property<bool>("ScoreOne");
+
+                    b.Property<bool>("ScoreTwo");
+
+                    b.Property<int>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConditionId");
+
+                    b.HasIndex("JoinConditionId");
+
+                    b.HasIndex("OperatorId");
+
+                    b.HasIndex("ResultTypeId");
+
+                    b.HasIndex("RuleId");
+
+                    b.ToTable("ResultRule");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Rule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rule");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>
@@ -1410,6 +1478,36 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("HomeTeamHomeTeamScore");
 
                     b.HasDiscriminator().HasValue("HomeTeamHomeTeamScore");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Condition", b =>
+                {
+                    b.HasBaseType("ProjectArcBlade.Models.Lookup");
+
+
+                    b.ToTable("Condition");
+
+                    b.HasDiscriminator().HasValue("Condition");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.JoinCondition", b =>
+                {
+                    b.HasBaseType("ProjectArcBlade.Models.Lookup");
+
+
+                    b.ToTable("JoinCondition");
+
+                    b.HasDiscriminator().HasValue("JoinCondition");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.Operator", b =>
+                {
+                    b.HasBaseType("ProjectArcBlade.Models.Lookup");
+
+
+                    b.ToTable("Operator");
+
+                    b.HasDiscriminator().HasValue("Operator");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.ClubPlayerStatus", b =>
@@ -1905,6 +2003,14 @@ namespace ProjectArcBlade.Data.Migrations
 
             modelBuilder.Entity("ProjectArcBlade.Models.Match", b =>
                 {
+                    b.HasOne("ProjectArcBlade.Models.Category", "Category")
+                        .WithMany("Matches")
+                        .HasForeignKey("CategoryId");
+
+                    b.HasOne("ProjectArcBlade.Models.Division", "Division")
+                        .WithMany("Matches")
+                        .HasForeignKey("DivisionId");
+
                     b.HasOne("ProjectArcBlade.Models.MatchStatus", "MatchStatus")
                         .WithMany("Matches")
                         .HasForeignKey("MatchStatusId");
@@ -1922,25 +2028,22 @@ namespace ProjectArcBlade.Data.Migrations
                         .HasForeignKey("VenueId");
                 });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateCategory", b =>
+            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateLink", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.Category", "Category")
-                        .WithMany("MatchTemplateCategories")
+                        .WithMany("MatchTemplateLinks")
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("ProjectArcBlade.Models.MatchTemplate", "MatchTemplate")
-                        .WithMany("MatchTemplateCategories")
+                        .WithMany("MatchTemplateLinks")
                         .HasForeignKey("MatchTemplateId");
-                });
 
-            modelBuilder.Entity("ProjectArcBlade.Models.MatchTemplateSeason", b =>
-                {
-                    b.HasOne("ProjectArcBlade.Models.MatchTemplate", "MatchTemplate")
-                        .WithMany("MatchTemplateSeasons")
-                        .HasForeignKey("MatchTemplateId");
+                    b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
+                        .WithMany("MatchTemplateLinks")
+                        .HasForeignKey("RuleId");
 
                     b.HasOne("ProjectArcBlade.Models.Season", "Season")
-                        .WithMany("MatchTemplateSeasons")
+                        .WithMany("MatchTemplateLinks")
                         .HasForeignKey("SeasonId");
                 });
 
@@ -1979,6 +2082,29 @@ namespace ProjectArcBlade.Data.Migrations
                     b.HasOne("ProjectArcBlade.Models.Match", "Match")
                         .WithMany("RescheduledStartDates")
                         .HasForeignKey("MatchId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ResultRule", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.Condition", "Condition")
+                        .WithMany("ResultRules")
+                        .HasForeignKey("ConditionId");
+
+                    b.HasOne("ProjectArcBlade.Models.JoinCondition", "JoinCondition")
+                        .WithMany()
+                        .HasForeignKey("JoinConditionId");
+
+                    b.HasOne("ProjectArcBlade.Models.Operator", "Operator")
+                        .WithMany()
+                        .HasForeignKey("OperatorId");
+
+                    b.HasOne("ProjectArcBlade.Models.ResultType", "ResultType")
+                        .WithMany("ResultRules")
+                        .HasForeignKey("ResultTypeId");
+
+                    b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
+                        .WithMany("ResultRules")
+                        .HasForeignKey("RuleId");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>

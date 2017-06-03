@@ -14,7 +14,7 @@
             Home,
             Away
         }
-
+        
         public static class DateFormat
         {
             public static string Long = "dddd, MMM dd, yyyy";
@@ -34,7 +34,30 @@
             public const string Forfeit = "Forfeit";
             public const string Pending = "Pending";
             public const string NoEntry = "No Entry";
-            public const string Conceded = "Concdeded";
+            public const string Conceded = "Conceded";
+            public const string Invalid = "Invalid";
+        }
+
+        public static class JoinCondition
+        {
+            public const string And = "and";
+            public const string Or = "or";
+        }
+
+        public static class Condition
+        {
+            public const string Equal = "equal";
+            public const string NotEqual = "not equal";
+            public const string GreaterThan = "greater than";
+            public const string LessThan = "less than";
+        }
+
+        public static class Operator
+        {
+            public const string Add = "add";
+            public const string Subtract = "subtract";
+            public const string Divide = "divide";
+            public const string Multiply = "multiply";
         }
 
         public static class MatchType

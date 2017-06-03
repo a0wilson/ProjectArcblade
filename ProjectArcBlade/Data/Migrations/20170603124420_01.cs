@@ -122,11 +122,27 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Lookup",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Discriminator = table.Column<string>(nullable: false),
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lookup", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MatchTemplate",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    DefaultGameLossScore = table.Column<int>(nullable: false),
+                    DefaultGameWinScore = table.Column<int>(nullable: false),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -145,6 +161,19 @@ namespace ProjectArcBlade.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Rank", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Rule",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Rule", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -258,32 +287,6 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MatchTemplateCategory",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CategoryId = table.Column<int>(nullable: true),
-                    MatchTemplateId = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MatchTemplateCategory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_MatchTemplateCategory_Category_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_MatchTemplateCategory_MatchTemplate_MatchTemplateId",
-                        column: x => x.MatchTemplateId,
-                        principalTable: "MatchTemplate",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "SetTemplate",
                 columns: table => new
                 {
@@ -319,6 +322,56 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_League_Sport_SportId",
                         column: x => x.SportId,
                         principalTable: "Sport",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResultRule",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ConditionId = table.Column<int>(nullable: true),
+                    JoinConditionId = table.Column<int>(nullable: true),
+                    OperatorId = table.Column<int>(nullable: true),
+                    ResultTypeId = table.Column<int>(nullable: true),
+                    RuleId = table.Column<int>(nullable: true),
+                    ScoreOne = table.Column<bool>(nullable: false),
+                    ScoreTwo = table.Column<bool>(nullable: false),
+                    Value = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResultRule", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResultRule_Lookup_ConditionId",
+                        column: x => x.ConditionId,
+                        principalTable: "Lookup",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ResultRule_Lookup_JoinConditionId",
+                        column: x => x.JoinConditionId,
+                        principalTable: "Lookup",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ResultRule_Lookup_OperatorId",
+                        column: x => x.OperatorId,
+                        principalTable: "Lookup",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ResultRule_Type_ResultTypeId",
+                        column: x => x.ResultTypeId,
+                        principalTable: "Type",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ResultRule_Rule_RuleId",
+                        column: x => x.RuleId,
+                        principalTable: "Rule",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -625,6 +678,8 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CategoryId = table.Column<int>(nullable: true),
+                    DivisionId = table.Column<int>(nullable: true),
                     MatchStatusId = table.Column<int>(nullable: true),
                     MatchTypeId = table.Column<int>(nullable: true),
                     SeasonId = table.Column<int>(nullable: true),
@@ -635,6 +690,18 @@ namespace ProjectArcBlade.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Match", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Match_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Match_Division_DivisionId",
+                        column: x => x.DivisionId,
+                        principalTable: "Division",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Match_Status_MatchStatusId",
                         column: x => x.MatchStatusId,
@@ -662,25 +729,39 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "MatchTemplateSeason",
+                name: "MatchTemplateLink",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CategoryId = table.Column<int>(nullable: true),
                     MatchTemplateId = table.Column<int>(nullable: true),
+                    RuleId = table.Column<int>(nullable: true),
                     SeasonId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MatchTemplateSeason", x => x.Id);
+                    table.PrimaryKey("PK_MatchTemplateLink", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MatchTemplateSeason_MatchTemplate_MatchTemplateId",
+                        name: "FK_MatchTemplateLink_Category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateLink_MatchTemplate_MatchTemplateId",
                         column: x => x.MatchTemplateId,
                         principalTable: "MatchTemplate",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MatchTemplateSeason_Season_SeasonId",
+                        name: "FK_MatchTemplateLink_Rule_RuleId",
+                        column: x => x.RuleId,
+                        principalTable: "Rule",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchTemplateLink_Season_SeasonId",
                         column: x => x.SeasonId,
                         principalTable: "Season",
                         principalColumn: "Id",
@@ -723,7 +804,7 @@ namespace ProjectArcBlade.Data.Migrations
                     AuditId = table.Column<int>(nullable: true),
                     ClubPlayerId = table.Column<int>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
-                    Score = table.Column<int>(nullable: false),
+                    Score = table.Column<int>(nullable: true),
                     ScoreStatusId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -758,7 +839,7 @@ namespace ProjectArcBlade.Data.Migrations
                     AuditId = table.Column<int>(nullable: true),
                     ClubPlayerId = table.Column<int>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),
-                    Score = table.Column<int>(nullable: false),
+                    Score = table.Column<int>(nullable: true),
                     ScoreStatusId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
@@ -1853,6 +1934,16 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "LeagueId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Match_CategoryId",
+                table: "Match",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Match_DivisionId",
+                table: "Match",
+                column: "DivisionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Match_MatchStatusId",
                 table: "Match",
                 column: "MatchStatusId");
@@ -1873,23 +1964,23 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "VenueId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchTemplateCategory_CategoryId",
-                table: "MatchTemplateCategory",
+                name: "IX_MatchTemplateLink_CategoryId",
+                table: "MatchTemplateLink",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchTemplateCategory_MatchTemplateId",
-                table: "MatchTemplateCategory",
+                name: "IX_MatchTemplateLink_MatchTemplateId",
+                table: "MatchTemplateLink",
                 column: "MatchTemplateId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchTemplateSeason_MatchTemplateId",
-                table: "MatchTemplateSeason",
-                column: "MatchTemplateId");
+                name: "IX_MatchTemplateLink_RuleId",
+                table: "MatchTemplateLink",
+                column: "RuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MatchTemplateSeason_SeasonId",
-                table: "MatchTemplateSeason",
+                name: "IX_MatchTemplateLink_SeasonId",
+                table: "MatchTemplateLink",
                 column: "SeasonId");
 
             migrationBuilder.CreateIndex(
@@ -1921,6 +2012,31 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "IX_RescheduledStartDate_MatchId",
                 table: "RescheduledStartDate",
                 column: "MatchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultRule_ConditionId",
+                table: "ResultRule",
+                column: "ConditionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultRule_JoinConditionId",
+                table: "ResultRule",
+                column: "JoinConditionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultRule_OperatorId",
+                table: "ResultRule",
+                column: "OperatorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultRule_ResultTypeId",
+                table: "ResultRule",
+                column: "ResultTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResultRule_RuleId",
+                table: "ResultRule",
+                column: "RuleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Season_LeagueId",
@@ -2066,10 +2182,7 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "HomeResult");
 
             migrationBuilder.DropTable(
-                name: "MatchTemplateCategory");
-
-            migrationBuilder.DropTable(
-                name: "MatchTemplateSeason");
+                name: "MatchTemplateLink");
 
             migrationBuilder.DropTable(
                 name: "PointScore");
@@ -2079,6 +2192,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "RescheduledStartDate");
+
+            migrationBuilder.DropTable(
+                name: "ResultRule");
 
             migrationBuilder.DropTable(
                 name: "TeamCaptain");
@@ -2106,6 +2222,12 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "GroupTemplate");
+
+            migrationBuilder.DropTable(
+                name: "Lookup");
+
+            migrationBuilder.DropTable(
+                name: "Rule");
 
             migrationBuilder.DropTable(
                 name: "Rank");

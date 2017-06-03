@@ -46,8 +46,15 @@
                                         @if (Model.IsHomeTeam)
                                         {
                                             <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@Model.SetId[index]">
-                                                <h4 class="form-control-static"><strong>@Model.HomeGroupName[index]</strong></h4>
+                                                <h4 class="form-control-static">                                                    
+                                                    @if (Model.SetHomeResult[index] == "Win")
+                                                    {
+                                                        <span class="label label-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>
+                                                    }
+                                                    <strong>@Model.HomeGroupName[index] </strong>
+                                                </h4>
                                             </a>
+                                            
                                         }
                                         else
                                         {
@@ -84,7 +91,10 @@
             </table>
         </div>
         <div class="panel-footer text-center">
-            <input type="submit" value="Complete Match" class="btn btn-lg btn-danger" />
+            @if (Model.AllowMatchCompletion)
+            {
+                <input type="submit" value="Complete Match" class="btn btn-lg btn-danger" />
+            }
             <input type="hidden" asp-for="@Model.MatchId" />
             <input type="hidden" asp-for="@Model.TeamId" />            
         </div>

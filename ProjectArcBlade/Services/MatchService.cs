@@ -2,6 +2,7 @@
 using ProjectArcBlade.Data;
 using ProjectArcBlade.Models;
 using ProjectArcBlade.Models.MatchViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,77 +43,84 @@ namespace ProjectArcBlade.Services
             return await _context.MatchTypes.SingleAsync(lookup => lookup.Name == value);
         }
 
+        public async Task<Rule> GetRuleBySeasonAndCategoryAsync(ApplicationDbContext context, int seasonId, int categoryId)
+        {
+            if (_context == null) _context = context;
+
+            var rule = await _context.MatchTemplateLinks
+                .Include(mtl => mtl.MatchTemplate)
+                //.Include(mtl => mtl.Season)
+                //.Include(mtl => mtl.Category)
+                .Include(mtl => mtl.Rule)
+                .Where(mtl => mtl.Season.Id == seasonId && mtl.Category.Id == categoryId)
+                .Select(mtl => mtl.Rule)
+                .SingleOrDefaultAsync();
+
+            if (rule != null)
+            {
+                //load the result rules navigation property for the matchTemplate
+
+                await _context.Entry(rule)
+                    .Collection(mt => mt.ResultRules)
+                    .Query()
+                    .Include(rr => rr.Condition)
+                    .Include(rr => rr.JoinCondition)
+                    .Include(rr => rr.Operator)
+                    .Include(rr => rr.ResultType)
+                    .ToListAsync();
+            }
+
+            return rule;
+        }
+
         public async Task<MatchTemplate> GetMatchTemplateBySeasonAndCategoryAsync(ApplicationDbContext context, int seasonId, int categoryId)
         {
             if (_context == null) _context = context;
 
-            var matchTemplatesForSeason = await _context.MatchTemplateSeasons
-                .Include(mts => mts.MatchTemplate)
-                .Include(mts => mts.Season)
-                .Where(mts => mts.Season.Id == seasonId)
+            var matchTemplate = await _context.MatchTemplateLinks
+                .Include(mtl => mtl.MatchTemplate)
+                .Include(mtl => mtl.Season)
+                .Include(mtl => mtl.Category)
+                .Where(mtl => mtl.Season.Id == seasonId && mtl.Category.Id == categoryId)
                 .Select(mts => mts.MatchTemplate)
-                .ToListAsync();
-
-            var matchTemplatesForCategory = await _context.MatchTemplateCategories
-                .Include(mtc => mtc.MatchTemplate)
-                .Include(mtc => mtc.Category)
-                .Where(mtc => mtc.Category.Id == categoryId)
-                .Select(mtc => mtc.MatchTemplate)
-                .ToListAsync();
-
-            if (matchTemplatesForSeason.Count != 0 && matchTemplatesForCategory.Count != 0)
+                .SingleOrDefaultAsync();
+            
+            if (matchTemplate != null)
             {
-                var matchTemplate = new MatchTemplate();
-                var intersectingMatchTemplates = matchTemplatesForSeason.Intersect(matchTemplatesForCategory).ToList();
-                if (intersectingMatchTemplates.Count == 1)
-                {
-                    matchTemplate = intersectingMatchTemplates.First();
-                }
-                else
-                {
-                    if (matchTemplatesForCategory.Count == 1) matchTemplate = matchTemplatesForCategory.First();
-                    if (matchTemplatesForSeason.Count == 1) matchTemplate = matchTemplatesForSeason.First();
-                }
+                //get all the navigation properties for the matchTemplate
 
-                if (matchTemplate.Id != 0)
-                {
-                    //get all the navigation properties for the matchTemplate
+                await _context.Entry(matchTemplate)
+                    .Collection(mt => mt.GroupTemplates)
+                    .Query()
+                    .Include(gt => gt.Group)
+                    .ToListAsync();
 
-                    await _context.Entry(matchTemplate)
-                        .Collection(mt => mt.GroupTemplates)
+                foreach (var groupTemplate in matchTemplate.GroupTemplates)
+                {
+                    await _context.Entry(groupTemplate)
+                        .Collection(gt => gt.RankTemplates)
                         .Query()
-                        .Include(gt => gt.Group)
+                        .Include(rt => rt.Rank)
                         .ToListAsync();
+                }
 
-                    foreach (var groupTemplate in matchTemplate.GroupTemplates)
-                    {
-                        await _context.Entry(groupTemplate)
-                            .Collection(gt => gt.RankTemplates)
-                            .Query()
-                            .Include(rt => rt.Rank)
-                            .ToListAsync();
-                    }
+                await _context.Entry(matchTemplate)
+                    .Collection(mt => mt.SetTemplates)
+                    .Query()
+                    .Include(mgt => mgt.HomeGroupTemplate)
+                    .Include(mgt => mgt.AwayGroupTemplate)
+                    .ToListAsync();
 
-                    await _context.Entry(matchTemplate)
-                        .Collection(mt => mt.SetTemplates)
+                foreach(var setTemplate in matchTemplate.SetTemplates)
+                {
+                    await _context.Entry(setTemplate)
+                        .Collection(st => st.GameTemplates)
                         .Query()
-                        .Include(mgt => mgt.HomeGroupTemplate)
-                        .Include(mgt => mgt.AwayGroupTemplate)
                         .ToListAsync();
-
-                    foreach(var setTemplate in matchTemplate.SetTemplates)
-                    {
-                        await _context.Entry(setTemplate)
-                            .Collection(st => st.GameTemplates)
-                            .Query()
-                            .ToListAsync();
-                    }
-
-                    return matchTemplate;
                 }
             }
 
-            return null;
+            return matchTemplate;
         }
 
         public async Task<List<RankTemplate>> GetRankTemplatesByMatchTemplateAsync(ApplicationDbContext context, int matchTemplateId)
@@ -295,25 +303,28 @@ namespace ProjectArcBlade.Services
                 .Include(s => s.SetStatus)
                 .Include(s => s.Match).ThenInclude(m => m.AwayMatchTeam).ThenInclude(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
                 .Include(s => s.Match).ThenInclude(m => m.HomeMatchTeam).ThenInclude(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                .Include(s => s.Match).ThenInclude(m => m.Category)
+                .Include(s => s.Match).ThenInclude(m => m.Division)
+                .Include(s => s.Match).ThenInclude(m => m.Season)
                 .Where(s => s.Id == setId)
                 .SingleAsync();
 
             //get associated games.
             await _context.Entry(set)
-                    .Collection(s => s.Games)
-                    .Query()
-                    .Include(g => g.GameAwayResult).ThenInclude(gar => gar.ResultType)
-                    .Include(g => g.GameHomeResult).ThenInclude(ghr => ghr.ResultType)
-                    .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.ScoreStatus)
-                    .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.Audit)
-                    .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.ScoreStatus)
-                    .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.Audit)
-                    .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.ScoreStatus)
-                    .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.Audit)
-                    .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.ScoreStatus)
-                    .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.Audit)
-                    .OrderBy(g => g.Number)
-                    .ToListAsync();
+                .Collection(s => s.Games)
+                .Query()
+                .Include(g => g.GameAwayResult).ThenInclude(gar => gar.ResultType)
+                .Include(g => g.GameHomeResult).ThenInclude(ghr => ghr.ResultType)
+                .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.ScoreStatus)
+                .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.Audit)
+                .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.ScoreStatus)
+                .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.Audit)
+                .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.ScoreStatus)
+                .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.Audit)
+                .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.ScoreStatus)
+                .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.Audit)
+                .OrderBy(g => g.Number)
+                .ToListAsync();
             
             return set;
         }
@@ -328,9 +339,12 @@ namespace ProjectArcBlade.Services
             var setId = new int[match.Sets.Count];
             var homeGroupName = new string[match.Sets.Count];
             var awayGroupName = new string[match.Sets.Count];
+            var setStatus = new string[match.Sets.Count];
             var homeScore = new int[match.Sets.Count]; //home games won
             var awayScore = new int[match.Sets.Count]; //away games won
-            
+            var setHomeResult = new string[match.Sets.Count];
+            var setAwayResult = new string[match.Sets.Count];
+
             var isHomeTeam = match.HomeMatchTeam.Team.Id == teamId;
 
             var index = 0;
@@ -338,21 +352,19 @@ namespace ProjectArcBlade.Services
             {
                 setId[index] = set.Id;
                 setNumber[index] = set.Number;
+                setStatus[index] = set.SetStatus.Name;
                 homeGroupName[index] = set.HomeMatchTeamGroup.Group.Name;
                 awayGroupName[index] = set.AwayMatchTeamGroup.Group.Name;
-
-                int homeWinTotal = 0, awayWinTotal = 0;
-                foreach (var game in set.Games)
-                {
-                    if (game.GameAwayResult.ResultType.Name == Constants.ResultType.Win) awayWinTotal++;
-                    if (game.GameHomeResult.ResultType.Name == Constants.ResultType.Win) homeWinTotal++;
-                }
-
-                homeScore[index] = homeWinTotal;
-                awayScore[index] = awayWinTotal;
+                homeScore[index] = set.Games.Where(g => g.GameHomeResult.ResultType.Name == Constants.ResultType.Win).Count();
+                awayScore[index] = set.Games.Where(g => g.GameAwayResult.ResultType.Name == Constants.ResultType.Win).Count();
+                setHomeResult[index] = set.SetHomeResult.ResultType.Name;
+                setAwayResult[index] = set.SetAwayResult.ResultType.Name;
 
                 index++;
             }
+
+            var homeWin = match.Sets.Where(s => s.SetHomeResult.ResultType.Name == Constants.ResultType.Win).Count() >= match.MinimumSetsToWinMatch;
+            var awayWin = match.Sets.Where(s => s.SetAwayResult.ResultType.Name == Constants.ResultType.Win).Count() >= match.MinimumSetsToWinMatch;
 
             var viewModel = new MatchProgressViewModel
             {
@@ -362,13 +374,17 @@ namespace ProjectArcBlade.Services
                 TeamId = teamId,
                 SetId = setId,
                 SetNumber = setNumber,
+                SetStatus = setStatus,
+                SetAwayResult = setAwayResult,
+                SetHomeResult = setHomeResult,
                 SetTotal = match.Sets.Count,
                 HomeTeamName = match.HomeMatchTeam.Team.FullName,
                 AwayTeamName = match.AwayMatchTeam.Team.FullName,
                 AwayScore = awayScore,
                 HomeScore = homeScore,
                 HomeGroupName = homeGroupName,
-                AwayGroupName = awayGroupName
+                AwayGroupName = awayGroupName,
+                AllowMatchCompletion = homeWin || awayWin
             };
 
             return viewModel;
@@ -402,10 +418,10 @@ namespace ProjectArcBlade.Services
 
             var gameId = new int[set.Games.Count];
             var gameNumber = new int[set.Games.Count];
-            var awayAwayScore = new int[set.Games.Count];
-            var awayHomeScore = new int[set.Games.Count];
-            var homeAwayScore = new int[set.Games.Count];
-            var homeHomeScore = new int[set.Games.Count];
+            var awayAwayScore = new int?[set.Games.Count];
+            var awayHomeScore = new int?[set.Games.Count];
+            var homeAwayScore = new int?[set.Games.Count];
+            var homeHomeScore = new int?[set.Games.Count];
             var awayAwayScoreStatus = new string[set.Games.Count];
             var awayHomeScoreStatus = new string[set.Games.Count];
             var homeAwayScoreStatus = new string[set.Games.Count];
@@ -448,6 +464,8 @@ namespace ProjectArcBlade.Services
                 AwayTeamName = set.Match.AwayMatchTeam.Team.FullName,
                 HomeTeamName = set.Match.HomeMatchTeam.Team.FullName,
                 IsHomeTeam = set.Match.HomeMatchTeam.Team.Id == teamId,
+                SeasonId = set.Match.Season.Id,
+                CategoryId = set.Match.Category.Id,
                 TeamName = set.Match.HomeMatchTeam.Team.Id == teamId ? set.Match.HomeMatchTeam.Team.FullName : set.Match.AwayMatchTeam.Team.FullName
             };
 
@@ -461,7 +479,11 @@ namespace ProjectArcBlade.Services
             var set = await GetSetByIdAsync(_context, viewModel.SetId);
             var scoreStatusContested = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Contested);
             var scoreStatusAccepted = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Accepted);
-            
+            var resultTypeWin = await GetResultTypeAsync(_context, Constants.ResultType.Win);
+            var resultTypeLoss = await GetResultTypeAsync(_context, Constants.ResultType.Loss);
+            var resultTypeDraw = await GetResultTypeAsync(_context, Constants.ResultType.Draw);
+            var resultTypePending = await GetResultTypeAsync(_context, Constants.ResultType.Pending);
+
             var i = 0;
             foreach( var game in set.Games)
             {
@@ -469,58 +491,94 @@ namespace ProjectArcBlade.Services
                 {
                     if(viewModel.IsHomeTeam)
                     {
-                        if (viewModel.HomeAwaySore[i] != 0)
+                        //capture scores as entered by the home team
+                        //only mark scores as being accepted on initial entry.
+                        if (viewModel.HomeAwaySore[i] != null)
                         {
+                            if(game.HomeTeamAwayTeamScore.Score == null) game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.HomeTeamAwayTeamScore.Score = viewModel.HomeAwaySore[i];
-                            game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
+                            
                         }
-                        if (viewModel.HomeHomeSore[i] != 0)
+                        if (viewModel.HomeHomeSore[i] != null)
                         {
+                            if(game.HomeTeamHomeTeamScore.Score == null) game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.HomeTeamHomeTeamScore.Score = viewModel.HomeHomeSore[i];
-                            game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                         }
                     }
                     else
                     {
-                        if (viewModel.AwayAwaySore[i] != 0)
+                        //capture scores as entered by the away team
+                        if (viewModel.AwayAwaySore[i] != null)
                         {
+                            if(game.AwayTeamAwayTeamScore.Score == null) game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.AwayTeamAwayTeamScore.Score = viewModel.AwayAwaySore[i];
-                            game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
                         }
-                        if (viewModel.AwayHomeSore[i] != 0)
+                        if (viewModel.AwayHomeSore[i] != null)
                         {
+                            if(game.AwayTeamHomeTeamScore.Score == null) game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.AwayTeamHomeTeamScore.Score = viewModel.AwayHomeSore[i];
-                            game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                         }
                     }
 
-                    if (game.AwayTeamAwayTeamScore.Score != 0 && game.HomeTeamAwayTeamScore.Score != 0)
+                    //if both teams have entered scores for away team but the scores are different then mark as contested otherwise mark as accepted.
+                    if (game.AwayTeamAwayTeamScore.Score != null && game.HomeTeamAwayTeamScore.Score != null)
                     {
                         if(game.AwayTeamAwayTeamScore.Score != game.HomeTeamAwayTeamScore.Score)
                         {
                             game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusContested;
                             game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusContested;
                         }
+                        else
+                        {
+                            game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
+                            game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
+                        }
                     }
 
-                    if(game.HomeTeamHomeTeamScore.Score != 0 && game.AwayTeamHomeTeamScore.Score != 0)
+                    //if both teams have entered scores for home team but the scores are different then mark as contested otherwise mark as accepted.
+                    if (game.HomeTeamHomeTeamScore.Score != null && game.AwayTeamHomeTeamScore.Score != null)
                     {
                         if(game.HomeTeamHomeTeamScore.Score != game.AwayTeamHomeTeamScore.Score)
                         {
                             game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusContested;
                             game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusContested;
                         }
+                        else
+                        {
+                            game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
+                            game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
+                        }
+                    }
+
+                    game.GameHomeResult.ResultType = resultTypePending;
+                    game.GameAwayResult.ResultType = resultTypePending;
+
+                    if ((game.HomeTeamHomeTeamScoreAccepted && game.HomeTeamAwayTeamScoreAccepted) 
+                        || (game.AwayTeamHomeTeamScoreAccepted && game.AwayTeamAwayTeamScoreAccepted))
+                    {
+
+                        if(game.HomeTeamHomeTeamScoreAccepted && game.HomeTeamAwayTeamScoreAccepted)
+                        {
+                            game.GameHomeResult.ResultType = await GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, Convert.ToInt32(game.HomeTeamHomeTeamScore.Score), Convert.ToInt32(game.HomeTeamAwayTeamScore.Score));
+                            game.GameAwayResult.ResultType = await GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, Convert.ToInt32(game.HomeTeamAwayTeamScore.Score), Convert.ToInt32(game.HomeTeamHomeTeamScore.Score));
+                        }
+
+                        if (game.AwayTeamHomeTeamScoreAccepted && game.AwayTeamAwayTeamScoreAccepted)
+                        {
+                            game.GameHomeResult.ResultType = await GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, Convert.ToInt32(game.AwayTeamHomeTeamScore.Score), Convert.ToInt32(game.AwayTeamAwayTeamScore.Score));
+                            game.GameAwayResult.ResultType = await GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, Convert.ToInt32(game.AwayTeamAwayTeamScore.Score), Convert.ToInt32(game.AwayTeamHomeTeamScore.Score));
+                        }
                     }
                 }
                 i++;
             }
 
-            //if any games have a score which is not zero then the set is in progress.
+            //if any games have a score which is Accepted then the set is in progress.
             var setInProgress = set.Games.Where(g =>
-                g.AwayTeamAwayTeamScore.Score != 0 ||
-                g.AwayTeamHomeTeamScore.Score != 0 ||
-                g.HomeTeamAwayTeamScore.Score != 0 ||
-                g.HomeTeamHomeTeamScore.Score != 0
+                g.AwayTeamAwayTeamScoreAccepted ||
+                g.AwayTeamHomeTeamScoreAccepted ||
+                g.HomeTeamAwayTeamScoreAccepted ||
+                g.HomeTeamHomeTeamScoreAccepted
             ).Any();
 
             if( set.SetStatus.Name != Constants.SetStatus.InProgress && setInProgress)
@@ -528,8 +586,139 @@ namespace ProjectArcBlade.Services
                 set.SetStatus = await GetSetStatusAsync(_context, Constants.SetStatus.InProgress);
             }
 
+            // set result type to pending...
+            set.SetHomeResult.ResultType = resultTypePending;
+            set.SetAwayResult.ResultType = resultTypePending;
+
+            // determine if the set can be marked as complete!
+            var homeWinCount = set.Games.Where(g => g.GameHomeResult.ResultType.Name == Constants.ResultType.Win).Count();
+            var awayWinCount = set.Games.Where(g => g.GameAwayResult.ResultType.Name == Constants.ResultType.Win).Count();
+
+            if( homeWinCount >= set.MinimumGamesToWinSet || awayWinCount >= set.MinimumGamesToWinSet )
+            {
+                set.SetStatus = await GetSetStatusAsync(_context, Constants.SetStatus.Complete);
+
+                if(homeWinCount >= set.MinimumGamesToWinSet)
+                {
+                    set.SetHomeResult.ResultType = resultTypeWin;
+                    set.SetAwayResult.ResultType = resultTypeLoss;
+                }
+
+                if(awayWinCount >= set.MinimumGamesToWinSet)
+                {
+                    set.SetAwayResult.ResultType = resultTypeWin;
+                    set.SetHomeResult.ResultType = resultTypeLoss;
+                }
+            }
+
             _context.Sets.Update(set);
             await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Returns a result type for score1 based on score2.
+        /// Uses the ResltRules attached to a matchTemplate as the conditions.
+        /// Will return result of win, loss, or draw, if unable to establish result, return pending.
+        /// </summary>
+        /// <param name="seasonId"></param>
+        /// <param name="categoryId"></param>
+        /// <param name="score1"></param>
+        /// <param name="score2"></param>
+        /// <returns></returns>
+        public async Task<ResultType> GetResultTypeAsync(ApplicationDbContext context, int seasonId, int categoryId, int score1, int score2)
+        {
+            var rule = await GetRuleBySeasonAndCategoryAsync(_context, seasonId, categoryId);
+            var resultTypes = await _context.ResultTypes.ToListAsync();
+            var resultTypePending = resultTypes.Single(rt => rt.Name == Constants.ResultType.Pending);
+            var resultTypeDraw = resultTypes.Single(rt => rt.Name == Constants.ResultType.Draw);
+            var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
+            var resultTypeLoss = resultTypes.Single(rt => rt.Name == Constants.ResultType.Loss);
+            var resultTypeInvalid = resultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid);
+
+            if (rule != null)
+            {
+                //first check for invalid, then draw then loss then win otherwise pending (default)
+                var invalidResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Invalid).ToList();
+                var drawResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Draw).ToList();
+                var lossResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Loss).ToList();
+                var winResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Win).ToList();
+
+                if (ValidateResultRule(invalidResultRules, score1, score2)) return resultTypeInvalid;
+                if (ValidateResultRule(drawResultRules, score1, score2)) return resultTypeDraw;
+                if (ValidateResultRule(lossResultRules, score1, score2)) return resultTypeLoss;
+                if (ValidateResultRule(winResultRules, score1, score2)) return resultTypeWin;
+            }
+
+            return resultTypePending;
+        }
+
+        private bool ValidateResultRule(List<ResultRule> resultRules, int score1, int score2)
+        {
+            var ruleResult = new bool[resultRules.Count];
+            string joinCondition = Constants.JoinCondition.And; //default to and.
+
+            var i = 0;
+            foreach(var rule in resultRules)
+            {
+                var ruleOperand = 0;
+
+                joinCondition = rule.JoinCondition.Name;
+                if (rule.UseOperator)
+                {
+                    switch(rule.Operator.Name)
+                    {
+                        case Constants.Operator.Add:
+                            ruleOperand = score1 + score2;
+                            break;
+                        case Constants.Operator.Subtract:
+                            ruleOperand = score1 - score2;
+                            break;
+                        case Constants.Operator.Divide:
+                            ruleOperand = score1 / score2;
+                            break;
+                        case Constants.Operator.Multiply:
+                            ruleOperand = score1 * score2;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {                    
+                    if (rule.ScoreOne) ruleOperand = score1;
+                    if (rule.ScoreTwo) ruleOperand = score2;
+                }
+
+                switch(rule.Condition.Name)
+                {
+                    case Constants.Condition.Equal:
+                        ruleResult[i] = ruleOperand == rule.Value;
+                        break;
+                    case Constants.Condition.NotEqual:
+                        ruleResult[i] = ruleOperand != rule.Value;
+                        break;
+                    case Constants.Condition.LessThan:
+                        ruleResult[i] = ruleOperand < rule.Value;
+                        break;
+                    case Constants.Condition.GreaterThan:
+                        ruleResult[i] = ruleOperand > rule.Value;
+                        break;
+                    default:
+                        break;
+                }
+
+                i++;
+            }
+
+            switch(joinCondition)
+            {
+                case Constants.JoinCondition.And:
+                    return ruleResult.Where(r => r == true).Count() == ruleResult.Count();
+                case Constants.JoinCondition.Or:
+                    return ruleResult.Where(r => r == true).Count() > 0;                    
+            }
+            
+            return false;
         }
     }
 }

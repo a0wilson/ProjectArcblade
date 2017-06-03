@@ -11,6 +11,8 @@ namespace ProjectArcBlade.Models
     {
         public int Id { get; set; }
         public Season Season { get; set; }
+        public Division Division { get; set; }
+        public Category Category { get; set; }
         public DateTime? StartTime { get; set; }
         [DisplayFormat(DataFormatString = "dddd, MMM dd, yyyy")]
         public DateTime? StartDate { get; set; }
@@ -19,10 +21,10 @@ namespace ProjectArcBlade.Models
         public MatchStatus MatchStatus { get; set; }
         public MatchAwayResult MatchAwayResult { get; set; }
         public MatchHomeResult MatchHomeResult { get; set; }
-
-        //Navigation properties
         public AwayMatchTeam AwayMatchTeam { get; set; }
         public HomeMatchTeam HomeMatchTeam { get; set; }
+
+        //Navigation properties
         public ICollection<RescheduledStartDate> RescheduledStartDates { get; set; }
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
@@ -30,7 +32,32 @@ namespace ProjectArcBlade.Models
 
         //unmapped properites
         [NotMapped]
-        public bool isHomeTeam { get; set; }
+        public bool IsHomeTeam { get; set; }
+
+        public int MinimumSetsToWinMatch
+        {
+            get
+            {
+                if (Sets != null)
+                {
+                    if (Sets.Count == 1) return 1;
+
+                    if (Sets.Count > 1)
+                    {
+                        var rem = Sets.Count % 2;
+                        if (rem == 0)
+                        {
+                            return (Sets.Count / 2) + 1;
+                        }
+                        else
+                        {
+                            return (Sets.Count + 1) / 2;
+                        }
+                    }
+                }
+                return 0;
+            }
+        }
 
     }
 }
