@@ -332,11 +332,11 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ConditionId = table.Column<int>(nullable: true),
-                    JoinConditionId = table.Column<int>(nullable: true),
+                    ConditionId = table.Column<int>(nullable: false),
+                    JoinConditionId = table.Column<int>(nullable: false),
                     OperatorId = table.Column<int>(nullable: true),
-                    ResultTypeId = table.Column<int>(nullable: true),
-                    RuleId = table.Column<int>(nullable: true),
+                    ResultTypeId = table.Column<int>(nullable: false),
+                    RuleId = table.Column<int>(nullable: false),
                     ScoreOne = table.Column<bool>(nullable: false),
                     ScoreTwo = table.Column<bool>(nullable: false),
                     Value = table.Column<int>(nullable: false)
@@ -349,7 +349,7 @@ namespace ProjectArcBlade.Data.Migrations
                         column: x => x.ConditionId,
                         principalTable: "Lookup",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ResultRule_Lookup_JoinConditionId",
                         column: x => x.JoinConditionId,
@@ -367,13 +367,13 @@ namespace ProjectArcBlade.Data.Migrations
                         column: x => x.ResultTypeId,
                         principalTable: "Type",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ResultRule_Rule_RuleId",
                         column: x => x.RuleId,
                         principalTable: "Rule",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

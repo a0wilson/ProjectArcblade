@@ -1,0 +1,85 @@
+@model ProjectArcBlade.Models.MatchViewModels.GameProgressViewModel
+@{
+    ViewData["Title"] = "Game Progress";
+}
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+            <li><a asp-action="Dashboard" asp-controller="Team" asp-route-id="@Model.TeamId">Team Dashboard - @Model.TeamName</a></li>
+            <li><a asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@Model.MatchId" asp-route-teamId="@Model.TeamId">Match Progress</a></li>
+            <li>Game Progress</li>
+        </ol>
+    </div>
+</div>
+
+<form asp-action="GameProgress">
+    <div class="panel-heading">
+        <h1>Game Progress</h1>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            @Html.Partial("SuccessAlertPartial")
+            <h2><strong>Home Team:</strong> @Model.HomeTeamName - @Model.HomeGroup Pair</h2>
+            <hr />
+            <h2><strong>Away Team:</strong> @Model.AwayTeamName - @Model.AwayGroup Pair</h2>
+            <hr />
+            <table class="table table-condensed table-hover">
+                <thead>
+                    <tr class="lead text-center">
+                        <td><strong>Game #</strong></td>
+                        <td><strong>Home Score</strong></td>
+                        <td><strong>Away Score</strong></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var index = 0; index < Model.GameTotal; index++)
+                    {
+                        <tr class="lead text-center">
+                            <td>
+                                <div class="form-control-static">
+                                    @Model.GameNumber[index]
+                                </div>
+
+                                <input type="hidden" asp-for="@Model.GameId[index]" />
+                            </td>
+                            <td>
+                                @if (Model.IsHomeTeam)
+                                {
+                                    @Model.HomeHomeSore[index]
+                                }
+                                else
+                                {
+                                    @Model.AwayHomeSore[index]
+                                }
+                            </td>
+                            <td>
+                                @if (Model.IsHomeTeam)
+                                {
+                                    @Model.HomeAwaySore[index]
+                                }
+                                else
+                                {
+                                    @Model.AwayAwaySore[index]
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer text-center">
+            <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+            </button>
+            
+            <input type="hidden" asp-for="@Model.IsHomeTeam" />
+            <input type="hidden" asp-for="@Model.MatchId" />
+            <input type="hidden" asp-for="@Model.CategoryId" />
+            <input type="hidden" asp-for="@Model.SeasonId" />
+            <input type="hidden" asp-for="@Model.TeamId" />
+            <input type="hidden" asp-for="@Model.SetId" />
+        </div>
+
+    </div>
+</form>
+

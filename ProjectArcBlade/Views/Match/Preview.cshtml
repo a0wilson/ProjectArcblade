@@ -1,6 +1,7 @@
 @model ProjectArcBlade.Models.MatchViewModels.PreviewMatchViewModel
 @{
     ViewData["Title"] = "Preview";
+    bool play = (Model.Match.HomeMatchTeam.TeamStatus.Name == "Active" && Model.Match.AwayMatchTeam.TeamStatus.Name == "Active");
 }
 <div class="row">
     <div class="col-md-12">
@@ -10,90 +11,121 @@
         </ol>
     </div>
 </div>
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="jumbotron text-center">
-            <h1><strong>@Model.Match.HomeMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.HomeMatchTeam.Team.Name</strong></h1>
-            <br />
-            <h1>vs</h1>
-            <br />
-            <h1><strong>@Model.Match.AwayMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.AwayMatchTeam.Team.Name</strong></h1>
-            <br />
-            <h2>on <strong>@Convert.ToDateTime(Model.Match.StartDate).ToString("dddd, MMM d, yyyy")</strong> starting at <strong>@Convert.ToDateTime(Model.Match.StartTime).ToString("HH:mm")</strong></h2>
-            <br />
-            <h2>playing at <strong>@Model.Match.Venue.Name</strong> (@Model.Match.Venue.Postcode)</h2>
-            <br />
-            <div class="row">
-                <div class="col-md-5 col-md-offset-1">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3><strong>Home Team Players</strong></h3>                           
-                            <h4>@Model.Match.HomeMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.HomeMatchTeam.Team.Name</h4>
+<form asp-action="Preview">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1>Preview Match</h1>
+        </div>
+        <div class="panel-body">
+            <table class="table table-condensed text-center">
+                <tr>
+                    <td style="border:0;">
+                        <div class="row">
+                            <div class="col-md-5 col-md-offset">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h2><strong>@Model.Match.HomeMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.HomeMatchTeam.Team.Name</strong></h2>
+                                        <h4>Home Team Players</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        @if (Model.Match.HomeMatchTeam.TeamStatus.Name == "Active")
+                                        {
+                                            <ul class="list-group text-left">
+                                                @foreach (var player in Model.HomeTeamPlayers)
+                                                {
+                                                    <li class="list-group-item">
+                                                        <span class="badge">@player.HomeMatchTeamGroup.Group.Name</span>
+                                                        @player.ClubPlayer.PlayerDetail.FirstName  @player.ClubPlayer.PlayerDetail.LastName
+                                                        @if (player.ClubPlayer.Id == Model.HomeTeamCaptainId)
+                                                        { <span class="label label-success">Captain</span>}
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <h5>Home Team Players have not been submitted as yet.</h5>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2"><h2><strong>VS</strong></h2></div>
+                            <div class="col-md-5">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h2><strong>@Model.Match.AwayMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.AwayMatchTeam.Team.Name</strong></h2>
+                                        <h4>Away Team Players</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        @if (Model.Match.AwayMatchTeam.TeamStatus.Name == "Complete" || Model.Match.AwayMatchTeam.TeamStatus.Name == "Active")
+                                        {
+                                            <ul class="list-group text-left">
+                                                @foreach (var player in Model.AwayTeamPlayers)
+                                                {
+                                                    <li class="list-group-item">
+                                                        <span class="badge">@player.AwayMatchTeamGroup.Group.Name</span>
+                                                        @player.ClubPlayer.PlayerDetail.FirstName  @player.ClubPlayer.PlayerDetail.LastName
+                                                        @if (player.ClubPlayer.Id == Model.AwayTeamCaptainId)
+                                                        { <span class="label label-success">Captain</span>}
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <h5>Away Team Players have not been submitted as yet.</h5>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="panel-body">
-                            @if (Model.Match.HomeMatchTeam.TeamStatus.Name == "Complete" || Model.Match.HomeMatchTeam.TeamStatus.Name == "Active")
-                            {
-                                <ul class="list-group text-left">
-                                    @foreach (var player in Model.HomeTeamPlayers)
-                                    {
-                                        <li class="list-group-item">
-                                            <span class="badge">@player.HomeMatchTeamGroup.Group.Name</span>
-                                            @player.ClubPlayer.PlayerDetail.FirstName  @player.ClubPlayer.PlayerDetail.LastName
-                                            @if(player.ClubPlayer.Id == Model.HomeTeamCaptainId) { <span class="label label-success">Captain</span>}
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <h5>Home Team Players have not been submitted as yet.</h5>
-                            }
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border:0;">
+                        <h3>on <strong>@Convert.ToDateTime(Model.Match.StartDate).ToString("dddd, MMM d, yyyy")</strong> starting at <strong>@Convert.ToDateTime(Model.Match.StartTime).ToString("HH:mm")</strong></h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border:0;"><h3>playing at <strong>@Model.Match.Venue.Name</strong> (@Model.Match.Venue.Postcode)</h3></td>
+                </tr>
+            </table>
+        </div>
+        <div class="panel-footer text-center">
+            <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+            </button>
+            <button type="button" name="btnConfirmConcede" class="btn btn-lg btn-danger" title="Concede" data-toggle="modal" data-target="#myModal">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
+            </button>
+            <button class="btn btn-lg btn-primary" type="submit" name="btnTeam" value="Team" title="Submit Team" asp-action="PreviewMatch">
+                <span class="glyphicon glyphicon-edit"></span> Submit Team
+            </button>
+            <button type="submit" name="btnPlay" value="Play" title="Play" asp-action="StartMatch" disabled="@(play?"disabled":"")" asp-route-matchId="@Model.Match.Id" asp-route-teamId="@Model.Team.Id" class="btn btn-success btn-lg">
+                <span class="glyphicon glyphicon-play"></span> Play Match
+            </button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Concede Match Confirmation</strong></h4>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-5">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3><strong>Away Team Players</strong></h3>
-                            <h4>@Model.Match.AwayMatchTeam.Team.LeagueClub.Club.Name - @Model.Match.AwayMatchTeam.Team.Name</h4>
+                        <div class="modal-body">
+                            Are you sure you want to concede this match? This action cannot be undone!
                         </div>
-                        <div class="panel-body">
-                            @if (Model.Match.AwayMatchTeam.TeamStatus.Name == "Complete" || Model.Match.AwayMatchTeam.TeamStatus.Name == "Active")
-                            {
-                                <ul class="list-group text-left">
-                                    @foreach (var player in Model.AwayTeamPlayers)
-                                    {
-                                        <li class="list-group-item">
-                                            <span class="badge">@player.AwayMatchTeamGroup.Group.Name</span>
-                                            @player.ClubPlayer.PlayerDetail.FirstName  @player.ClubPlayer.PlayerDetail.LastName
-                                            @if(player.ClubPlayer.Id == Model.AwayTeamCaptainId){ <span class="label label-success">Captain</span>}
-                                        </li>
-                                    }
-                                </ul>
-                            }
-                            else
-                            {
-                                <h5>Away Team Players have not submitted as yet.</h5>
-                            }
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="btnConcede" class="btn btn-danger" title="Concede" value="Conncede">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-            @if (Model.Match.HomeMatchTeam.TeamStatus.Name == "Active" && Model.Match.AwayMatchTeam.TeamStatus.Name == "Active")
-            {
-                <div class="row">
-                    <div class="col-md-2 col-md-offset-5">
-                        <form asp-action="StartMatch" >
-                            <button type="submit" asp-action="StartMatch" asp-route-matchId="@Model.Match.Id" asp-route-teamId="@Model.Team.Id" class="btn btn-success btn-lg">
-                                <span class="glyphicon glyphicon-play"></span> Start Match
-                            </button>
-                        </form>
-                        
-                                                
-                    </div>
-                </div>
-            }            
         </div>
     </div>
+</form>
 
-</div>

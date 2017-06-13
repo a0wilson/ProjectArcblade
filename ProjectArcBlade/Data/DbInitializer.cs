@@ -248,7 +248,6 @@ namespace ProjectArcBlade.Data
                     new ResultType{Name="Win"},
                     new ResultType{Name="Loss"},
                     new ResultType{Name="Draw"},
-                    new ResultType{Name="Forfeit"},
                     new ResultType{Name="Pending"},
                     new ResultType{Name="Conceded"},
                     new ResultType{Name="Invalid"}
@@ -857,7 +856,7 @@ namespace ProjectArcBlade.Data
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
-                        ScoreOne = true,
+                        ScoreTwo = true,
                         Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
                         Value = 20,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
@@ -866,7 +865,7 @@ namespace ProjectArcBlade.Data
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
-                        ScoreOne = true,
+                        ScoreTwo = true,
                         Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
                         Value = 31,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
@@ -897,9 +896,27 @@ namespace ProjectArcBlade.Data
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.GreaterThan),
+                        Value = 30,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
                         ScoreOne = true,
                         Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
-                        Value = 0,
+                        Value = -30,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    },
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = -30,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
                     }

@@ -390,26 +390,6 @@ namespace ProjectArcBlade.Services
             return viewModel;
         }
 
-        public async Task UpdateMatchProgress(ApplicationDbContext context, MatchProgressViewModel viewModel)
-        {
-            if (_context == null) _context = context;
-
-            var match = await GetMatchByIdAsync(viewModel.MatchId);
-
-            var isHomeGame = match.HomeMatchTeam.Team.Id == viewModel.TeamId;
-
-            var index = 0;
-            foreach (var game in match.Sets)
-            {
-                
-                index++;
-            }
-
-            _context.Matches.Update(match);
-            await _context.SaveChangesAsync();
-
-        }
-
         public async Task<GameProgressViewModel> GetGameProgressViewModelAsync( ApplicationDbContext context, int setId, int teamId)
         {
             if (_context == null) _context = context;
@@ -455,6 +435,8 @@ namespace ProjectArcBlade.Services
                 AwayHomeSore = awayHomeScore,
                 HomeAwaySore = homeAwayScore,
                 HomeHomeSore = homeHomeScore,
+                SetAwayResult = set.SetAwayResult.ResultType.Name,
+                SetHomeResult = set.SetHomeResult.ResultType.Name,
                 AwayAwaySoreStatus = awayAwayScoreStatus,
                 AwayHomeSoreStatus = awayHomeScoreStatus,
                 HomeAwaySoreStatus = homeAwayScoreStatus,
@@ -472,17 +454,84 @@ namespace ProjectArcBlade.Services
             return viewModel;
         }
 
-        public async Task UpdateGameProgressAsync(ApplicationDbContext context, GameProgressViewModel viewModel)
+        public async Task<ServiceResult<GameProgressViewModel>> UpdateSetStatusToConcedeAsync(ApplicationDbContext context, GameProgressViewModel viewModel)
+        {
+            if (_context == null) _context = context;
+
+            var set = await GetSetByIdAsync(_context, viewModel.SetId);
+            var matchTemplate = await GetMatchTemplateBySeasonAndCategoryAsync(_context, set.Match.Season.Id, set.Match.Category.Id);
+            var awayGroup = set.AwayMatchTeamGroup.Group.Name;
+            var homeGroup = set.HomeMatchTeamGroup.Group.Name;
+            var awayTeamName = set.Match.AwayMatchTeam.Team.FullName;
+            var homeTeamName = set.Match.HomeMatchTeam.Team.FullName;
+            var resultTypes = await _context.ResultTypes.ToListAsync();
+            var resultTypeConceded = resultTypes.Single(rt => rt.Name == Constants.ResultType.Conceded);
+            var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
+
+            //set all the games in the set to 0;
+            set.Games.ToList().ForEach(g => SetGameScore(g, 0, 0));
+            
+            if ( viewModel.IsHomeTeam)
+            {
+                for (var i=0; i<set.MinimumGamesToWinSet; i++)
+                {
+                    var game = SetGameScore(set.Games.ElementAt(i), matchTemplate.DefaultGameLossScore, matchTemplate.DefaultGameWinScore);
+                }
+
+                set.SetHomeResult.ResultType = resultTypeConceded;
+                set.SetAwayResult.ResultType = resultTypeWin;
+            }
+            else
+            {
+                for (var i = 0; i < set.MinimumGamesToWinSet; i++)
+                {
+                    var game = SetGameScore(set.Games.ElementAt(i),matchTemplate.DefaultGameWinScore, matchTemplate.DefaultGameLossScore);
+                }
+                set.SetAwayResult.ResultType = resultTypeConceded;
+                set.SetHomeResult.ResultType = resultTypeWin;
+            }
+
+            _context.Sets.Update(set);
+            await _context.SaveChangesAsync();
+
+            var successMessage = String.Format("{0} - {1} pair have conceded the game against {2} - {3} pair", awayTeamName, awayGroup, homeTeamName, homeGroup);
+            if (viewModel.IsHomeTeam) successMessage = String.Format("{0} - {1} pair have conceded the game against {2} - {3} pair", homeTeamName, homeGroup, awayTeamName, awayGroup);
+            
+            var serviceResult = new ServiceResult<GameProgressViewModel>()
+            {
+                Success = true,
+                SuccessMessage = successMessage
+            };
+            return serviceResult;
+        }
+        
+        private Game SetGameScore(Game game, int homeScore, int awayScore)
+        {
+            game.HomeTeamAwayTeamScore.Score = awayScore;
+            game.AwayTeamAwayTeamScore.Score = awayScore;
+            game.HomeTeamHomeTeamScore.Score = homeScore;
+            game.AwayTeamHomeTeamScore.Score = homeScore;
+            
+            game.GameHomeResult.ResultType =  GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, homeScore, awayScore).Result;
+            game.GameAwayResult.ResultType = GetResultTypeAsync(_context, game.Set.Match.Season.Id, game.Set.Match.Category.Id, awayScore, homeScore).Result;
+
+            return game;
+        }
+
+        public async Task<ServiceResult<GameProgressViewModel>> UpdateSetAsync(ApplicationDbContext context, GameProgressViewModel viewModel)
         {
             if (_context == null) _context = context;
 
             var set = await GetSetByIdAsync(_context, viewModel.SetId);
             var scoreStatusContested = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Contested);
             var scoreStatusAccepted = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Accepted);
-            var resultTypeWin = await GetResultTypeAsync(_context, Constants.ResultType.Win);
-            var resultTypeLoss = await GetResultTypeAsync(_context, Constants.ResultType.Loss);
-            var resultTypeDraw = await GetResultTypeAsync(_context, Constants.ResultType.Draw);
-            var resultTypePending = await GetResultTypeAsync(_context, Constants.ResultType.Pending);
+
+            var resultTypes = await _context.ResultTypes.ToListAsync();
+            var resultTypePending = resultTypes.Single(rt => rt.Name == Constants.ResultType.Pending);
+            var resultTypeDraw = resultTypes.Single(rt => rt.Name == Constants.ResultType.Draw);
+            var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
+            var resultTypeLoss = resultTypes.Single(rt => rt.Name == Constants.ResultType.Loss);
+            var resultTypeInvalid = resultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid);
 
             var i = 0;
             foreach( var game in set.Games)
@@ -611,8 +660,18 @@ namespace ProjectArcBlade.Services
                 }
             }
 
+            viewModel.SetAwayResult = set.SetAwayResult.ResultType.Name;
+            viewModel.SetHomeResult = set.SetHomeResult.ResultType.Name;
+
             _context.Sets.Update(set);
             await _context.SaveChangesAsync();
+
+            var serviceResult = new ServiceResult<GameProgressViewModel>()
+            {
+                Success = true,
+                ReturnValue = viewModel
+            };
+            return serviceResult;
         }
 
         /// <summary>
@@ -626,8 +685,7 @@ namespace ProjectArcBlade.Services
         /// <param name="score2"></param>
         /// <returns></returns>
         public async Task<ResultType> GetResultTypeAsync(ApplicationDbContext context, int seasonId, int categoryId, int score1, int score2)
-        {
-            var rule = await GetRuleBySeasonAndCategoryAsync(_context, seasonId, categoryId);
+        {            
             var resultTypes = await _context.ResultTypes.ToListAsync();
             var resultTypePending = resultTypes.Single(rt => rt.Name == Constants.ResultType.Pending);
             var resultTypeDraw = resultTypes.Single(rt => rt.Name == Constants.ResultType.Draw);
@@ -635,20 +693,24 @@ namespace ProjectArcBlade.Services
             var resultTypeLoss = resultTypes.Single(rt => rt.Name == Constants.ResultType.Loss);
             var resultTypeInvalid = resultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid);
 
-            if (rule != null)
+            if(!(score1 == 0 && score2 == 0))
             {
-                //first check for invalid, then draw then loss then win otherwise pending (default)
-                var invalidResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Invalid).ToList();
-                var drawResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Draw).ToList();
-                var lossResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Loss).ToList();
-                var winResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Win).ToList();
+                var rule = await GetRuleBySeasonAndCategoryAsync(_context, seasonId, categoryId);
 
-                if (ValidateResultRule(invalidResultRules, score1, score2)) return resultTypeInvalid;
-                if (ValidateResultRule(drawResultRules, score1, score2)) return resultTypeDraw;
-                if (ValidateResultRule(lossResultRules, score1, score2)) return resultTypeLoss;
-                if (ValidateResultRule(winResultRules, score1, score2)) return resultTypeWin;
+                if (rule != null)
+                {
+                    //first check for invalid, then draw then loss then win otherwise pending (default)
+                    var invalidResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Invalid).ToList();
+                    var drawResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Draw).ToList();
+                    var lossResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Loss).ToList();
+                    var winResultRules = rule.ResultRules.Where(rr => rr.ResultType.Name == Constants.ResultType.Win).ToList();
+
+                    if (ValidateResultRule(invalidResultRules, score1, score2)) return resultTypeInvalid;
+                    if (ValidateResultRule(drawResultRules, score1, score2)) return resultTypeDraw;
+                    if (ValidateResultRule(lossResultRules, score1, score2)) return resultTypeLoss;
+                    if (ValidateResultRule(winResultRules, score1, score2)) return resultTypeWin;
+                }
             }
-
             return resultTypePending;
         }
 
@@ -719,6 +781,17 @@ namespace ProjectArcBlade.Services
             }
             
             return false;
+        }
+
+        public async Task<ServiceResult<MatchProgressViewModel>> CompleteMatchAsync(ApplicationDbContext context, MatchProgressViewModel viewModel)
+        {
+
+            var serviceResult = new ServiceResult<MatchProgressViewModel>()
+            {
+                Success = true,
+                ReturnValue = viewModel
+            };
+            return serviceResult;
         }
     }
 }

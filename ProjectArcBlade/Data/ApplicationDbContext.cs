@@ -161,6 +161,10 @@ namespace ProjectArcBlade.Data
             //result rule
             builder.Entity<Rule>().ToTable("Rule");
             builder.Entity<ResultRule>().ToTable("ResultRule");
+            builder.Entity<ResultRule>()
+                .HasOne(rr => rr.JoinCondition)
+                .WithMany(jc => jc.ResultRules)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Audit>().ToTable("Audit");
             builder.Entity<Venue>().ToTable("Venue");

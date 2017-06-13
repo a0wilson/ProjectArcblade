@@ -1,0 +1,26 @@
+@model string
+
+@switch (Model)
+{
+    case "Win":
+        <span class="label label-success small">Win</span>
+        break;
+    case "Loss":
+        <span class="label label-danger">Loss</span>
+        break;
+    case "Draw":
+        <span class="label label-primary">Draw</span>
+        break;
+    case "Conceded":
+        <span class="label label-danger">Conceded</span>
+        break;
+    case "Pending":
+        <span class="label label-info">Pending</span>
+        break;
+    case "No Entry":
+        <span class="label label-default">No Entry</span>
+        break;
+    case "Invalid":
+        <span class="label label-warning">Invalid</span>
+        break;
+}

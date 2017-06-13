@@ -6,6 +6,8 @@
         public int TeamId { get; set; }
         public int MatchId { get; set; }
         public string TeamName { get; set; }
+        public string SetAwayResult { get; set; }
+        public string SetHomeResult { get; set; }
         public int[] GameId { get; set; }
         public int[] GameNumber { get; set; }
         public int?[] AwayAwaySore { get; set; }

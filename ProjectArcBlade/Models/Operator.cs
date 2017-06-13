@@ -3,6 +3,6 @@ namespace ProjectArcBlade.Models
 {
     public class Operator : Lookup
     {
-        ICollection<ResultRule> ResultRules { get; set; }
+        public ICollection<ResultRule> ResultRules { get; set; }
     }
 }

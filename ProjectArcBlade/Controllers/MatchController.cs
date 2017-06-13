@@ -83,6 +83,56 @@ namespace ProjectArcBlade.Controllers
             return RedirectToAction("MatchProgress", new { matchId = matchId, teamId = teamId });
         }
 
+        //GET: Match/GameProgress
+        public async Task<IActionResult> GameProgress(MatchService matchService, int setId, int teamId)
+        {
+            var viewModel = await matchService.GetGameProgressViewModelAsync(_context, setId, teamId);
+
+            if (viewModel.SetAwayResult == Constants.ResultType.Conceded || viewModel.SetHomeResult == Constants.ResultType.Conceded)
+            {
+                return View("ViewGameProgress", viewModel);
+            }
+
+            return View(viewModel);
+        }
+
+        //POST: Match/GameProgress
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GameProgress(MatchService matchService, GameProgressViewModel viewModel, string btnSave, string btnBack, string btnConcede)
+        {
+            if (btnSave != null)
+            {
+                var serviceResult = await matchService.UpdateSetAsync(_context, viewModel);
+                if (serviceResult.Success)
+                {
+                    TempData["successMessage"] = "Game Progress updated successfully!";
+                    //if the score update means a pair has won the set then redirect to the match progress page.
+                    if( serviceResult.ReturnValue.SetHomeResult == Constants.ResultType.Win || serviceResult.ReturnValue.SetAwayResult == Constants.ResultType.Win)
+                    {
+                        return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+                    }
+                }
+
+            }
+                
+            if( btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+            
+            if(btnConcede != null)
+            {
+                var serviceResult = await matchService.UpdateSetStatusToConcedeAsync(_context, viewModel);
+
+                if (serviceResult.Success)
+                {
+                    if (serviceResult.HasSuccessMessage) TempData["successMessage"] = serviceResult.SuccessMessage;
+                    return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+                }
+                
+            }
+
+            return RedirectToAction("GameProgress", new { setId = viewModel.SetId, teamId = viewModel.TeamId });
+        }
+
         // GET: Match/MatchProgress
         public async Task<IActionResult> MatchProgress(MatchService matchService, int matchId, int teamId)
         {
@@ -90,34 +140,22 @@ namespace ProjectArcBlade.Controllers
             return View(viewModel);
         }
 
-        //GET: Match/GameProgress
-        public async Task<IActionResult> GameProgress(MatchService matchService, int setId, int teamId)
-        {
-            var viewModel = await matchService.GetGameProgressViewModelAsync(_context, setId, teamId);
-            return View(viewModel);
-        }
-
-        //POST: Match/GameProgress
+        //POST: Match/MatchProgress
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> GameProgress(MatchService matchService, GameProgressViewModel viewModel, string btnSave, string btnBack)
+        public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel, string btnBack, string btnConcede, string btnComplete)
         {
-            if( btnSave != null ) await matchService.UpdateGameProgressAsync(_context, viewModel);
-                
-            if( btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+            if(btnBack != null) return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+
+            if(btnComplete != null)
+            {
+                var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
+            }
+
+            return RedirectToAction("GameProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
             
-            return RedirectToAction("GameProgress", new { setId = viewModel.SetId, teamId = viewModel.TeamId });
         }
-
-        // POST: Match/CreateStep1
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel)
-        {
-            await matchService.UpdateMatchProgress(_context, viewModel);
-            return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
-        }
-
+        
         // GET: Match/CreateStep1
         public async Task<IActionResult> CreateStep1(int leagueId)
         {

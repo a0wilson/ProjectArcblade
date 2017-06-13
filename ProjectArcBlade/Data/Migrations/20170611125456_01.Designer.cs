@@ -8,13 +8,13 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170603124420_01")]
+    [Migration("20170611125456_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.1.1")
+                .HasAnnotation("ProductVersion", "1.1.2")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
@@ -1095,15 +1095,15 @@ namespace ProjectArcBlade.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int?>("ConditionId");
+                    b.Property<int>("ConditionId");
 
-                    b.Property<int?>("JoinConditionId");
+                    b.Property<int>("JoinConditionId");
 
                     b.Property<int?>("OperatorId");
 
-                    b.Property<int?>("ResultTypeId");
+                    b.Property<int>("ResultTypeId");
 
-                    b.Property<int?>("RuleId");
+                    b.Property<int>("RuleId");
 
                     b.Property<bool>("ScoreOne");
 
@@ -2088,23 +2088,26 @@ namespace ProjectArcBlade.Data.Migrations
                 {
                     b.HasOne("ProjectArcBlade.Models.Condition", "Condition")
                         .WithMany("ResultRules")
-                        .HasForeignKey("ConditionId");
+                        .HasForeignKey("ConditionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ProjectArcBlade.Models.JoinCondition", "JoinCondition")
-                        .WithMany()
+                        .WithMany("ResultRules")
                         .HasForeignKey("JoinConditionId");
 
                     b.HasOne("ProjectArcBlade.Models.Operator", "Operator")
-                        .WithMany()
+                        .WithMany("ResultRules")
                         .HasForeignKey("OperatorId");
 
                     b.HasOne("ProjectArcBlade.Models.ResultType", "ResultType")
                         .WithMany("ResultRules")
-                        .HasForeignKey("ResultTypeId");
+                        .HasForeignKey("ResultTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ProjectArcBlade.Models.Rule", "Rule")
                         .WithMany("ResultRules")
-                        .HasForeignKey("RuleId");
+                        .HasForeignKey("RuleId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>

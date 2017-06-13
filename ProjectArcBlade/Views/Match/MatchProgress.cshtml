@@ -10,93 +10,86 @@
         </ol>
     </div>
 </div>
-<h1>Match Progress</h1>
 
 <form asp-action="MatchProgress">
     <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1>Match Progress</h1>
+        </div>
         <div class="panel-body">
+            @Html.Partial("SuccessAlertPartial")
+            <h2><strong>Home Team:</strong> @Model.HomeTeamName</h2>
+            <hr />
+            <h2><strong>Away Team:</strong> @Model.AwayTeamName</h2>
+            <hr />
             <table class="table table-hover">
-                <thead>
-                    <tr style="background-color:lightgray">
-                        <td>
-                            <div class="col-md-offset-1 col-md-4 text-right">
-                                <h3 class="form-control-static"><strong>@Model.HomeTeamName</strong></h3>
-                                <h3 class="form-control-static"><strong>Home</strong></h3>                                
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <p>&nbsp;</p>
-                                <h3 class="form-control-static"><strong>vs</strong></h3>
-                            </div>
-                            <div class="col-md-4 text-left">
-                                <h3 class="form-control-static"><strong>@Model.AwayTeamName</strong></h3>
-                                <h3 class="form-control-static"><strong>Away</strong></h3>                                
-                            </div>
-                        </td>
+                <thead class="lead text-center">
+                    <tr>
+                        <td></td>
+                        <td colspan="3" class="active"><strong>Home</strong></td>
+                        <td></td>
+                        <td colspan="3" class="active"><strong>Away</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Match #</strong></td>
+                        <td class="active"><strong>Pair</strong></td>
+                        <td class="active"><strong>Result</strong></td>
+                        <td class="active"><strong>Score</strong></td>
+                        <td></td>
+                        <td class="active"><strong>Score</strong></td>
+                        <td class="active"><strong>Result</strong></td>
+                        <td class="active"><strong>Pair</strong></td>                        
                     </tr>
                 </thead>
-                <tbody class="text-center">
+                <tbody>
                     @for(var index = 0; index < Model.SetTotal; index++)
                     {
-                        <tr>
-                            <td>
-                                <div class="form-group">
-                                    <input type="hidden" asp-for="@Model.SetId[index]" />
-
-                                    <div class="col-md-offset-1 col-md-3 text-right">
-                                        @if (Model.IsHomeTeam)
-                                        {
-                                            <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@Model.SetId[index]">
-                                                <h4 class="form-control-static">                                                    
-                                                    @if (Model.SetHomeResult[index] == "Win")
-                                                    {
-                                                        <span class="label label-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>
-                                                    }
-                                                    <strong>@Model.HomeGroupName[index] </strong>
-                                                </h4>
-                                            </a>
-                                            
-                                        }
-                                        else
-                                        {
-                                            <h4 class="form-control-static"><strong>@Model.HomeGroupName[index]</strong></h4>
-                                        }                                        
-                                    </div>
-                                    <div class="col-md-1">
-                                        <h4 class="form-control-static">@Model.HomeScore[index]</h4>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <h4 class="form-control-static"><strong>@Model.SetNumber[index]</strong></h4>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <h4 class="form-control-static">@Model.AwayScore[index]</h4>
-                                    </div>
-                                    <div class="col-md-2 text-left">
-                                        @if (Model.IsHomeTeam)
-                                        {
-                                            <h4 class="form-control-static"><strong>@Model.AwayGroupName[index]</strong></h4>
-                                        }
-                                        else
-                                        {
-                                            <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@Model.SetId[index]">
-                                                <h4 class="form-control-static"><strong>@Model.HomeGroupName[index]</strong></h4>
-                                            </a>
-                                        }
-
-                                    </div>
-                                </div>
+                        <tr class="lead text-center">
+                            <td>@Model.SetNumber[index]</td>
+                            <td class="active">
+                                @if (Model.IsHomeTeam)
+                                {
+                                    <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@Model.SetId[index]">@Model.HomeGroupName[index]</a>
+                                }
+                                else
+                                {
+                                    @Model.HomeGroupName[index]
+                                }                                
                             </td>
+                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", Model.SetHomeResult[index])</td>
+                            <td class="active">@Model.HomeScore[index]</td>
+                            <td><em>vs</em></td>
+                            <td class="active">@Model.AwayScore[index]</td>
+                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", Model.SetAwayResult[index])</td>
+                            <td class="active">
+                                @if (Model.IsHomeTeam)
+                                {
+                                    @Model.AwayGroupName[index]
+                                }
+                                else
+                                {
+                                    <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@Model.SetId[index]">@Model.HomeGroupName[index]</a>
+                                }
+                            </td>                            
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
         <div class="panel-footer text-center">
+            <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+            </button>
             @if (Model.AllowMatchCompletion)
             {
-                <input type="submit" value="Complete Match" class="btn btn-lg btn-danger" />
+                <button type="submit" name="btnComplete" class="btn btn-lg btn-success" title="Complete" value="Complete">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Back
+                </button>
             }
             <input type="hidden" asp-for="@Model.MatchId" />
-            <input type="hidden" asp-for="@Model.TeamId" />            
+            <input type="hidden" asp-for="@Model.TeamId" />
+            <input type="hidden" asp-for="@Model.SetHomeResult" />
+            <input type="hidden" asp-for="@Model.SetAwayResult" />
         </div>
     </div>
 </form>

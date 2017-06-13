@@ -4,6 +4,6 @@ namespace ProjectArcBlade.Models
 {
     public class JoinCondition : Lookup
     {
-        ICollection<ResultRule> ResultRules { get; set; }
+        public ICollection<ResultRule> ResultRules { get; set; }
     }
 }
