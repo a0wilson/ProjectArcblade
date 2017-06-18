@@ -146,7 +146,6 @@
             public const string TotalLost = "Total Matches Lost";
             public const string TotalDrawn = "Total Matches Drawn ";
             public const string TotalConceded = "Total Matches Conceded";
-            public const string TotalForfeited = "Total Matches Forfeited";
             public const string TotalPlayed = "Total Matches Played";
             public const string TotalRemaining = "Total Matches Remaining";
             public const string TotalMatches = "Total Matches";

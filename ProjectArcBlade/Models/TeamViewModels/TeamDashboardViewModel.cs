@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using ProjectArcBlade.Models.MatchViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +9,14 @@ namespace ProjectArcBlade.Models.TeamViewModels
 {
     public class TeamDashboardViewModel
     {
-        public Team Team { get; set; }
-        public ICollection<Match> InProgressMatches { get; set; }
-        public ICollection<Match> UpcomingMatches { get; set; }
-        public ICollection<Match> RecentMatches { get; set; }
-        public ICollection<NameValuePair> Overview { get; set; }
+        public int TeamId { get; set; }
+        public string TeamName { get; set; }
+        public IEnumerable<MatchViewModel> InProgressMatches { get; set; }
+        public IEnumerable<MatchViewModel> UpcomingMatches { get; set; }
+        public IEnumerable<MatchViewModel> CompletedMatches { get; set; }
+        public IEnumerable<NameValuePair> Overview { get; set; }
 
-        public int SelectedTeamId { get; set; }
         public List<SelectListItem> AvailableTeams{ get; set; }
+        
     }
 }

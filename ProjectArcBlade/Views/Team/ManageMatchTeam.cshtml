@@ -8,18 +8,20 @@
     <div class="row">
         <div class="col-md-12">
             <ol class="breadcrumb">
-                <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Team Dashboard - @Model.Team.FullName</a></li>
+                <li><a asp-action="Dashboard" asp-route-id="@Model.TeamId">Team Dashboard - @Model.TeamName</a></li>
+                <li><a asp-action="Preview" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-matchId="@Model.MatchId">Preview Match</a></li>
                 <li>Manage Match Team</li>
             </ol>
         </div>
     </div>
-    <h1>Manage Match Team for @Model.Team.FullName</h1>
-    <h2>vs @Model.Opponents.FullName</h2>
+    
     <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1>Manage Match Team for @Model.TeamName<br /><small> vs @Model.Opponents.FullName</small></h1>
+        </div>
         <div class="panel-body">
             @Html.Partial("SuccessAlertPartial")
             @Html.Partial("DisplayWarningsPartial", Model.Warnings)
-
 
             <table class="table">
 
@@ -27,59 +29,127 @@
                 @foreach (var item in Model.MatchClubPlayerIds)
                 {
                     <tr>
-                        <td style="border-top:none !important;">
-                            <div class="form-group">
-                                <div class="col-md-2 text-right">
-                                    <h4 class="form-control-static"><strong>Player @Model.MatchPlayerRankIds[i]</strong></h4>
-                                </div>
-                                <div class="col-md-10 input-group-lg">
-                                    <select asp-for="MatchClubPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
-                                        <option value="0">Please nominate a Player</option>
-                                    </select>
-                                </div>
-
-                                <input type="hidden" asp-for="MatchPlayerIds[i]" />
-                                <input type="hidden" asp-for="MatchPlayerGroupIds[i]" />
-                                <input type="hidden" asp-for="MatchPlayerRankIds[i]" />
+                        <td class="text-right" style="border-top:none">
+                            <h4 class="form-control-static"><strong>Player @Model.MatchPlayerRankIds[i]</strong></h4>
+                        </td>
+                        <td style="border-top:none">
+                            <div class="input-group-lg">
+                                <select asp-for="MatchClubPlayerIds[i]" asp-items="Model.AvailablePlayers" class="form-control">
+                                    <option value="0">Please nominate a Player</option>
+                                </select>
                             </div>
+
+                            <input type="hidden" asp-for="MatchPlayerIds[i]" />
+                            <input type="hidden" asp-for="MatchPlayerGroupIds[i]" />
+                            <input type="hidden" asp-for="MatchPlayerRankIds[i]" />
                         </td>
                     </tr>
                     i++;
                 }
 
                 <tr>
+                    <td class="text-right">
+                        <h4 class="form-control-static"><strong>Team Captain</strong></h4>
+                    </td>
                     <td>
-                        <div class="form-group">
-                            <div class="col-md-2 text-right">
-                                <h4 class="form-control-static"><strong>Team Captain</strong></h4>
-                            </div>
-                            <div class="col-md-10 input-group-lg">
-                                <select asp-for="CaptainId" asp-items="Model.MatchPlayers" class="form-control">
-                                    <option value="0">Please select a Player</option>
-                                </select>
-                            </div>
+                        <div class="input-group-lg">
+                            <select asp-for="CaptainId" asp-items="Model.MatchPlayers" class="form-control input-group-lg">
+                                <option value="0">Please select a Player</option>
+                            </select>
                         </div>
                     </td>
                 </tr>
             </table>
+
+
+            
+            
         </div>
         <div class="panel-footer text-center">
-            <input type="submit" asp-action="BackToDashboard" asp-route-teamId="@Model.TeamId" value="Back" class="btn btn-lg btn-danger" />
-            <input type="submit" value="Save" class=" text-right btn btn-lg btn-primary" />
-            @if (Model.TeamStatus.Name == "Complete")
-            {
-                if (Model.IsHomeMatch)
-                {
-                    <input type="submit" asp-action="ConfirmHomeMatchTeam" value="Submit" asp-route-homeMatchTeamId="@Model.HomeMatchTeamId" class="text-right btn btn-lg btn-success" />
-                }
-                else
-                {
-                    <input type="submit" asp-action="ConfirmAwayMatchTeam" value="Submit" asp-route-awayMatchTeamId="@Model.AwayMatchTeamId" class="text-right btn btn-lg btn-success" />
-                }
-            }
+            <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+            </button>
+
+            <button type="button" name="btnPreviewPairs" class="btn btn-lg btn-info" title="Preview Pairs" data-toggle="modal" data-target="#previewPairsModal">
+                <span class="glyphicon glyphicon-check" aria-hidden="true"></span> Preview Pairs
+            </button>
+
+            <button type="submit" name="btnSave" class="btn btn-lg btn-primary" title="Save" value="Save">
+                <span class="glyphicon glyphicon-save" aria-hidden="true"></span> Save
+            </button>           
+
+            <button type="button" name="btnConfirmSubmit" class="btn btn-lg btn-success" title="Submit Team" value="ConfirmSubmit" @(Model.AllowSubmitTeam?"":"disabled='disabled'") data-toggle="modal" data-target="#myModal">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit Team
+            </button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Confirm Team Submission</strong></h4>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to submit this team? This action cannot be undone!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="btnSubmit" class="btn btn-success" title="Submit Team" value="SubmitTeam">
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Submit Team
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="previewPairsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Preview Pairs</strong></h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="well-sm">
+                                <table class="table table-condensed table-responsive table-hover lead">
+                                    <tbody>
+                                        @foreach (var groupTemplate in Model.MatchTemplate.GroupTemplates)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <strong>@groupTemplate.Group.Name Pair</strong>
+                                                </td>
+                                                <td>
+                                                    <table class="table table-condensed table-bordered table-responsive lead">
+                                                        @foreach (var rankTemplate in groupTemplate.RankTemplates)
+                                                        {
+                                                            <tr>
+                                                                <td>@Model.GetMatchPlayer(rankTemplate.Rank.Number)</td>
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <input type="hidden" asp-for="HomeMatchTeamId" />
     <input type="hidden" asp-for="AwayMatchTeamId" />
+    <input type="hidden" asp-for="HomeMatchTeamId" />
+    <input type="hidden" asp-for="MatchTeamId" />
+    <input type="hidden" asp-for="TeamType" />
     <input type="hidden" asp-for="TeamId" />
+    <input type="hidden" asp-for="MatchId" />
 </form>

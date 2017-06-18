@@ -29,11 +29,7 @@ namespace ProjectArcBlade.Models
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
         public ICollection<Set> Sets { get; set; }
-
-        //unmapped properites
-        [NotMapped]
-        public bool IsHomeTeam { get; set; }
-
+        
         public int MinimumSetsToWinMatch
         {
             get

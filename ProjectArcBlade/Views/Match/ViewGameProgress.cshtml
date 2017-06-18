@@ -19,16 +19,19 @@
     <div class="panel panel-default">
         <div class="panel-body">
             @Html.Partial("SuccessAlertPartial")
-            <h2><strong>Home Team:</strong> @Model.HomeTeamName - @Model.HomeGroup Pair</h2>
-            <hr />
-            <h2><strong>Away Team:</strong> @Model.AwayTeamName - @Model.AwayGroup Pair</h2>
-            <hr />
-            <table class="table table-condensed table-hover">
+            <table class="table table-condensed table-hover table-responsive text-center">
                 <thead>
-                    <tr class="lead text-center">
+                    <tr class="lead">
+                        <td></td>
+                        <td class="active"><h3>Home Team<br /><small>@Model.HomeTeamName - @Model.HomeGroup Pair</small></h3></td>
+                        <td></td>
+                        <td class="active"><h3>Away Team<br /><small>@Model.AwayTeamName - @Model.AwayGroup Pair</small></h3></td>
+                    </tr>
+                    <tr class="lead">
                         <td><strong>Game #</strong></td>
-                        <td><strong>Home Score</strong></td>
-                        <td><strong>Away Score</strong></td>
+                        <td class="active"><strong>Score</strong></td>
+                        <td>&nbsp;</td>
+                        <td class="active"><strong>Score</strong></td>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,7 +45,7 @@
 
                                 <input type="hidden" asp-for="@Model.GameId[index]" />
                             </td>
-                            <td>
+                            <td class="active">
                                 @if (Model.IsHomeTeam)
                                 {
                                     @Model.HomeHomeSore[index]
@@ -52,7 +55,8 @@
                                     @Model.AwayHomeSore[index]
                                 }
                             </td>
-                            <td>
+                            <td>&nbsp;</td>
+                            <td class="active">
                                 @if (Model.IsHomeTeam)
                                 {
                                     @Model.HomeAwaySore[index]

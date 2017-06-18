@@ -2,23 +2,25 @@
 <div class="well-sm">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h2>In Progress Matches</h2>
+            <h2>Completed Matches</h2>
         </div>
         <div class="panel-body">
-            @if (Model.InProgressMatches.Count() != 0)
+            @if (Model.CompletedMatches.Count() != 0)
             {
                 <table class="table table-hover table-condensed table-responsive lead">
                     <thead>
                         <tr>
+                            <th>Result</th>
                             <th>Opponent</th>
                             <th>Venue</th>
                             <th>Match Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var item in Model.InProgressMatches)
+                        @foreach (var item in Model.CompletedMatches)
                         {
                             <tr>
+                                <td>@Html.Partial("DisplayResultTypeLabelPartial", item.TeamResult)</td>
                                 <td>
                                     <a title="Update" asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@item.MatchId" asp-route-teamId="@Model.TeamId">
                                         @item.Opponent
@@ -39,7 +41,7 @@
             }
             else
             {
-                <div>There are no matches in progress</div>
+                <div>There are no completed matches</div>
             }
         </div>
     </div>

@@ -1,44 +1,52 @@
 @model ProjectArcBlade.Models.TeamViewModels.TeamDashboardViewModel
-
-<h2>Upcoming Matches</h2>
-<hr />
-<div class="well">
-    @if (Model.UpcomingMatches.Count != 0)
-    {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Vs</th>
-                    <th>Venue</th>
-                    <th>Match Date</th>                                    
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.UpcomingMatches)
-                {
-                    var isHome = item.AwayMatchTeam.Team.Id == Model.Team.Id ? false : true;
-                    <tr>
-                        <td>
-                            @if( (isHome && item.HomeMatchTeam.TeamStatus.Name != "Active") || (!isHome && item.AwayMatchTeam.TeamStatus.Name != "Active"))
-                            {
-                                <a title="Organise" asp-action="ManageMatchTeam" asp-route-homeMatchTeamId="@(isHome?item.HomeMatchTeam.Id.ToString():"")" asp-route-awayMatchTeamId="@(isHome?"":item.AwayMatchTeam.Id.ToString())"><span class="glyphicon glyphicon-edit"></span> Organise</a> @("|")
-                            }
-                            <a title="Preview" asp-action="Preview" asp-controller="Match" asp-route-matchId="@item.HomeMatchTeam.Match.Id" asp-route-teamId="@Model.Team.Id"><span class="glyphicon glyphicon-play-circle"></span> Preview</a>
-                        </td>
-                        <td>@if (isHome)
-                        { <span class="label label-primary">Home</span> }
-                        else
-                        { <span class="label label-default">Away</span> } @(isHome ? item.AwayMatchTeam.Team.LeagueClub.Club.Name + " - " + item.AwayMatchTeam.Team.Name : item.HomeMatchTeam.Team.LeagueClub.Club.Name + " - " + item.HomeMatchTeam.Team.Name) </td>
-                        <td>@item.Venue.Name</td>
-                        <td>@Convert.ToDateTime(item.StartDate).ToString("dddd, MMM d, yyyy")</td>                        
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <div>There are no upcoming matches</div>
-    }
+<div class="well-sm">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2>Upcoming Matches</h2>
+        </div>
+        <div class="panel-body">
+            @if (Model.UpcomingMatches.Count() != 0)
+            {
+                <table class="table table-hover table-condensed table-responsive lead">
+                    <thead>
+                        <tr>
+                            <th>Team Status</th>
+                            <th>Opponent</th>
+                            <th>Venue</th>
+                            <th>Match Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.UpcomingMatches)
+                        {
+                            <tr>
+                                <td>@Html.Partial("DisplayTeamStatusLabelPartial", item.TeamStatus)</td>
+                                <td> 
+                                    <a title="Preview" asp-action="Preview" asp-controller="Match" asp-route-matchId="@item.MatchId" asp-route-teamId="@Model.TeamId">
+                                        @item.Opponent
+                                    </a>
+                                </td>
+                                <td>
+                                    @item.VenueName
+                                    @if (item.IsHomeTeam)
+                                    {
+                                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                                    }                                    
+                                </td>
+                                <td>@item.StartDate</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div>There are no upcoming matches</div>
+            }
+        </div>
+    </div>
 </div>
+
+
+
+

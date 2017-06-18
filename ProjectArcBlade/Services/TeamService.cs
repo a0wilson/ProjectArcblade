@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectArcBlade.Data;
 using ProjectArcBlade.Models;
+using ProjectArcBlade.Models.MatchViewModels;
 using ProjectArcBlade.Models.TeamViewModels;
 using System;
 using System.Collections.Generic;
@@ -185,6 +186,7 @@ namespace ProjectArcBlade.Services
 
             return allTeams;
         }
+          
 
         private async Task UpdateAwayMatchTeamWithManageMatchTeamViewTeamModelAsync(ManageMatchTeamViewModel viewModel)
         {
@@ -381,8 +383,10 @@ namespace ProjectArcBlade.Services
 
             return new ManageMatchTeamViewModel
             {
+                MatchId = homeMatchTeam.Match.Id,
+                HomeTeamId = homeMatchTeam.Team.Id, 
                 HomeMatchTeamId = homeMatchTeam.Id,
-                Team = homeMatchTeam.Team,
+                TeamName = homeMatchTeam.Team.FullName,
                 TeamStatus = homeMatchTeam.TeamStatus,
                 Opponents = homeMatchTeam.Match.AwayMatchTeam.Team,
                 TeamId = homeMatchTeam.Team.Id,
@@ -460,8 +464,10 @@ namespace ProjectArcBlade.Services
 
             return new ManageMatchTeamViewModel
             {
+                MatchId = awayMatchTeam.Match.Id,
                 AwayMatchTeamId = awayMatchTeam.Id,
-                Team = awayMatchTeam.Team,
+                AwayTeamId = awayMatchTeam.Team.Id,
+                TeamName = awayMatchTeam.Team.FullName,
                 TeamStatus = awayMatchTeam.TeamStatus,
                 Opponents = awayMatchTeam.Match.HomeMatchTeam.Team,
                 TeamId = awayMatchTeam.Team.Id,
@@ -645,59 +651,60 @@ namespace ProjectArcBlade.Services
                 Errors = errors
             };
         }
+
         
+
         public async Task<TeamDashboardViewModel> GetTeamDashboardViewModelAsync(ApplicationDbContext context, MatchService matchService, int teamId)
         {
             if (_context == null) _context = context;
 
             var team = await GetTeamByIdAsync(teamId);
             var allLeagueMatches = await matchService.GetAllLeagueMatchesByTeamAsync(_context, teamId);
+            var allLeagueMatchViewModels = allLeagueMatches.Select(m => matchService.GetMatchViewModel(m, teamId));
+                   
             var availableTeams = (await GetAllTeamsAsync()).Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.FullName }).ToList();
             
-            //set unmapped property - isHomeTeam
-            foreach (Match m in allLeagueMatches) m.IsHomeTeam = m.HomeMatchTeam.Team.Id == team.Id ? true : false;
+            var inProgressMatches = allLeagueMatchViewModels.Where(m => m.MatchStatusName == Constants.MatchStatus.InProgress).ToList();
 
-            var inProgressMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.InProgress).ToList();
-
-            var upcomingMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.New).ToList();
-
-            var recentMatches = allLeagueMatches.Where(m => m.MatchStatus.Name == Constants.MatchStatus.Complete).ToList();
+            var upcomingMatches = allLeagueMatchViewModels.Where(m => m.MatchStatusName == Constants.MatchStatus.New).ToList();
+                
+            var recentMatches = allLeagueMatchViewModels.Where(m => m.MatchStatusName == Constants.MatchStatus.Complete).ToList();
 
             var leaguePosition = 0;
             var leaguePoints = 0;
-            var totalMatchesWon = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Win) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Win))
+            var totalMatchesWon = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.Win) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.Win))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesLost = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Loss) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Loss))
+            var totalMatchesLost = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.Loss) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.Loss))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesDrawn = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Draw) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Draw))
+            var totalMatchesDrawn = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.Draw) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.Draw))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesConceded = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Conceded) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Conceded))
+            var totalMatchesConceded = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.Conceded) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.Conceded))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesForfeited = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.Forfeit) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.Forfeit))
+            var totalMatchesForfeited = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.Forfeit) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.Forfeit))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesPlayed = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name != Constants.ResultType.NoEntry) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name != Constants.ResultType.NoEntry))
+            var totalMatchesPlayed = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult != Constants.ResultType.NoEntry) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult != Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
-            var totalMatchesRemaining = allLeagueMatches
-                .Where(m => (m.IsHomeTeam && m.MatchHomeResult.ResultType.Name == Constants.ResultType.NoEntry) ||
-                    ((!m.IsHomeTeam) && m.MatchAwayResult.ResultType.Name == Constants.ResultType.NoEntry))
+            var totalMatchesRemaining = allLeagueMatchViewModels
+                .Where(m => (m.IsHomeTeam && m.MatchHomeResult == Constants.ResultType.NoEntry) ||
+                    ((!m.IsHomeTeam) && m.MatchAwayResult == Constants.ResultType.NoEntry))
                 .Select(m => new { count = 1 })
                 .Sum(m => m.count);
             var totalMatches = allLeagueMatches.Count.ToString();
@@ -711,7 +718,6 @@ namespace ProjectArcBlade.Services
                 new NameValuePair {Name=OverviewStrings.TotalLost, Value = totalMatchesLost.ToString()},
                 new NameValuePair {Name=OverviewStrings.TotalDrawn, Value = totalMatchesDrawn.ToString()},
                 new NameValuePair {Name=OverviewStrings.TotalConceded, Value = totalMatchesConceded.ToString()},
-                new NameValuePair {Name=OverviewStrings.TotalForfeited, Value = totalMatchesForfeited.ToString()},
                 new NameValuePair {Name=OverviewStrings.TotalPlayed, Value = totalMatchesPlayed.ToString()},
                 new NameValuePair {Name=OverviewStrings.TotalRemaining, Value = totalMatchesRemaining.ToString()},
                 new NameValuePair {Name=OverviewStrings.TotalMatches, Value = totalMatches.ToString()},
@@ -719,11 +725,11 @@ namespace ProjectArcBlade.Services
 
             var viewModel = new TeamDashboardViewModel
             {
-                Team = team,
-                SelectedTeamId = teamId,
+                TeamId = teamId,
+                TeamName = team.FullName,
                 AvailableTeams = availableTeams,
                 UpcomingMatches = upcomingMatches,
-                RecentMatches = recentMatches,
+                CompletedMatches = recentMatches,
                 InProgressMatches = inProgressMatches,
                 Overview = overview
             };

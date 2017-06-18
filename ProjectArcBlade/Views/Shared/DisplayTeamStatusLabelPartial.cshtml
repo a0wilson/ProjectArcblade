@@ -1,0 +1,20 @@
+@model string
+
+@switch (Model)
+{
+    case "New":
+        <span class="label label-default">@Model</span>
+        break;
+    case "In Progress":
+        <span class="label label-info">@Model</span>
+        break;
+    case "Complete":
+        <span class="label label-primary">@Model</span>
+        break;
+    case "Active":
+        <span class="label label-success">@Model</span>
+        break;
+    case "Inavtive":
+        <span class="label label-danger">@Model</span>
+        break;
+}

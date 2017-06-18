@@ -32,33 +32,12 @@ namespace ProjectArcBlade.Controllers
             return View(viewModel);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult BackToDashboard(int teamId)
-        {
-            return RedirectToAction("Dashboard", new { id = teamId });
-        }
-        
-        //POST: Team/ManageNominations
+        //POST: Team/Dashboard
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Dashboard(TeamService teamService, TeamDashboardViewModel viewModel)
         {
-            return RedirectToAction("Dashboard", new { id = viewModel.SelectedTeamId });
-        }
-
-        // GET: Team/ConfirmHomeMatchTeam/5
-        public async Task<ActionResult> ConfirmHomeMatchTeam(TeamService teamService, int homeMatchTeamId)
-        {
-            var viewModel = await teamService.GetHomeMatchTeamByIdAsync(_context, homeMatchTeamId);
-            return View(viewModel);
-        }
-
-        // GET: Team/ConfirmAwayMatchTeam/5
-        public async Task<ActionResult> ConfirmAwayMatchTeam(TeamService teamService, int awayMatchTeamId)
-        {
-            var viewModel = await teamService.GetAwayMatchTeamByIdAsync(_context, awayMatchTeamId);
-            return View(viewModel);
+            return RedirectToAction("Dashboard", new { id = viewModel.TeamId });
         }
 
         // GET: Team
@@ -73,29 +52,7 @@ namespace ProjectArcBlade.Controllers
             var viewModel = await teamService.GetManageNominationsViewModelAsync(_context, matchService, id);
             return View(viewModel);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ActivateHomeMatchTeam(TeamService teamService, int homeMatchTeamId, int teamId)
-        {
-            if (await teamService.ActivateHomeMatchTeam(_context, homeMatchTeamId) )
-            {
-                return RedirectToAction("Dashboard", new { id = teamId });
-            }
-            return RedirectToAction("ConfirmHomeMatchTeam", new { homeMatchTeamId = homeMatchTeamId });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ActivateAwayMatchTeam(TeamService teamService, int awayMatchTeamId, int teamId)
-        {
-            if (await teamService.ActivateAwayMatchTeam(_context, awayMatchTeamId))
-            {
-                return RedirectToAction("Dashboard", new { id = teamId });
-            }
-            return RedirectToAction("ConfirmAwayMatchTeam", new { awayMatchTeamId = awayMatchTeamId });
-        }
-
+        
         //POST: Team/ManageNominations
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -110,40 +67,51 @@ namespace ProjectArcBlade.Controllers
         }
         
         //GET: Team/ManageNominations
-        public async Task<IActionResult> ManageMatchTeam(TeamService teamService, MatchService matchService, int? awayMatchTeamId, int? homeMatchTeamId)
+        public async Task<IActionResult> ManageMatchTeam(TeamService teamService, MatchService matchService, int matchTeamId, TeamType teamType)
         {
-            var id = Convert.ToInt32( awayMatchTeamId == null ? homeMatchTeamId : awayMatchTeamId );
-            var teamType = awayMatchTeamId == null ? TeamType.Home : TeamType.Away;
-            var viewModel = await teamService.GetManageMatchTeamViewModelAsync(_context, matchService, teamType, id);
+            var viewModel = await teamService.GetManageMatchTeamViewModelAsync(_context, matchService, teamType, matchTeamId);
             return View(viewModel);
         }
 
         //POST: Team/ManageNominations
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ManageMatchTeam(TeamService teamService, ManageMatchTeamViewModel viewModel)
+        public async Task<IActionResult> ManageMatchTeam(TeamService teamService, ManageMatchTeamViewModel viewModel, string btnBack, string btnSave, string btnSubmit )
         {
-            if (ModelState.IsValid)
+            if( btnBack != null)
             {
-                await teamService.UpdateMatchTeamsWithManageMatchTeamViewModelAsync(_context, viewModel);
-                TempData["successMessage"] = "Match team updated!";
+                return RedirectToAction("Preview", "Match", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
             }
             
-            if(viewModel.IsHomeMatch)
+            if(btnSave != null)
             {
-                return RedirectToAction( "ManageMatchTeam", new { homeMatchTeamId = viewModel.HomeMatchTeamId });
-            }
-            else
-            {
-                return RedirectToAction("ManageMatchTeam", new { awayMatchTeamId = viewModel.AwayMatchTeamId });
-            }
-        }
+                if (ModelState.IsValid)
+                {
+                    await teamService.UpdateMatchTeamsWithManageMatchTeamViewModelAsync(_context, viewModel);
+                    TempData["successMessage"] = "Match team updated!";
+                }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult BackToManageMatchTeam( int? homeMatchTeamId, int? awayMatchTeamId)
-        {
-            return RedirectToAction("ManageMatchTeam", new { homeMatchTeamId = homeMatchTeamId, awayMatchTeamId = awayMatchTeamId });
+                return RedirectToAction("ManageMatchTeam", new { matchTeamId = viewModel.MatchTeamId, teamType = viewModel.TeamType });
+            }
+
+            if(btnSubmit != null)
+            {
+                
+                await teamService.UpdateMatchTeamsWithManageMatchTeamViewModelAsync(_context, viewModel);
+
+                switch (viewModel.TeamType)
+                {
+                    case TeamType.Home:                        
+                        if (await teamService.ActivateHomeMatchTeam(_context, viewModel.MatchTeamId)) return RedirectToAction("Dashboard", new { id = viewModel.TeamId });
+                        return RedirectToAction("ManageMatchTeam", new { matchTeamId = viewModel.MatchTeamId, teamType = viewModel.TeamType });
+
+                    case TeamType.Away:
+                        if (await teamService.ActivateAwayMatchTeam(_context, viewModel.MatchTeamId)) return RedirectToAction("Dashboard", new { id = viewModel.TeamId });
+                        return RedirectToAction("ManageMatchTeam", new { matchTeamId = viewModel.MatchTeamId, teamType = viewModel.TeamType });
+                }
+            }
+
+            return RedirectToAction("ManageMatchTeam", new { matchTeamId = viewModel.MatchTeamId, teamType = viewModel.TeamType });
         }
 
         // GET: Team/Details/5

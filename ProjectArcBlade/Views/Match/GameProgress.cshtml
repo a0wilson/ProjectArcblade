@@ -19,50 +19,41 @@
         </div>
         <div class="panel-body">
             @Html.Partial("SuccessAlertPartial")
-            <h2><strong>Home Team:</strong> @Model.HomeTeamName - @Model.HomeGroup Pair</h2>
-            <hr />
-            <h2><strong>Away Team:</strong> @Model.AwayTeamName - @Model.AwayGroup Pair</h2>
-            <hr />
-            <table class="table table-condensed table-hover">
+            
+            <table class="table table-condensed table-hover table-responsive text-center">
                 <thead>
                     <tr class="lead">
-                        <td class="text-center"><strong>Game #</strong></td>
-                        <td><strong>Home Score</strong></td>
-                        <td><strong>Away Score</strong></td>
+                        <td></td>
+                        <td class="active"><h3>Home Team<br /><small>@Model.HomeTeamName - @Model.HomeGroup Pair</small></h3></td>
+                        <td></td>
+                        <td class="active"><h3>Away Team<br /><small>@Model.AwayTeamName - @Model.AwayGroup Pair</small></h3></td>
+                    </tr>
+                    <tr class="lead">
+                        <td ><strong>Game #</strong></td>
+                        <td class="active"><strong>Score</strong></td>
+                        <td></td>
+                        <td class="active"><strong>Score</strong></td>
                     </tr>
                 </thead>
                 <tbody>
                     @for (var index = 0; index < Model.GameTotal; index++)
                     {
                         <tr class="lead">
-                            <td class="text-center">
+                            <td class="col-md-1">
                                 <div class="form-control-static">
                                     @Model.GameNumber[index]
                                 </div>
                                 
                                 <input type="hidden" asp-for="@Model.GameId[index]" />
                             </td>
-                            <td>
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <div class="form-group-lg">
-                                                @if (Model.HomeHomeSoreStatus[index] == "Contested" || Model.AwayHomeSoreStatus[index] == "Contested")
-                                                {
-                                                    <div class="has-warning has-feedback">
-                                                        @if (Model.IsHomeTeam)
-                                                        {
-                                                            <input class="form-control" asp-for="HomeHomeSore[index]" />
-                                                        }
-                                                        else
-                                                        {
-                                                            <input class="form-control" asp-for="AwayHomeSore[index]" />
-                                                        }
-                                                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
-                                                    </div>
-                                                }
-                                                else
-                                                {
+                            <td class="col-md-5 active">
+                                <div class="row">
+                                    <div class="col-md-4">&nbsp;</div>
+                                    <div class="col-md-4">
+                                        <div class="form-group-lg">
+                                            @if (Model.HomeHomeSoreStatus[index] == "Contested" || Model.AwayHomeSoreStatus[index] == "Contested")
+                                            {
+                                                <div class="has-warning has-feedback">
                                                     @if (Model.IsHomeTeam)
                                                     {
                                                         <input class="form-control" asp-for="HomeHomeSore[index]" />
@@ -71,60 +62,61 @@
                                                     {
                                                         <input class="form-control" asp-for="AwayHomeSore[index]" />
                                                     }
-                                                }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            @if (Model.IsHomeTeam)
-                                            {
-                                                if (Model.AwayHomeSore[index] == null)
-                                                {
-                                                    <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
-                                                }
-                                                else
-                                                {
-                                                    <h4><small><em>Opposition submitted: @Model.AwayHomeSore[index]</em></small></h4>
-                                                }
+                                                    <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
+                                                </div>
                                             }
                                             else
                                             {
-                                                if (Model.HomeHomeSore[index] == null)
+                                                @if (Model.IsHomeTeam)
                                                 {
-                                                    <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                                    <input class="form-control" asp-for="HomeHomeSore[index]" />
                                                 }
                                                 else
                                                 {
-                                                    <h4><small><em>Opposition submitted: @Model.HomeHomeSore[index]</em></small></h4>
+                                                    <input class="form-control" asp-for="AwayHomeSore[index]" />
                                                 }
                                             }
-                                        </td>
-                                    </tr>
-                                </table>                                                                
+                                        </div>                                        
+                                    </div>
+                                    <div class="col-md-4">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        @if (Model.IsHomeTeam)
+                                        {
+                                            if (Model.AwayHomeSore[index] == null)
+                                            {
+                                                <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4><small><em>Opposition submitted: @Model.AwayHomeSore[index]</em></small></h4>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Model.HomeHomeSore[index] == null)
+                                            {
+                                                <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4><small><em>Opposition submitted: @Model.HomeHomeSore[index]</em></small></h4>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                              
                             </td>
-                            <td>
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <div class="form-group-lg">
-                                                
-                                                @if (Model.HomeAwaySoreStatus[index] == "Contested" || Model.AwayAwaySoreStatus[index] == "Contested")
-                                                {
-                                                    <div class="has-warning has-feedback">
-                                                        @if (Model.IsHomeTeam)
-                                                        {
-                                                            <input class="form-control" asp-for="HomeAwaySore[index]" />
-                                                        }
-                                                        else
-                                                        {
-                                                            <input class="form-control" asp-for="AwayAwaySore[index]" />
-                                                        }
-                                                        <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
-                                                    </div>
-                                                }
-                                                else
-                                                {
+                            <td class="col-md-1">&nbsp;</td>
+                            <td class="col-md-5 active">
+                                <div class="row">
+                                    <div class="col-md-4">&nbsp;</div>
+                                    <div class="col-md-4">
+                                        <div class="form-group-lg">
+                                            @if (Model.HomeAwaySoreStatus[index] == "Contested" || Model.AwayAwaySoreStatus[index] == "Contested")
+                                            {
+                                                <div class="has-warning has-feedback">
                                                     @if (Model.IsHomeTeam)
                                                     {
                                                         <input class="form-control" asp-for="HomeAwaySore[index]" />
@@ -133,37 +125,51 @@
                                                     {
                                                         <input class="form-control" asp-for="AwayAwaySore[index]" />
                                                     }
-                                                }
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            @if (Model.IsHomeTeam)
-                                            {
-                                                if (Model.AwayAwaySore[index] == null)
-                                                {
-                                                    <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
-                                                }
-                                                else
-                                                {
-                                                    <h4><small><em>Opposition submitted: @Model.AwayAwaySore[index]</em></small></h4>
-                                                }
+                                                    <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
+                                                </div>
                                             }
                                             else
                                             {
-                                                if (Model.HomeAwaySore[index] == null)
+                                                @if (Model.IsHomeTeam)
                                                 {
-                                                    <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                                    <input class="form-control" asp-for="HomeAwaySore[index]" />
                                                 }
                                                 else
                                                 {
-                                                    <h4><small><em>Opposition submitted: @Model.HomeAwaySore[index]</em></small></h4>
+                                                    <input class="form-control" asp-for="AwayAwaySore[index]" />
                                                 }
                                             }
-                                        </td>
-                                    </tr>
-                                </table>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">&nbsp;</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        @if (Model.IsHomeTeam)
+                                        {
+                                            if (Model.AwayAwaySore[index] == null)
+                                            {
+                                                <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4><small><em>Opposition submitted: @Model.AwayAwaySore[index]</em></small></h4>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (Model.HomeAwaySore[index] == null)
+                                            {
+                                                <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
+                                            }
+                                            else
+                                            {
+                                                <h4><small><em>Opposition submitted: @Model.HomeAwaySore[index]</em></small></h4>
+                                            }
+                                        }
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     }

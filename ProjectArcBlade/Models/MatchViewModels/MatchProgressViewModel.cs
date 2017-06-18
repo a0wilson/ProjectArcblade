@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectArcBlade.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,21 +9,17 @@ namespace ProjectArcBlade.Models.MatchViewModels
     public class MatchProgressViewModel
     {
         public int TeamId { get; set; }
-        public string TeamName { get; set; }
-        public bool IsHomeTeam { get; set; }
         public int MatchId { get; set; }
-        public int[] SetId { get; set; }
-        public int[] SetNumber { get; set; }
-        public string[] SetStatus { get; set; }
-        public string[] SetHomeResult { get; set; }
-        public string[] SetAwayResult { get; set; }
-        public int[] HomeScore { get; set; }
-        public int[] AwayScore { get; set; }
-        public string[] HomeGroupName { get; set; }
-        public string[] AwayGroupName { get; set; }
-        public string HomeTeamName { get; set; }
-        public string AwayTeamName { get; set; }        
-        public int SetTotal { get; set; }
-        public bool AllowMatchCompletion { get; set; }
+        public MatchViewModel Match { get; set; }
+        public ICollection<SetViewModel> Sets { get; set; }
+        
+        //Calculated fields
+        public bool HomeWin { get { return  Sets == null ? false : Sets.Where(s => s.HomeResult == Constants.ResultType.Win).Count() > Match.MinimumSetsToWin; } }
+        public bool AwayWin { get { return Sets == null ? false : Sets.Where(s => s.AwayResult == Constants.ResultType.Win).Count() > Match.MinimumSetsToWin; } }
+        public string TeamName { get { return Match == null ? "" : Match.IsHomeTeam ? Match.HomeTeamName : Match.AwayTeamName; } }
+        public bool AllSetsCompleted { get { return Sets == null ? false : Sets.Where(s => s.Status == Constants.SetStatus.Complete).Count() == Sets.Count(); } }
+        public bool MatchStatusInProgress { get { return Match == null ? false : Match.MatchStatusName == Constants.MatchStatus.InProgress; } }
+        public bool AllowMatchCompletion { get { return Match == null ? false : (MatchStatusInProgress ? ((HomeWin || AwayWin) || AllSetsCompleted ? true : false) : false); } }
+
     }
 }

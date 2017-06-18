@@ -76,13 +76,40 @@ namespace ProjectArcBlade.Controllers
             var viewModel = await matchService.GetPreviewMatchViewModelAsync(_context, matchId, teamId);
             return View(viewModel);
         }
-               
-        public async Task<IActionResult> StartMatch( MatchService matchService, int matchId, int teamId)
-        {
-            await matchService.StartMatch(_context, matchId);
-            return RedirectToAction("MatchProgress", new { matchId = matchId, teamId = teamId });
-        }
 
+        //POST: Match/Preview
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Preview(MatchService matchService, PreviewMatchViewModel viewModel, string btnBack, string btnConcede, string btnTeam, string btnPlay)
+        {
+            if(btnBack != null)
+            {
+                return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+            }
+
+            if(btnTeam != null)
+            {
+                return RedirectToAction("ManageMatchTeam", "Team", new { matchTeamId = viewModel.MatchTeamId, teamType = viewModel.TeamType });
+            }
+
+            if(btnPlay != null)
+            {
+                await matchService.StartMatch(_context, viewModel.MatchId);
+                return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+            }
+
+            if(btnConcede != null)
+            {
+                var serviceResult = await matchService.ConcedeMatchAsync(_context, viewModel.MatchId, viewModel.TeamId);
+                if (serviceResult.Success)
+                {
+                    return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+                }
+            }
+
+            return View(viewModel);
+        }
+        
         //GET: Match/GameProgress
         public async Task<IActionResult> GameProgress(MatchService matchService, int setId, int teamId)
         {
@@ -120,7 +147,7 @@ namespace ProjectArcBlade.Controllers
             
             if(btnConcede != null)
             {
-                var serviceResult = await matchService.UpdateSetStatusToConcedeAsync(_context, viewModel);
+                var serviceResult = await matchService.ConcedeGameAsync(_context, viewModel);
 
                 if (serviceResult.Success)
                 {
@@ -152,7 +179,7 @@ namespace ProjectArcBlade.Controllers
                 var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
             }
 
-            return RedirectToAction("GameProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+            return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
             
         }
         
