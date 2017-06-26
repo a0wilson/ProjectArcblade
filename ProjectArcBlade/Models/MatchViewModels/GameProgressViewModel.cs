@@ -1,4 +1,6 @@
-﻿namespace ProjectArcBlade.Models.MatchViewModels
+﻿using ProjectArcBlade.Data;
+
+namespace ProjectArcBlade.Models.MatchViewModels
 {
     public class GameProgressViewModel
     {
@@ -26,5 +28,9 @@
         public int GameTotal { get; set; }
         public int SeasonId { get; set; }
         public int CategoryId { get; set; }
+
+        public bool AwayWin { get { return SetAwayResult == Constants.ResultType.Win ? true : false; } }
+        public bool HomeWin { get { return SetHomeResult == Constants.ResultType.Win ? true : false; } }
+        public bool AllowConcedeGame { get { return AwayWin || HomeWin ? false : true; } }
     }
 }

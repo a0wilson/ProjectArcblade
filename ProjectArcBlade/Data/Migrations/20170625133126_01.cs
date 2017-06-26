@@ -1310,6 +1310,48 @@ namespace ProjectArcBlade.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ScoreSheet",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AuditId = table.Column<int>(nullable: true),
+                    Discriminator = table.Column<string>(nullable: false),
+                    SignedOff = table.Column<bool>(nullable: false),
+                    AwayMatchTeamId = table.Column<int>(nullable: true),
+                    MatchId = table.Column<int>(nullable: true),
+                    HomeMatchTeamId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoreSheet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheet_Audit_AuditId",
+                        column: x => x.AuditId,
+                        principalTable: "Audit",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheet_AwayMatchTeam_AwayMatchTeamId",
+                        column: x => x.AwayMatchTeamId,
+                        principalTable: "AwayMatchTeam",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheet_Match_MatchId",
+                        column: x => x.MatchId,
+                        principalTable: "Match",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheet_HomeMatchTeam_HomeMatchTeamId",
+                        column: x => x.HomeMatchTeamId,
+                        principalTable: "HomeMatchTeam",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AwayMatchTeamGroupPlayer",
                 columns: table => new
                 {
@@ -1412,6 +1454,69 @@ namespace ProjectArcBlade.Data.Migrations
                         name: "FK_Set_Status_SetStatusId",
                         column: x => x.SetStatusId,
                         principalTable: "Status",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScoreSheetGame",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AwaySocre = table.Column<int>(nullable: false),
+                    HomeScore = table.Column<int>(nullable: false),
+                    ScoreSheetId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoreSheetGame", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheetGame_ScoreSheet_ScoreSheetId",
+                        column: x => x.ScoreSheetId,
+                        principalTable: "ScoreSheet",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScoreSheetPoint",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AwaySocre = table.Column<int>(nullable: false),
+                    HomeScore = table.Column<int>(nullable: false),
+                    ScoreSheetId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoreSheetPoint", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheetPoint_ScoreSheet_ScoreSheetId",
+                        column: x => x.ScoreSheetId,
+                        principalTable: "ScoreSheet",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ScoreSheetSet",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AwaySocre = table.Column<int>(nullable: false),
+                    HomeScore = table.Column<int>(nullable: false),
+                    ScoreSheetId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ScoreSheetSet", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ScoreSheetSet_ScoreSheet_ScoreSheetId",
+                        column: x => x.ScoreSheetId,
+                        principalTable: "ScoreSheet",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -2039,6 +2144,44 @@ namespace ProjectArcBlade.Data.Migrations
                 column: "RuleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheet_AuditId",
+                table: "ScoreSheet",
+                column: "AuditId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheet_AwayMatchTeamId",
+                table: "ScoreSheet",
+                column: "AwayMatchTeamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheet_MatchId",
+                table: "ScoreSheet",
+                column: "MatchId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheet_HomeMatchTeamId",
+                table: "ScoreSheet",
+                column: "HomeMatchTeamId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheetGame_ScoreSheetId",
+                table: "ScoreSheetGame",
+                column: "ScoreSheetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheetPoint_ScoreSheetId",
+                table: "ScoreSheetPoint",
+                column: "ScoreSheetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScoreSheetSet_ScoreSheetId",
+                table: "ScoreSheetSet",
+                column: "ScoreSheetId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Season_LeagueId",
                 table: "Season",
                 column: "LeagueId");
@@ -2197,6 +2340,15 @@ namespace ProjectArcBlade.Data.Migrations
                 name: "ResultRule");
 
             migrationBuilder.DropTable(
+                name: "ScoreSheetGame");
+
+            migrationBuilder.DropTable(
+                name: "ScoreSheetPoint");
+
+            migrationBuilder.DropTable(
+                name: "ScoreSheetSet");
+
+            migrationBuilder.DropTable(
                 name: "TeamCaptain");
 
             migrationBuilder.DropTable(
@@ -2228,6 +2380,9 @@ namespace ProjectArcBlade.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Rule");
+
+            migrationBuilder.DropTable(
+                name: "ScoreSheet");
 
             migrationBuilder.DropTable(
                 name: "Rank");

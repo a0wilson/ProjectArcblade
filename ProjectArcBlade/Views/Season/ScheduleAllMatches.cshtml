@@ -10,7 +10,12 @@
     <div class="form-horizontal">        
         <div class="form-group">
             <div class="col-md-offset-10 col-md-1">
-                <input type="submit" value="Schedule All Macthes" asp-route-seasonId=4 class="btn btn-primary" />
+                <input type="submit" value="Schedule All Macthes" asp-route-seasonId=4 class="btn btn-primary" data-toggle="modal" data-target="#myPleaseWait"/>
+
+                @*<button type="button" name="" class="btn btn-lg btn-danger" title="Concede" data-toggle="modal" data-target="#myPleaseWait">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
+                </button>*@
+
             </div>
         </div>
     </div>
@@ -81,3 +86,4 @@
         
 </div>
 
+@Html.Partial("PleaseWaitModalPartial")

@@ -8,7 +8,7 @@ using ProjectArcBlade.Data;
 namespace ProjectArcBlade.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170611125456_01")]
+    [Migration("20170625133126_01")]
     partial class _01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1138,6 +1138,81 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("Rule");
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("AuditId");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
+                    b.Property<bool>("SignedOff");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditId");
+
+                    b.ToTable("ScoreSheet");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ScoreSheet");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AwaySocre");
+
+                    b.Property<int>("HomeScore");
+
+                    b.Property<int?>("ScoreSheetId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScoreSheetId");
+
+                    b.ToTable("ScoreSheetGame");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetPoint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AwaySocre");
+
+                    b.Property<int>("HomeScore");
+
+                    b.Property<int?>("ScoreSheetId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScoreSheetId");
+
+                    b.ToTable("ScoreSheetPoint");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetSet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AwaySocre");
+
+                    b.Property<int>("HomeScore");
+
+                    b.Property<int?>("ScoreSheetId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScoreSheetId");
+
+                    b.ToTable("ScoreSheetSet");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>
                 {
                     b.Property<int>("Id")
@@ -1508,6 +1583,44 @@ namespace ProjectArcBlade.Data.Migrations
                     b.ToTable("Operator");
 
                     b.HasDiscriminator().HasValue("Operator");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.AwayScoreSheet", b =>
+                {
+                    b.HasBaseType("ProjectArcBlade.Models.ScoreSheet");
+
+                    b.Property<int>("AwayMatchTeamId");
+
+                    b.Property<int>("MatchId");
+
+                    b.HasIndex("AwayMatchTeamId")
+                        .IsUnique();
+
+                    b.HasIndex("MatchId")
+                        .IsUnique();
+
+                    b.ToTable("AwayScoreSheet");
+
+                    b.HasDiscriminator().HasValue("AwayScoreSheet");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.HomeScoreSheet", b =>
+                {
+                    b.HasBaseType("ProjectArcBlade.Models.ScoreSheet");
+
+                    b.Property<int>("HomeMatchTeamId");
+
+                    b.Property<int>("MatchId");
+
+                    b.HasIndex("HomeMatchTeamId")
+                        .IsUnique();
+
+                    b.HasIndex("MatchId")
+                        .IsUnique();
+
+                    b.ToTable("HomeScoreSheet");
+
+                    b.HasDiscriminator().HasValue("HomeScoreSheet");
                 });
 
             modelBuilder.Entity("ProjectArcBlade.Models.ClubPlayerStatus", b =>
@@ -2110,6 +2223,34 @@ namespace ProjectArcBlade.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheet", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.Audit", "Audit")
+                        .WithMany("ScoreSheets")
+                        .HasForeignKey("AuditId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetGame", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.ScoreSheet", "ScoreSheet")
+                        .WithMany("ScoreSheetGames")
+                        .HasForeignKey("ScoreSheetId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetPoint", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.ScoreSheet", "ScoreSheet")
+                        .WithMany("ScoreSheetPoints")
+                        .HasForeignKey("ScoreSheetId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.ScoreSheetSet", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.ScoreSheet", "ScoreSheet")
+                        .WithMany("ScoreSheetSets")
+                        .HasForeignKey("ScoreSheetId");
+                });
+
             modelBuilder.Entity("ProjectArcBlade.Models.Season", b =>
                 {
                     b.HasOne("ProjectArcBlade.Models.League", "League")
@@ -2243,6 +2384,28 @@ namespace ProjectArcBlade.Data.Migrations
                         .WithOne("SetHomeResult")
                         .HasForeignKey("ProjectArcBlade.Models.SetHomeResult", "SetId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.AwayScoreSheet", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.AwayMatchTeam", "AwayMatchTeam")
+                        .WithOne("AwayScoreSheet")
+                        .HasForeignKey("ProjectArcBlade.Models.AwayScoreSheet", "AwayMatchTeamId");
+
+                    b.HasOne("ProjectArcBlade.Models.Match", "Match")
+                        .WithOne("AwayScoreSheet")
+                        .HasForeignKey("ProjectArcBlade.Models.AwayScoreSheet", "MatchId");
+                });
+
+            modelBuilder.Entity("ProjectArcBlade.Models.HomeScoreSheet", b =>
+                {
+                    b.HasOne("ProjectArcBlade.Models.HomeMatchTeam", "HomeMatchTeam")
+                        .WithOne("HomeScoreSheet")
+                        .HasForeignKey("ProjectArcBlade.Models.HomeScoreSheet", "HomeMatchTeamId");
+
+                    b.HasOne("ProjectArcBlade.Models.Match", "Match")
+                        .WithOne("HomeScoreSheet")
+                        .HasForeignKey("ProjectArcBlade.Models.HomeScoreSheet", "MatchId");
                 });
         }
     }

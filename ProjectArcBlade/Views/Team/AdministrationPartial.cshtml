@@ -1,18 +1,16 @@
 @model ProjectArcBlade.Models.TeamViewModels.TeamDashboardViewModel
-<div class="well-sm">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2>Administration</h2>
-        </div>
-        <div class="panel-body">
-            <div class="list-group">
-                <a class="list-group-item" asp-action="Edit" asp-route-id="@Model.TeamId">
-                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Update Team
-                </a>
-                <a class="list-group-item" asp-action="ManageNominations" asp-route-id="@Model.TeamId">
-                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Manage Nominations
-                </a>
-            </div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Administration</h2>
+    </div>
+    <div class="panel-body">
+        <div class="list-group">
+            <a class="list-group-item" asp-action="Edit" asp-route-id="@Model.TeamId">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Update Team
+            </a>
+            <a class="list-group-item" asp-action="ManageNominations" asp-route-id="@Model.TeamId">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Manage Nominations
+            </a>
         </div>
     </div>
 </div>

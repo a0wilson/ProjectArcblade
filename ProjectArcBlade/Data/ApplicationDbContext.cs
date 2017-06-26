@@ -50,6 +50,14 @@ namespace ProjectArcBlade.Data
         public DbSet<Rule> Rules { get; set; }
         public DbSet<ResultRule> ResultRules { get; set; }
 
+        //scoresheets
+        public DbSet<ScoreSheet> ScoreSheets { get; set; }
+        public DbSet<ScoreSheetSet> ScoreSheetSets { get; set; }
+        public DbSet<ScoreSheetGame> ScoreSheetGames { get; set; }
+        public DbSet<ScoreSheetPoint> ScoreSheetPoints { get; set; }
+        public DbSet<HomeScoreSheet> HomeScoreSheets { get; set; }
+        public DbSet<AwayScoreSheet> AwayScoreSheets { get; set; }
+        
         public DbSet<Audit> Audits { get; set; }        
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Rank> Ranks { get; set; }
@@ -166,6 +174,14 @@ namespace ProjectArcBlade.Data
                 .WithMany(jc => jc.ResultRules)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //scoresheets
+            builder.Entity<ScoreSheet>().ToTable("ScoreSheet");
+            builder.Entity<ScoreSheetSet>().ToTable("ScoreSheetSet");
+            builder.Entity<ScoreSheetGame>().ToTable("ScoreSheetGame");
+            builder.Entity<ScoreSheetPoint>().ToTable("ScoreSheetPoint");
+            builder.Entity<HomeScoreSheet>().ToTable("HomeScoreSheet");
+            builder.Entity<AwayScoreSheet>().ToTable("AwayScoreSheet");
+            
             builder.Entity<Audit>().ToTable("Audit");
             builder.Entity<Venue>().ToTable("Venue");
             builder.Entity<Award>().ToTable("Award");
@@ -209,6 +225,16 @@ namespace ProjectArcBlade.Data
                 .HasOne(m => m.MatchHomeResult)
                 .WithOne(mar => mar.Match)
                 .HasForeignKey<MatchHomeResult>(mar => mar.MatchId);
+            builder.Entity<Match>()
+                .HasOne(m => m.HomeScoreSheet)
+                .WithOne(hss => hss.Match)
+                .HasForeignKey<HomeScoreSheet>(hss => hss.MatchId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Match>()
+                .HasOne(m => m.AwayScoreSheet)
+                .WithOne(ass => ass.Match)
+                .HasForeignKey<AwayScoreSheet>(ass => ass.MatchId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Set>().ToTable("Set");
             builder.Entity<Set>()
@@ -235,6 +261,11 @@ namespace ProjectArcBlade.Data
                 .HasOne(hmt => hmt.HomeMatchTeamCaptain)
                 .WithOne(hmtc => hmtc.HomeMatchTeam)
                 .HasForeignKey<HomeMatchTeamCaptain>(hmtc => hmtc.HomeMatchTeamId);
+            builder.Entity<HomeMatchTeam>()
+                .HasOne(hmt => hmt.HomeScoreSheet)
+                .WithOne(hss => hss.HomeMatchTeam)
+                .HasForeignKey<HomeScoreSheet>(hss => hss.HomeMatchTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<HomeMatchTeamCaptain>().ToTable("HomeMatchTeamCaptain");
             builder.Entity<HomeMatchTeamGroup>().ToTable("HomeMatchTeamGroup");
@@ -264,6 +295,11 @@ namespace ProjectArcBlade.Data
                 .HasOne(amt => amt.AwayMatchTeamCaptain)
                 .WithOne(amtc => amtc.AwayMatchTeam)
                 .HasForeignKey<AwayMatchTeamCaptain>(amtc => amtc.AwayMatchTeamId);
+            builder.Entity<AwayMatchTeam>()
+                .HasOne(amt => amt.AwayScoreSheet)
+                .WithOne(ass => ass.AwayMatchTeam)
+                .HasForeignKey<AwayScoreSheet>(ass => ass.AwayMatchTeamId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<AwayMatchTeamCaptain>().ToTable("AwayMatchTeamCaptain");
             builder.Entity<AwayMatchTeamGroup>().ToTable("AwayMatchTeamGroup");

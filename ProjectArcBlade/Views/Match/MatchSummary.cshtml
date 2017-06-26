@@ -1,0 +1,89 @@
+@model ProjectArcBlade.Models.MatchViewModels.MatchSummaryViewModel
+@{
+    ViewData["Title"] = "Match Summary";
+}
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+            <li><a asp-action="Dashboard" asp-controller="Team" asp-route-id="@Model.TeamId">Team Dashboard - @Model.TeamName</a></li>
+            <li><a asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@Model.MatchId" asp-route-teamId="@Model.TeamId">Match Progress</a></li>
+            <li>Match Summary</li>
+        </ol>
+    </div>
+</div>
+
+<form asp-action="MatchSummary">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h1>Match Summary</h1>
+        </div>
+        <div class="panel-body">
+        
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#matchdetails">Match Details <span class="badge">"0"</span></a></li>
+                <li class=""><a data-toggle="tab" href="#matchscoresheet">Match Scoresheet <span class="badge">"0"</span></a></li>
+                <li><a data-toggle="tab" href="#contestedscores">Contested Scores <span class="badge">"0"</span></a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="matchdetails" class="tab-pane fade in active">
+                    Match Details
+                    @*@Html.Partial("InProgressMatchesPartial", Model)*@
+                </div>
+                <div id="matchscoresheet" class="tab-pane fade">
+                    Detail
+                </div>
+                <div id="contestedscores" class="tab-pane fade">
+                    Contested Scores
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer text-center">
+            <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
+                <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+            </button>
+            <button type="button" name="btnCompleteConfirmation" class="btn btn-lg btn-success" title="Complete" value="Complete" data-toggle="modal" data-target="#myModal">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Complete Match Confirmation</strong></h4>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to complete this match? This action cannot be undone!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="btnComplete" class="btn btn-success" title="Complete" value="Complete">
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal End -->
+        </div>
+    </div>
+
+    <input type="hidden" asp-for="@Model.MatchId" />
+    <input type="hidden" asp-for="@Model.TeamId" />
+    <input type="hidden" asp-for="@Model.Match.TeamId" />
+    <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
+    <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+
+    @for (var i = 0; i < Model.Sets.Count(); i++)
+    {
+        <input type="hidden" asp-for="@Model.Sets[i].HomeResult" />
+        <input type="hidden" asp-for="@Model.Sets[i].AwayResult" />
+        <input type="hidden" asp-for="@Model.Sets[i].Status" />
+    }
+</form>
+

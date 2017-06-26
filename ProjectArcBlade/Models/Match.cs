@@ -23,7 +23,9 @@ namespace ProjectArcBlade.Models
         public MatchHomeResult MatchHomeResult { get; set; }
         public AwayMatchTeam AwayMatchTeam { get; set; }
         public HomeMatchTeam HomeMatchTeam { get; set; }
-
+        public AwayScoreSheet AwayScoreSheet { get; set; }
+        public HomeScoreSheet HomeScoreSheet { get; set; }
+        
         //Navigation properties
         public ICollection<RescheduledStartDate> RescheduledStartDates { get; set; }
         public ICollection<CupMatch> CupMatches { get; set; }

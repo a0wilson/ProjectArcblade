@@ -180,7 +180,7 @@
             <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
             </button>
-            <button type="button" name="btnConfirmConcede" class="btn btn-lg btn-danger" title="Concede" data-toggle="modal" data-target="#myModal">
+            <button type="button" name="btnConfirmConcede" class="btn btn-lg btn-danger" title="Concede" @(Model.AllowConcedeGame ? "" : "disabled='disabled'") data-toggle="modal" data-target="#myModal">
                 <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
             </button>
             <button type="submit" name="btnSave" class="btn btn-lg btn-primary" title="Save" value="Save">

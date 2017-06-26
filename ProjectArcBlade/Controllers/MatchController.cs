@@ -140,7 +140,6 @@ namespace ProjectArcBlade.Controllers
                         return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
                     }
                 }
-
             }
                 
             if( btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
@@ -170,19 +169,46 @@ namespace ProjectArcBlade.Controllers
         //POST: Match/MatchProgress
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel, string btnBack, string btnConcede, string btnComplete)
+        public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel, string btnBack, string btnConcede, string btnSummary)
         {
             if(btnBack != null) return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
 
-            if(btnComplete != null)
+            if (btnSummary != null) return RedirectToAction("MatchSummary", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId, matchTeamId = viewModel.MatchTeamId });
+
+            if (btnConcede != null)
             {
-                var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
+                var serviceResult = await matchService.ConcedeMatchAsync(_context, viewModel.MatchId, viewModel.TeamId);
+                return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
             }
 
             return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
-            
         }
-        
+
+        // GET: Match/MatchSummary
+        public async Task<IActionResult> MatchSummary(MatchService matchService, int matchId, int teamId, int matchTeamId)
+        {
+            var serviceResult = await matchService.GetMatchSummaryViewModelAsync(_context, matchId, teamId);
+            var viewModel = serviceResult.ReturnValue;
+            return View(viewModel);
+        }
+
+        //POST: Match/MatchSummary
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MatchSummary(MatchService matchService, MatchSummaryViewModel viewModel, string btnBack, string btnComplete)
+        {
+            if (btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
+
+            if (btnComplete != null)
+            {
+                var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
+                return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+            }
+
+            return RedirectToAction("MatchSummary", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId, matchTeamId = viewModel.MatchTeamId });
+
+        }
+
         // GET: Match/CreateStep1
         public async Task<IActionResult> CreateStep1(int leagueId)
         {

@@ -1,19 +1,17 @@
 @model IEnumerable<NameValuePair>
-<div class="well-sm">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2>Overview</h2>
-        </div>
-        <div class="panel-body">
-            <ul class="list-group">
-                @foreach (var item in Model)
-                {
-                    <li class="list-group-item">
-                        <span class="badge">@item.Value</span>
-                        @item.Name
-                    </li>
-                }
-            </ul>
-        </div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Overview</h2>
+    </div>
+    <div class="panel-body">
+        <ul class="list-group">
+            @foreach (var item in Model)
+            {
+                <li class="list-group-item">
+                    <span class="badge">@item.Value</span>
+                    @item.Name
+                </li>
+            }
+        </ul>
     </div>
 </div>

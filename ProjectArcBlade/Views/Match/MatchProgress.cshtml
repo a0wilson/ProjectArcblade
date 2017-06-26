@@ -76,15 +76,52 @@
             <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
             </button>
-            @if (Model.AllowMatchCompletion)
-            {
-                <button type="submit" name="btnComplete" class="btn btn-lg btn-success" title="Complete" value="Complete">
-                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
-                </button>
-            }
+            <button type="button" name="btnConfirmConcede" class="btn btn-lg btn-danger" @(Model.AllowConcedeMatch ? "" : "disabled='disabled'") title="Concede" data-toggle="modal" data-target="#myModal">
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
+            </button>
+            <button type="submit" name="btnSummary" class="btn btn-lg btn-primary" title="Match Summary" value="Summary" @(Model.AllowMatchSummary ? "" : "disabled='disabled'")>
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Match Summary
+            </button>
+           
             <input type="hidden" asp-for="@Model.MatchId" />
             <input type="hidden" asp-for="@Model.TeamId" />
+            <input type="hidden" asp-for="@Model.Match.TeamId" />
+            <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
+            <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
+            <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
+            <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+            <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+            
+            @for(var i=0; i<Model.Sets.Count(); i++)
+            {
+                <input type="hidden" asp-for="@Model.Sets[i].HomeResult" />
+                <input type="hidden" asp-for="@Model.Sets[i].AwayResult" />
+                <input type="hidden" asp-for="@Model.Sets[i].Status" />
+            }
 
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Concede Match Confirmation</strong></h4>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to concede this match? This action cannot be undone!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="btnConcede" class="btn btn-danger" title="Concede" value="Concede" data-toggle="modal" data-target="#myPleaseWait">
+                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Concede
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal End -->
+
+            @Html.Partial("PleaseWaitModalPartial")
         </div>
     </div>
 </form>

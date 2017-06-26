@@ -3,11 +3,18 @@
 @{
     ViewData["Title"] = "Dashboard";
 }
-
-<h1>Team Dashboard - @Model.TeamName</h1>
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+            <li>Team Dashboard - @Model.TeamName</li>
+        </ol>
+    </div>
+</div>
 <div class="panel panel-default">
-    <div class="panel-body">
-        
+    <div class="panel-heading">
+        <h1>Team Dashboard - @Model.TeamName</h1>
+    </div>
+    <div class="panel-body">        
         <div class="text-right">
             <form class="form-inline" asp-action="Dashboard">
                 <div class="form-group">

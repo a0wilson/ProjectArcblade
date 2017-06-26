@@ -11,8 +11,9 @@ namespace ProjectArcBlade.Models
         public Team Team { get; set; }
         public Match Match { get; set; }
         public TeamStatus TeamStatus { get; set; }
+        public AwayScoreSheet AwayScoreSheet { get; set; }
 
-        public int MatchId { get; set; }        
+        public int MatchId { get; set; } 
         public ICollection<AwayMatchTeamGroup> AwayMatchTeamGroups { get; set; }
         public AwayMatchTeamCaptain AwayMatchTeamCaptain { get; set; }
     }

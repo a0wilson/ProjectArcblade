@@ -1,49 +1,47 @@
 @model ProjectArcBlade.Models.TeamViewModels.TeamDashboardViewModel
-<div class="well-sm">
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h2>Upcoming Matches</h2>
-        </div>
-        <div class="panel-body">
-            @if (Model.UpcomingMatches.Count() != 0)
-            {
-                <table class="table table-hover table-condensed table-responsive lead">
-                    <thead>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Upcoming Matches</h2>
+    </div>
+    <div class="panel-body">
+        @if (Model.UpcomingMatches.Count() != 0)
+        {
+            <table class="table table-hover table-condensed table-responsive lead">
+                <thead>
+                    <tr>
+                        <th>Team Status</th>
+                        <th>Opponent</th>
+                        <th>Venue</th>
+                        <th>Match Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.UpcomingMatches)
+                    {
                         <tr>
-                            <th>Team Status</th>
-                            <th>Opponent</th>
-                            <th>Venue</th>
-                            <th>Match Date</th>
+                            <td>@Html.Partial("DisplayTeamStatusLabelPartial", item.TeamStatus)</td>
+                            <td> 
+                                <a title="Preview" asp-action="Preview" asp-controller="Match" asp-route-matchId="@item.MatchId" asp-route-teamId="@Model.TeamId">
+                                    @item.Opponent
+                                </a>
+                            </td>
+                            <td>
+                                @item.VenueName
+                                @if (item.IsHomeTeam)
+                                {
+                                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                                }                                    
+                            </td>
+                            <td>@item.StartDate</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.UpcomingMatches)
-                        {
-                            <tr>
-                                <td>@Html.Partial("DisplayTeamStatusLabelPartial", item.TeamStatus)</td>
-                                <td> 
-                                    <a title="Preview" asp-action="Preview" asp-controller="Match" asp-route-matchId="@item.MatchId" asp-route-teamId="@Model.TeamId">
-                                        @item.Opponent
-                                    </a>
-                                </td>
-                                <td>
-                                    @item.VenueName
-                                    @if (item.IsHomeTeam)
-                                    {
-                                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                                    }                                    
-                                </td>
-                                <td>@item.StartDate</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <div>There are no upcoming matches</div>
-            }
-        </div>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div>There are no upcoming matches</div>
+        }
     </div>
 </div>
 
