@@ -24,5 +24,11 @@ namespace ProjectArcBlade.Models
         public bool HomeTeamHomeTeamScoreAccepted { get { return HomeTeamHomeTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
         public bool AwayTeamAwayTeamScoreAccepted { get { return AwayTeamAwayTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
         public bool AwayTeamHomeTeamScoreAccepted { get { return AwayTeamHomeTeamScore.ScoreStatus.Name == Constants.ScoreStatus.Accepted; } }
+
+        public bool HomeTeamAwayTeamScoreEntered { get { return HomeTeamAwayTeamScore.ScoreStatus.Name != Constants.ScoreStatus.NoEntry; } }
+        public bool HomeTeamHomeTeamScoreEntered { get { return HomeTeamHomeTeamScore.ScoreStatus.Name != Constants.ScoreStatus.NoEntry; } }
+        public bool AwayTeamAwayTeamScoreEntered { get { return AwayTeamAwayTeamScore.ScoreStatus.Name != Constants.ScoreStatus.NoEntry; } }
+        public bool AwayTeamHomeTeamScoreEntered { get { return AwayTeamHomeTeamScore.ScoreStatus.Name != Constants.ScoreStatus.NoEntry; } }
+
     }
 }

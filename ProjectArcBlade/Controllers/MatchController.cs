@@ -115,7 +115,7 @@ namespace ProjectArcBlade.Controllers
         {
             var viewModel = await matchService.GetGameProgressViewModelAsync(_context, setId, teamId);
 
-            if (viewModel.SetAwayResult == Constants.ResultType.Conceded || viewModel.SetHomeResult == Constants.ResultType.Conceded)
+            if (viewModel.Set.AwayResult == Constants.ResultType.Conceded || viewModel.Set.HomeResult == Constants.ResultType.Conceded)
             {
                 return View("ViewGameProgress", viewModel);
             }
@@ -135,7 +135,7 @@ namespace ProjectArcBlade.Controllers
                 {
                     TempData["successMessage"] = "Game Progress updated successfully!";
                     //if the score update means a pair has won the set then redirect to the match progress page.
-                    if( serviceResult.ReturnValue.SetHomeResult == Constants.ResultType.Win || serviceResult.ReturnValue.SetAwayResult == Constants.ResultType.Win)
+                    if( serviceResult.ReturnValue.Set.HomeResult == Constants.ResultType.Win || serviceResult.ReturnValue.Set.AwayResult == Constants.ResultType.Win)
                     {
                         return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
                     }
@@ -156,7 +156,7 @@ namespace ProjectArcBlade.Controllers
                 
             }
 
-            return RedirectToAction("GameProgress", new { setId = viewModel.SetId, teamId = viewModel.TeamId });
+            return RedirectToAction("GameProgress", new { setId = viewModel.Set.Id, teamId = viewModel.TeamId });
         }
 
         // GET: Match/MatchProgress

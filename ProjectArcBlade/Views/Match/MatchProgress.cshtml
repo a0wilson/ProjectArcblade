@@ -22,9 +22,9 @@
                 <thead class="lead text-center">
                     <tr>
                         <td></td>
-                        <td colspan="3" class="active"><h3>Home Team<br /><small>@Model.Match.HomeTeamName</small></h3></td>
+                        <td colspan="3" class="active"><h3>Home Team @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedHomeResult)<br /><small>@Model.Match.HomeTeamName</small></h3></td>
                         <td></td>
-                        <td colspan="3" class="active"><h3>Away Team<br /><small>@Model.Match.AwayTeamName</small></h3></td>
+                        <td colspan="3" class="active"><h3>Away Team @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedAwayResult)<br /><small>@Model.Match.AwayTeamName</small></h3></td>
                     </tr>
                     <tr>
                         <td><strong>Match #</strong></td>
@@ -38,7 +38,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(var set in Model.Sets)
+                    @foreach(var set in Model.Match.Sets)
                     {
                         <tr class="lead text-center">
                             <td>@set.Number</td>
@@ -52,11 +52,11 @@
                                     @set.AwayGroup
                                 }                                
                             </td>
-                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", set.HomeResult)</td>
-                            <td class="active">@set.HomeScore</td>
+                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", set.AggregatedHomeResult)</td>
+                            <td class="active">@set.AggregatedHomeScore</td>
                             <td><em>vs</em></td>
-                            <td class="active">@set.AwayScore</td>
-                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", set.AwayResult)</td>
+                            <td class="active">@set.AggregatedAwayScore</td>
+                            <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", set.AggregatedAwayResult)</td>
                             <td class="active">
                                 @if (set.IsHomeTeam)
                                 {
@@ -83,22 +83,6 @@
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Match Summary
             </button>
            
-            <input type="hidden" asp-for="@Model.MatchId" />
-            <input type="hidden" asp-for="@Model.TeamId" />
-            <input type="hidden" asp-for="@Model.Match.TeamId" />
-            <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
-            <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
-            <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
-            <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
-            <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
-            
-            @for(var i=0; i<Model.Sets.Count(); i++)
-            {
-                <input type="hidden" asp-for="@Model.Sets[i].HomeResult" />
-                <input type="hidden" asp-for="@Model.Sets[i].AwayResult" />
-                <input type="hidden" asp-for="@Model.Sets[i].Status" />
-            }
-
             <!-- Modal -->
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                 <div class="modal-dialog" role="document">
@@ -124,5 +108,31 @@
             @Html.Partial("PleaseWaitModalPartial")
         </div>
     </div>
+
+    <!-- Hidden Fields -->
+    <input type="hidden" asp-for="@Model.MatchId" />
+    <input type="hidden" asp-for="@Model.TeamId" />
+    <input type="hidden" asp-for="@Model.Match.TeamId" />
+    <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
+    <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+    <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
+
+    @for (var i = 0; i < Model.Match.Sets.Count(); i++)
+    {
+        <input type="hidden" asp-for="@Model.Match.Sets[i].HomeResult" />
+                <input type="hidden" asp-for="@Model.Match.Sets[i].AwayResult" />
+                <input type="hidden" asp-for="@Model.Match.Sets[i].Status" />
+
+        for (var j = 0; j < Model.Match.Sets[i].Games.Count(); j++)
+        {
+            <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedAwayResult" />
+                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeResult" />
+                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedAwayScore" />
+                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeScore" />
+        }
+    }
+    <!-- End hidden Feilds-->
 </form>
 

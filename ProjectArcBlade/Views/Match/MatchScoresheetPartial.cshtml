@@ -1,4 +1,72 @@
+@model ProjectArcBlade.Models.MatchViewModels.MatchSummaryViewModel
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Match Scoresheet</h2>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row lead text-center">
+                    <div class="col-md-6">
+                        <strong>Home Team: </strong>@Model.Match.HomeTeamName
+                        <br /><strong>(@Model.Match.AggregatedHomeScore)</strong> @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedHomeResult)
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Away Team: </strong>@Model.Match.AwayTeamName
+                        <br /><strong>(@Model.Match.AggregatedAwayScore)</strong> @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedAwayResult)
+                    </div>
+                </div>
+            </div>
+        </div>        
+        
+        <table class="table table-bordered table-responsive table-condensed text-center">
+            <thead>
+                <tr>
+                    <td class="text-left" style="border:0" rowspan="2">
+                        <strong>Section: </strong>@Model.Match.Category<br />
+                        <strong>Division: </strong>@Model.Match.Division<br />
+                        <strong>Date: </strong>@Model.Match.StartDate
+                    </td>
+                    <th colspan="2" class="text-center active">Rubbers</th>
+                    <th colspan="2" class="text-center active">Games</th>
+                    <th colspan="2" class="text-center active">Points</th>
+                </tr>
+                <tr>
+                    <th class="text-center active">Home</th>
+                    <th class="text-center active">Away</th>
+                    <th class="text-center active">Home</th>
+                    <th class="text-center active">Away</th>
+                    <th class="text-center active">Home</th>
+                    <th class="text-center active">Away</th>
+                </tr>
+            </thead>
+            <tbody>
 
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+                @foreach(var line in Model.ScoresheetLines)
+                {
+                    <tr>
+                        <th class="active">@line.Heading Pair</th>
+                        <td>@line.HomeSetWinTotal</td>
+                        <td>@line.AwaySetWinTotal</td>
+                        <td>@line.HomeGameWinTotal</td>
+                        <td>@line.AwayGameWinTotal</td>
+                        <td>@line.HomePointsTotal</td>
+                        <td>@line.AwayPointsTotal</td>
+                    </tr>
+
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="active">Totals</th>
+                    <th class="text-center active">@Model.Match.HomeSetWinTotal</th>
+                    <th class="text-center active">@Model.Match.AwaySetWinTotal</th>
+                    <th class="text-center active">@Model.Match.HomeGameWinTotal</th>
+                    <th class="text-center active">@Model.Match.AwayGameWinTotal</th>
+                    <th class="text-center active">@Model.Match.HomePointsTotal</th>
+                    <th class="text-center active">@Model.Match.AwayPointsTotal</th>
+                </tr>                
+            </tfoot>
+        </table>
+</div>
+</div>

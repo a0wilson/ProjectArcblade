@@ -24,9 +24,9 @@
                 <thead>
                     <tr class="lead">
                         <td></td>
-                        <td class="active"><h3>Home Team<br /><small>@Model.HomeTeamName - @Model.HomeGroup Pair</small></h3></td>
+                        <td class="active"><h3>Home Team<br /><small>@Model.Set.HomeTeam - @Model.Set.HomeGroup Pair</small></h3></td>
                         <td></td>
-                        <td class="active"><h3>Away Team<br /><small>@Model.AwayTeamName - @Model.AwayGroup Pair</small></h3></td>
+                        <td class="active"><h3>Away Team<br /><small>@Model.Set.AwayTeam - @Model.Set.AwayGroup Pair</small></h3></td>
                     </tr>
                     <tr class="lead">
                         <td ><strong>Game #</strong></td>
@@ -36,44 +36,44 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (var index = 0; index < Model.GameTotal; index++)
+                    @for (var index = 0; index < Model.Set.Games.Count(); index++)
                     {
                         <tr class="lead">
                             <td class="col-md-1">
                                 <div class="form-control-static">
-                                    @Model.GameNumber[index]
+                                    @Model.Set.Games[index].GameNumber 
                                 </div>
                                 
-                                <input type="hidden" asp-for="@Model.GameId[index]" />
+                                <input type="hidden" asp-for="@Model.Set.Games[index].Id" />
                             </td>
                             <td class="col-md-5 active">
                                 <div class="row">
                                     <div class="col-md-4">&nbsp;</div>
                                     <div class="col-md-4">
                                         <div class="form-group-lg">
-                                            @if (Model.HomeHomeSoreStatus[index] == "Contested" || Model.AwayHomeSoreStatus[index] == "Contested")
+                                            @if (Model.Set.Games[index].HomeHomeScoreContested || Model.Set.Games[index].AwayHomeScoreContested)
                                             {
                                                 <div class="has-warning has-feedback">
-                                                    @if (Model.IsHomeTeam)
+                                                    @if (Model.Set.IsHomeTeam)
                                                     {
-                                                        <input class="form-control" asp-for="HomeHomeSore[index]" />
+                                                        <input class="form-control" asp-for="Set.Games[index].HomeHomeScore" />
                                                     }
                                                     else
                                                     {
-                                                        <input class="form-control" asp-for="AwayHomeSore[index]" />
+                                                        <input class="form-control" asp-for="Set.Games[index].AwayHomeScore" />
                                                     }
                                                     <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
                                                 </div>
                                             }
                                             else
                                             {
-                                                @if (Model.IsHomeTeam)
+                                                @if (Model.Set.IsHomeTeam)
                                                 {
-                                                    <input class="form-control" asp-for="HomeHomeSore[index]" />
+                                                    <input class="form-control" asp-for="Set.Games[index].HomeHomeScore" />
                                                 }
                                                 else
                                                 {
-                                                    <input class="form-control" asp-for="AwayHomeSore[index]" />
+                                                    <input class="form-control" asp-for="Set.Games[index].AwayHomeScore" />
                                                 }
                                             }
                                         </div>                                        
@@ -82,26 +82,26 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12 text-center">
-                                        @if (Model.IsHomeTeam)
+                                        @if (Model.Set.IsHomeTeam)
                                         {
-                                            if (Model.AwayHomeSore[index] == null)
+                                            if (Model.Set.Games[index].AwayHomeScore == null)
                                             {
                                                 <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
                                             }
                                             else
                                             {
-                                                <h4><small><em>Opposition submitted: @Model.AwayHomeSore[index]</em></small></h4>
+                                                <h4><small><em>Opposition submitted: @Model.Set.Games[index].AwayHomeScore</em></small></h4>
                                             }
                                         }
                                         else
                                         {
-                                            if (Model.HomeHomeSore[index] == null)
+                                            if (Model.Set.Games[index].HomeHomeScore == null)
                                             {
                                                 <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
                                             }
                                             else
                                             {
-                                                <h4><small><em>Opposition submitted: @Model.HomeHomeSore[index]</em></small></h4>
+                                                <h4><small><em>Opposition submitted: @Model.Set.Games[index].HomeHomeScore</em></small></h4>
                                             }
                                         }
                                     </div>
@@ -114,29 +114,29 @@
                                     <div class="col-md-4">&nbsp;</div>
                                     <div class="col-md-4">
                                         <div class="form-group-lg">
-                                            @if (Model.HomeAwaySoreStatus[index] == "Contested" || Model.AwayAwaySoreStatus[index] == "Contested")
+                                            @if (Model.Set.Games[index].HomeAwayScoreContested || Model.Set.Games[index].AwayAwayScoreContested)
                                             {
                                                 <div class="has-warning has-feedback">
-                                                    @if (Model.IsHomeTeam)
+                                                    @if (Model.Set.IsHomeTeam)
                                                     {
-                                                        <input class="form-control" asp-for="HomeAwaySore[index]" />
+                                                        <input class="form-control" asp-for="Set.Games[index].HomeAwayScore" />
                                                     }
                                                     else
                                                     {
-                                                        <input class="form-control" asp-for="AwayAwaySore[index]" />
+                                                        <input class="form-control" asp-for="Set.Games[index].AwayAwayScore" />
                                                     }
                                                     <span class="glyphicon glyphicon-exclamation-sign form-control-feedback" aria-hidden="true"></span>
                                                 </div>
                                             }
                                             else
                                             {
-                                                @if (Model.IsHomeTeam)
+                                                @if (Model.Set.IsHomeTeam)
                                                 {
-                                                    <input class="form-control" asp-for="HomeAwaySore[index]" />
+                                                    <input class="form-control" asp-for="Set.Games[index].HomeAwayScore" />
                                                 }
                                                 else
                                                 {
-                                                    <input class="form-control" asp-for="AwayAwaySore[index]" />
+                                                    <input class="form-control" asp-for="Set.Games[index].AwayAwayScore" />
                                                 }
                                             }
                                         </div>
@@ -146,26 +146,26 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        @if (Model.IsHomeTeam)
+                                        @if (Model.Set.IsHomeTeam)
                                         {
-                                            if (Model.AwayAwaySore[index] == null)
+                                            if (Model.Set.Games[index].AwayAwayScore == null)
                                             {
                                                 <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
                                             }
                                             else
                                             {
-                                                <h4><small><em>Opposition submitted: @Model.AwayAwaySore[index]</em></small></h4>
+                                                <h4><small><em>Opposition submitted: @Model.Set.Games[index].AwayAwayScore</em></small></h4>
                                             }
                                         }
                                         else
                                         {
-                                            if (Model.HomeAwaySore[index] == null)
+                                            if (Model.Set.Games[index].HomeAwayScore == null)
                                             {
                                                 <h4><small><em>Opposition has not yet submitted a score for this game</em></small></h4>
                                             }
                                             else
                                             {
-                                                <h4><small><em>Opposition submitted: @Model.HomeAwaySore[index]</em></small></h4>
+                                                <h4><small><em>Opposition submitted: @Model.Set.Games[index].HomeAwayScore</em></small></h4>
                                             }
                                         }
                                     </div>
@@ -186,12 +186,12 @@
             <button type="submit" name="btnSave" class="btn btn-lg btn-primary" title="Save" value="Save">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Save
             </button>
-            <input type="hidden" asp-for="@Model.IsHomeTeam" />
+            <input type="hidden" asp-for="@Model.Set.IsHomeTeam" />
             <input type="hidden" asp-for="@Model.MatchId" />
-            <input type="hidden" asp-for="@Model.CategoryId" />
-            <input type="hidden" asp-for="@Model.SeasonId" />
+            @*<input type="hidden" asp-for="@Model.Set.CategoryId" />
+            <input type="hidden" asp-for="@Model.Set.SeasonId" />*@           
             <input type="hidden" asp-for="@Model.TeamId" />
-            <input type="hidden" asp-for="@Model.SetId" />
+            <input type="hidden" asp-for="@Model.Set.Id" />
         </div>
 
         <!-- Modal -->

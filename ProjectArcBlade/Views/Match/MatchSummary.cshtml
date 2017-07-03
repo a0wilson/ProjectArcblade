@@ -20,21 +20,20 @@
         <div class="panel-body">
         
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#matchdetails">Match Details <span class="badge">"0"</span></a></li>
-                <li class=""><a data-toggle="tab" href="#matchscoresheet">Match Scoresheet <span class="badge">"0"</span></a></li>
-                <li><a data-toggle="tab" href="#contestedscores">Contested Scores <span class="badge">"0"</span></a></li>
+                <li class="active"><a data-toggle="tab" href="#matchscoresheet">Match Scoresheet</a></li>
+                <li class=""><a data-toggle="tab" href="#matchdetails">Match Details</a></li>                
+                <li><a data-toggle="tab" href="#contestedscores">Contested Scores <span class="badge">0</span></a></li>
             </ul>
 
             <div class="tab-content">
-                <div id="matchdetails" class="tab-pane fade in active">
-                    Match Details
-                    @*@Html.Partial("InProgressMatchesPartial", Model)*@
+                <div id="matchscoresheet" class="tab-pane fade in active">
+                    @Html.Partial("MatchScoresheetPartial", Model)
                 </div>
-                <div id="matchscoresheet" class="tab-pane fade">
-                    Detail
-                </div>
+                <div id="matchdetails" class="tab-pane fade">
+                    @Html.Partial("MatchDetailsPartial", Model)
+                </div>                
                 <div id="contestedscores" class="tab-pane fade">
-                    Contested Scores
+                    @Html.Partial("ContestedScoresPartial", Model)
                 </div>
             </div>
         </div>
@@ -79,11 +78,27 @@
     <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
 
-    @for (var i = 0; i < Model.Sets.Count(); i++)
+    @for (var setIndex = 0; setIndex < Model.Match.Sets.Count(); setIndex++)
     {
-        <input type="hidden" asp-for="@Model.Sets[i].HomeResult" />
-        <input type="hidden" asp-for="@Model.Sets[i].AwayResult" />
-        <input type="hidden" asp-for="@Model.Sets[i].Status" />
+        <input type="hidden" asp-for="@Model.Match.Sets[setIndex].HomeResult" />
+        <input type="hidden" asp-for="@Model.Match.Sets[setIndex].AwayResult" />
+        <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Status" />
+
+        @for (var gameIndex = 0; gameIndex < Model.Match.Sets[gameIndex].Games.Count(); gameIndex++)
+        {
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeResult" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayResult" />
+        }
+    }
+
+    @for (var i= 0; i < Model.Match.AwayGroups.Count(); i++)
+    {
+        <input type="hidden" asp-for="@Model.Match.AwayGroups[i].Name" />
+    }
+
+    @for (var i = 0; i < Model.Match.HomeGroups.Count(); i++)
+    {
+        <input type="hidden" asp-for="@Model.Match.HomeGroups[i].Name" />
     }
 </form>
 

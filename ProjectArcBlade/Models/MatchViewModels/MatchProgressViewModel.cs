@@ -11,19 +11,13 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public int TeamId { get; set; }
         public int MatchId { get; set; }
         public MatchViewModel Match { get; set; }
-        public SetViewModel[] Sets { get; set; }
         
         //Calculated fields
         public int MatchTeamId { get { return Match.IsHomeTeam ? Match.HomeMatchTeamId : Match.AwayMatchTeamId; } }
-        public bool MatchDrawn { get { return (AllSetsCompleted && !HomeWin && !AwayWin) ? true : false; } }
-        public bool HomeWin { get { return  Sets.Where(s => s.HomeResult == Constants.ResultType.Win).Count() > Match.MinimumSetsToWin; } }
-        public bool AwayWin { get { return Sets.Where(s => s.AwayResult == Constants.ResultType.Win).Count() > Match.MinimumSetsToWin; } }
+        public bool MatchDrawn { get { return (Match.AllSetsCompleted && !Match.HomeWin && !Match.AwayWin) ? true : false; } }
         public string TeamName { get { return Match.IsHomeTeam ? Match.HomeTeamName : Match.AwayTeamName; } }
-        public bool AllSetsCompleted { get { return Sets.Where(s => s.Status == Constants.SetStatus.Complete).Count() == Sets.Count(); } }
-        public bool MatchStatusInProgress { get { return Match.MatchStatusName == Constants.MatchStatus.InProgress; } }
-        public bool MatchStatusComplete { get { return Match.MatchStatusName == Constants.MatchStatus.Complete; } }
-        public bool AllowMatchSummary { get { return (MatchStatusInProgress ? ((HomeWin || AwayWin) || AllSetsCompleted ? true : false) : false); } }
-        public bool AllowConcedeMatch { get { return MatchStatusComplete ? false : (HomeWin || AwayWin) ? false : true; } }
+        public bool AllowMatchSummary { get { return (Match.MatchStatusInProgress ? ((Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted ? true : false) : false); } }
+        public bool AllowConcedeMatch { get { return Match.MatchStatusComplete ? false : (Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted ? false : true; } }
         
     }
 }

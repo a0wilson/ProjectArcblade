@@ -18,6 +18,7 @@
         public static class DateFormat
         {
             public static string Long = "dddd, MMM dd, yyyy";
+            public static string Short = "dd/MM/yyyy";
         }
 
         public static class TimeFormat

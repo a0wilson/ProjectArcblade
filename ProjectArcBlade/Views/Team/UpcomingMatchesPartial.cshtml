@@ -11,6 +11,7 @@
                     <tr>
                         <th>Team Status</th>
                         <th>Opponent</th>
+                        <th></th>
                         <th>Venue</th>
                         <th>Match Date</th>
                     </tr>
@@ -26,12 +27,12 @@
                                 </a>
                             </td>
                             <td>
-                                @item.VenueName
                                 @if (item.IsHomeTeam)
                                 {
                                     <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-                                }                                    
+                                }
                             </td>
+                            <td>@item.VenueName</td>
                             <td>@item.StartDate</td>
                         </tr>
                     }

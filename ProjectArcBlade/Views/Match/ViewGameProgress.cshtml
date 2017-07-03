@@ -23,9 +23,9 @@
                 <thead>
                     <tr class="lead">
                         <td></td>
-                        <td class="active"><h3>Home Team<br /><small>@Model.HomeTeamName - @Model.HomeGroup Pair</small></h3></td>
+                        <td class="active"><h3>Home Team<br /><small>@Model.Set.HomeTeam - @Model.Set.HomeGroup Pair</small></h3></td>
                         <td></td>
-                        <td class="active"><h3>Away Team<br /><small>@Model.AwayTeamName - @Model.AwayGroup Pair</small></h3></td>
+                        <td class="active"><h3>Away Team<br /><small>@Model.Set.AwayTeam - @Model.Set.AwayGroup Pair</small></h3></td>
                     </tr>
                     <tr class="lead">
                         <td><strong>Game #</strong></td>
@@ -35,35 +35,33 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (var index = 0; index < Model.GameTotal; index++)
+                    @foreach(var game in Model.Set.Games)
                     {
                         <tr class="lead text-center">
                             <td>
                                 <div class="form-control-static">
-                                    @Model.GameNumber[index]
+                                    @game.GameNumber 
                                 </div>
-
-                                <input type="hidden" asp-for="@Model.GameId[index]" />
                             </td>
                             <td class="active">
-                                @if (Model.IsHomeTeam)
+                                @if (Model.Set.IsHomeTeam)
                                 {
-                                    @Model.HomeHomeSore[index]
+                                    @game.HomeHomeScore
                                 }
                                 else
                                 {
-                                    @Model.AwayHomeSore[index]
+                                    @game.AwayHomeScore
                                 }
                             </td>
                             <td>&nbsp;</td>
                             <td class="active">
-                                @if (Model.IsHomeTeam)
+                                @if (Model.Set.IsHomeTeam)
                                 {
-                                    @Model.HomeAwaySore[index]
+                                    @game.HomeAwayScore
                                 }
                                 else
                                 {
-                                    @Model.AwayAwaySore[index]
+                                    @game.AwayAwayScore
                                 }
                             </td>
                         </tr>
@@ -76,12 +74,12 @@
                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
             </button>
             
-            <input type="hidden" asp-for="@Model.IsHomeTeam" />
+            <input type="hidden" asp-for="@Model.Set.IsHomeTeam" />
             <input type="hidden" asp-for="@Model.MatchId" />
-            <input type="hidden" asp-for="@Model.CategoryId" />
-            <input type="hidden" asp-for="@Model.SeasonId" />
+            <input type="hidden" asp-for="@Model.Set.CategoryId" />
+            <input type="hidden" asp-for="@Model.Set.SeasonId" />
             <input type="hidden" asp-for="@Model.TeamId" />
-            <input type="hidden" asp-for="@Model.SetId" />
+            <input type="hidden" asp-for="@Model.Set.Id" />
         </div>
 
     </div>

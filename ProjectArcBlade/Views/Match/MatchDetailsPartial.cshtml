@@ -1,4 +1,79 @@
-
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ProjectArcBlade.Models.MatchViewModels.MatchSummaryViewModel
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Match Details</h2>
+    </div>
+    <div class="panel-body">
+        @*<table class="table table-bordered table-responsive table-condensed text-center">
+            <tr>
+                <td></td>
+                <td class="active" colspan="@(Model.AwayGroups.Count())">
+                    <strong>Away Team @Html.Partial("DisplayResultTypeLabelPartial", Model.AwayResult)</strong>
+                    <br />@Model.Match.AwayTeamName
+                </td>
+            </tr>
+            <tr>
+                <td class="active">
+                    <strong>Home Team @Html.Partial("DisplayResultTypeLabelPartial", Model.HomeResult)</strong>
+                    <br />@Model.Match.HomeTeamName
+                </td>
+                @foreach (var awayGroup in Model.AwayGroups)
+                {
+                    <td class="active">
+                        <strong>@awayGroup Pair</strong>
+                        @foreach (var awayPlayer in Model.AwayPlayers)
+                        {
+                            if (awayPlayer.GroupName == awayGroup)
+                            {
+                                <br />@awayPlayer.FullName
+                            }
+                        }
+                    </td>
+                }
+                </tr>
+                @foreach (var homeGroup in Model.HomeGroups)
+            {
+                    <tr>
+                        <td class="active">
+                            <strong>@homeGroup Pair</strong>
+                            @foreach (var homePlayer in Model.HomePlayers)
+                            {
+                                if (homePlayer.GroupName == homeGroup)
+                                {
+                                    <br />@homePlayer.FullName
+                                }
+                            }
+                        </td>
+                        @foreach (var awayGroup in Model.AwayGroups)
+                        {
+                            foreach (var set in Model.Sets)
+                            {
+                                if (set.AwayGroup == awayGroup && set.HomeGroup == homeGroup)
+                                {
+                                    <td>
+                                        @{ var i = 0;}
+                                        @foreach (var game in Model.Games)
+                                        {
+                                            if (game.SetId == set.Id)
+                                            {
+                                                if (Model.Match.IsHomeTeam)
+                                                {
+                                                    if (i != 0){<br />}<span>@game.HomeHomeScore / @game.HomeAwayScore</span>
+                                                    
+                                                }
+                                                else
+                                                {
+                                                    if (i != 0){<br />}<span>@game.AwayHomeScore / @game.AwayAwayScore</span>
+                                                }
+                                                i++;
+                                            }
+                                        }
+                                    </td>
+                                }
+                            }
+                        }
+                    </tr>
+                }
+            </table>*@
+    </div>
+</div>
