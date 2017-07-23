@@ -25,6 +25,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
 
         public GameViewModel[] Games { get; set; }
 
+        public GameViewModel[] ContestedGames{ get { return Games == null ? null : Games.Where(g => g.IsContestedGame).ToArray(); } }
+
         //calculated fields
         public int AggregatedHomeScore { get { return Games == null ? 0 : Games.Where(g => g.AggregatedHomeResult == Constants.ResultType.Win).Count(); } }
         public int AggregatedAwayScore { get { return Games == null ? 0 : Games.Where(g => g.AggregatedAwayResult == Constants.ResultType.Win).Count(); } }
@@ -58,8 +60,9 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public bool HomeWin { get { return AggregatedHomeResult == Constants.ResultType.Win; } }
         public bool SetDrawn { get { return AggregatedAwayResult == Constants.ResultType.Draw; } }
         public bool AllGamesCompleted { get { return Games == null ? false : AggregatedHomeScore + AggregatedAwayScore == Games.Count(); } }
+        public bool SetIsComplete { get { return Games == null ? false : HomeWin || AwayWin || AllGamesCompleted; } }
 
-        private int MinimumGamesToWinSet
+        public int MinimumGamesToWinSet
         {
             get
             {

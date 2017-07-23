@@ -41,7 +41,6 @@ namespace ProjectArcBlade.Controllers
                     StartTime = Convert.ToDateTime(m.StartTime).ToString(Constants.TimeFormat.Short),
                     HomeTeam = String.Format("{0} - {1}", m.HomeMatchTeam.Team.LeagueClub.Club.Name, m.HomeMatchTeam.Team.Name),
                     AwayTeam = String.Format("{0} - {1}", m.AwayMatchTeam.Team.LeagueClub.Club.Name, m.AwayMatchTeam.Team.Name)
-                        
                 })
                 .ToListAsync());
             //.Include(m=>m.HomeMatchTeams)
@@ -135,7 +134,7 @@ namespace ProjectArcBlade.Controllers
                 {
                     TempData["successMessage"] = "Game Progress updated successfully!";
                     //if the score update means a pair has won the set then redirect to the match progress page.
-                    if( serviceResult.ReturnValue.Set.HomeResult == Constants.ResultType.Win || serviceResult.ReturnValue.Set.AwayResult == Constants.ResultType.Win)
+                    if( serviceResult.ReturnValue.HomeWin || serviceResult.ReturnValue.AwayWin)
                     {
                         return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
                     }
@@ -171,7 +170,7 @@ namespace ProjectArcBlade.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> MatchProgress(MatchService matchService, MatchProgressViewModel viewModel, string btnBack, string btnConcede, string btnSummary)
         {
-            if(btnBack != null) return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+            if (btnBack != null) return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
 
             if (btnSummary != null) return RedirectToAction("MatchSummary", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId, matchTeamId = viewModel.MatchTeamId });
 
@@ -195,7 +194,7 @@ namespace ProjectArcBlade.Controllers
         //POST: Match/MatchSummary
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MatchSummary(MatchService matchService, MatchSummaryViewModel viewModel, string btnBack, string btnComplete)
+        public async Task<IActionResult> MatchSummary(MatchService matchService, MatchSummaryViewModel viewModel, string btnBack, string btnComplete, string btnUpdateResults, string btnAcceptResults)
         {
             if (btnBack != null) return RedirectToAction("MatchProgress", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId });
 
@@ -203,6 +202,17 @@ namespace ProjectArcBlade.Controllers
             {
                 var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
                 return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
+            }
+
+            if (btnAcceptResults != null)
+            {
+                var serviceResult = await matchService.UpdateContestedGamesAsync(_context, viewModel, true);
+                
+            }
+
+            if (btnUpdateResults != null)
+            {
+                var serviceResult = await matchService.UpdateContestedGamesAsync(_context, viewModel, false);
             }
 
             return RedirectToAction("MatchSummary", new { matchId = viewModel.MatchId, teamId = viewModel.TeamId, matchTeamId = viewModel.MatchTeamId });
@@ -253,7 +263,6 @@ namespace ProjectArcBlade.Controllers
                 TempData[Constants.CreateMatchStrings.DivisionId] = createStep1ViewModel.DivisionId;
                 TempData[Constants.CreateMatchStrings.SeasonId] = createStep1ViewModel.SeasonId;
                 TempData[Constants.CreateMatchStrings.MatchTypeId] = createStep1ViewModel.MatchTypeId;
-                //TempData[Constants.CreateMatchStrings.IsCupMatch] = createStep1ViewModel.MatchTypeId == Constants.MatchType.Cup;
                 TempData.Keep();
                 
                 return RedirectToAction("CreateStep2");

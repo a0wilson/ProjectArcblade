@@ -16,7 +16,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public int MatchTeamId { get { return Match.IsHomeTeam ? Match.HomeMatchTeamId : Match.AwayMatchTeamId; } }
         public bool MatchDrawn { get { return (Match.AllSetsCompleted && !Match.HomeWin && !Match.AwayWin) ? true : false; } }
         public string TeamName { get { return Match.IsHomeTeam ? Match.HomeTeamName : Match.AwayTeamName; } }
-        public bool AllowMatchSummary { get { return (Match.MatchStatusInProgress ? ((Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted ? true : false) : false); } }
+        public bool AllowMatchSummary { get { return ((Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted) ? true : false; } }
         public bool AllowConcedeMatch { get { return Match.MatchStatusComplete ? false : (Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted ? false : true; } }
         
     }

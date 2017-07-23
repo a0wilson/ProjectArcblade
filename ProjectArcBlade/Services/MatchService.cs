@@ -16,13 +16,19 @@ namespace ProjectArcBlade.Services
         public MatchViewModel GetMatchViewModel(Match match, Rule rule, int teamId, bool includeSets, bool includeGroups)
         {
             var isHomeTeam = match.HomeMatchTeam.Team.Id == teamId;
-            return new MatchViewModel
+
+            var homeGroups = includeGroups ? match.HomeMatchTeam.HomeMatchTeamGroups.Select(hmtg => GetHomeGroupViewModel(hmtg, rule, isHomeTeam)).ToArray() : null;
+            var awayGroups = includeGroups ? match.AwayMatchTeam.AwayMatchTeamGroups.Select(amtg => GetAwayGroupViewModel(amtg, rule, isHomeTeam)).ToArray() : null;
+            var sets = includeSets ? match.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray() : null;
+
+            var matchViewModel = new MatchViewModel
             {
                 MatchId = match.Id,
+                CategoryId = match.Category.Id,
+                SeasonId = match.Season.Id,
                 TeamId = teamId,
                 VenueName = match.Venue.Name,
                 StartDate = Convert.ToDateTime(match.StartDate).ToString(Constants.DateFormat.Short),
-                MinimumSetsToWin = match.MinimumSetsToWinMatch,
                 Category = match.Category.Name,
                 Division = match.Division.Name,
                 Season = match.Season.Name,
@@ -40,15 +46,19 @@ namespace ProjectArcBlade.Services
                 AwayTeamStatus = match.AwayMatchTeam.TeamStatus.Name,
                 AwayResult = match.MatchAwayResult.ResultType.Name,
                 
-                Sets = includeSets ? match.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray() : null,
-                HomeGroups = includeGroups ? match.HomeMatchTeam.HomeMatchTeamGroups.Select(hmtg => GetHomeGroupViewModel(hmtg, rule, isHomeTeam)).ToArray() : null,
-                AwayGroups = includeGroups ? match.AwayMatchTeam.AwayMatchTeamGroups.Select(amtg => GetAwayGroupViewModel(amtg, rule, isHomeTeam)).ToArray() : null,
+                HomeGroups = homeGroups,
+                AwayGroups = awayGroups,
+                Sets = sets
             };
+
+            return matchViewModel; 
         }
         
         public SetViewModel GetSetViewModel(Set set, Rule rule, bool IsHomeTeam)
         {
-            return new SetViewModel
+            var games = set.Games.Select(g => GetGameViewModel(g, rule, IsHomeTeam)).ToArray();
+
+            var setViewModel = new SetViewModel
             {
                 Id = set.Id,
                 Number = set.Number,
@@ -56,7 +66,7 @@ namespace ProjectArcBlade.Services
                 IsHomeTeam = IsHomeTeam,
                 SeasonId = set.Match.Season.Id,
                 CategoryId = set.Match.Category.Id,
-                                
+
                 HomeGroup = set.HomeMatchTeamGroup.Group.Name,
                 HomeResult = set.SetHomeResult.ResultType.Name,
                 HomeTeamId = set.HomeMatchTeamGroup.HomeMatchTeam.Team.Id,
@@ -66,14 +76,16 @@ namespace ProjectArcBlade.Services
                 AwayResult = set.SetAwayResult.ResultType.Name,
                 AwayGroup = set.AwayMatchTeamGroup.Group.Name,
                 AwayTeam = set.AwayMatchTeamGroup.AwayMatchTeam.Team.FullName,
-
-                Games = set.Games.Select(g => GetGameViewModel(g, rule, IsHomeTeam)).ToArray()
+                
+                Games = games
             };
+
+            return setViewModel;
         }
         
         private GameViewModel GetGameViewModel (Game game, Rule rule, bool IsHomeTeam)
         {
-            return new GameViewModel
+            var gameViewModel = new GameViewModel
             {
                 Id = game.Id,
                 SetId = game.Set.Id,
@@ -94,31 +106,40 @@ namespace ProjectArcBlade.Services
                 HomeHomeScore = game.HomeTeamHomeTeamScore.Score,
                 HomeHomeScoreStatus = game.HomeTeamHomeTeamScore.ScoreStatus.Name,
                 AwayHomeScore = game.AwayTeamHomeTeamScore.Score,
-                AwayHomeScoreStatus = game.AwayTeamHomeTeamScore.ScoreStatus.Name,
-                
+                AwayHomeScoreStatus = game.AwayTeamHomeTeamScore.ScoreStatus.Name
             };
+
+            return gameViewModel;
         }
         
         private HomeGroupViewModel GetHomeGroupViewModel(HomeMatchTeamGroup matchTeamGroup, Rule rule, bool isHomeTeam)
         {
-            return new HomeGroupViewModel
+            var sets = matchTeamGroup.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray();
+            var players = matchTeamGroup.HomeMatchTeamGroupPlayers.Select(hmtgp => GetHomePlayerViewModel(hmtgp)).ToArray();
+            var homeGroupViewModel = new HomeGroupViewModel
             {
                 Id = matchTeamGroup.Id,
                 Name = matchTeamGroup.Group.Name,
-                Sets = matchTeamGroup.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray(),
-                Players = matchTeamGroup.HomeMatchTeamGroupPlayers.Select(hmtgp => GetHomePlayerViewModel(hmtgp)).ToArray(),
+                Sets = sets,
+                Players = players
             };
+
+            return homeGroupViewModel;
         }
 
         private AwayGroupViewModel GetAwayGroupViewModel(AwayMatchTeamGroup matchTeamGroup, Rule rule, bool isHomeTeam)
         {
-            return new AwayGroupViewModel
+            var sets = matchTeamGroup.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray();
+            var players = matchTeamGroup.AwayMatchTeamGroupPlayers.Select(amtgp => GetAwayPlayerViewModel(amtgp)).ToArray();
+            var awayGroupViewModel = new AwayGroupViewModel
             {
                 Id = matchTeamGroup.Id,
                 Name = matchTeamGroup.Group.Name,
-                Sets = matchTeamGroup.Sets.Select(s => GetSetViewModel(s, rule, isHomeTeam)).ToArray(),
-                Players = matchTeamGroup.AwayMatchTeamGroupPlayers.Select(amtgp => GetAwayPlayerViewModel(amtgp)).ToArray(),
+                Sets = sets,
+                Players = players
             };
+
+            return awayGroupViewModel;
         }
 
         private PlayerViewModel GetHomePlayerViewModel(HomeMatchTeamGroupPlayer player)
@@ -128,7 +149,7 @@ namespace ProjectArcBlade.Services
                 MatchTeamGroupPlayerId = player.Id,
                 GroupId = player.HomeMatchTeamGroup.Group.Id,
                 GroupName = player.HomeMatchTeamGroup.Group.Name,
-                FullName = player.ClubPlayer.PlayerDetail.FullName,
+                FullName = player.ClubPlayer != null ? player.ClubPlayer.PlayerDetail.FullName : Constants.NotApplicable,
                 MatchTeamId = player.HomeMatchTeamGroup.HomeMatchTeam.Id,
                 MatchTeamGroupId = player.HomeMatchTeamGroup.Id
             };
@@ -140,7 +161,7 @@ namespace ProjectArcBlade.Services
             {
                 GroupId = player.AwayMatchTeamGroup.Group.Id,
                 GroupName = player.AwayMatchTeamGroup.Group.Name,
-                FullName = player.ClubPlayer.PlayerDetail.FullName,
+                FullName = player.ClubPlayer != null ? player.ClubPlayer.PlayerDetail.FullName : Constants.NotApplicable,
                 MatchTeamId = player.AwayMatchTeamGroup.AwayMatchTeam.Id,
                 MatchTeamGroupId = player.AwayMatchTeamGroup.Id
             };
@@ -415,7 +436,7 @@ namespace ProjectArcBlade.Services
                 .Include(m => m.Venue)
                 .Where(m => m.Id == matchId)
                 .SingleAsync();
-
+                        
             await _context.Entry(match)
                 .Collection(m => m.Sets)
                 .Query()
@@ -431,7 +452,7 @@ namespace ProjectArcBlade.Services
                 .Include(s => s.SetStatus)
                 .OrderBy(s => s.Number)
                 .ToListAsync();
-
+            
             foreach (var set in match.Sets)
             {
                 await _context.Entry(set)
@@ -447,6 +468,8 @@ namespace ProjectArcBlade.Services
                     .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.Audit)
                     .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.ScoreStatus)
                     .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.Audit)
+                    .Include(g => g.Set).ThenInclude(s => s.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                    .Include(g => g.Set).ThenInclude(s => s.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
                     .OrderBy(g => g.Number)
                     .ToListAsync();
 
@@ -499,10 +522,35 @@ namespace ProjectArcBlade.Services
                 .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.Audit)
                 .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.ScoreStatus)
                 .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.Audit)
+                .Include(g => g.Set).ThenInclude(s => s.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Include(g => g.Set).ThenInclude(s => s.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
                 .OrderBy(g => g.Number)
                 .ToListAsync();
             
             return set;
+        }
+
+        public async Task<Game>GetGameByIdAsync(ApplicationDbContext context, int gameId)
+        {
+            if (_context == null) _context = context;
+
+            var game = await _context.Games
+                .Include(g => g.GameAwayResult).ThenInclude(gar => gar.ResultType)
+                .Include(g => g.GameHomeResult).ThenInclude(ghr => ghr.ResultType)
+                .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.ScoreStatus)
+                .Include(g => g.AwayTeamAwayTeamScore).ThenInclude(atats => atats.Audit)
+                .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.ScoreStatus)
+                .Include(g => g.AwayTeamHomeTeamScore).ThenInclude(athts => athts.Audit)
+                .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.ScoreStatus)
+                .Include(g => g.HomeTeamAwayTeamScore).ThenInclude(htats => htats.Audit)
+                .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.ScoreStatus)
+                .Include(g => g.HomeTeamHomeTeamScore).ThenInclude(hthts => hthts.Audit)
+                .Include(g => g.Set).ThenInclude(s => s.HomeMatchTeamGroup).ThenInclude(hmtg => hmtg.Group)
+                .Include(g => g.Set).ThenInclude(s => s.AwayMatchTeamGroup).ThenInclude(amtg => amtg.Group)
+                .Where(g => g.Id == gameId)
+                .SingleAsync();
+
+            return game;
         }
 
         public async Task<MatchProgressViewModel> GetMatchProgressViewModelAsync(ApplicationDbContext context, int matchId, int teamId)
@@ -530,15 +578,13 @@ namespace ProjectArcBlade.Services
             var match = await GetMatchByIdAsync(matchId);
             var rule = await GetRuleBySeasonAndCategoryAsync(_context, match.Season.Id, match.Category.Id);
             var matchViewModel = GetMatchViewModel(match, rule, teamId, true, true);
-           
-            var homeWin = match.Sets.Where(s => s.SetHomeResult.ResultType.Name == Constants.ResultType.Win).Count() >= match.MinimumSetsToWinMatch;
-            var awayWin = match.Sets.Where(s => s.SetAwayResult.ResultType.Name == Constants.ResultType.Win).Count() >= match.MinimumSetsToWinMatch;
 
             var viewModel = new MatchSummaryViewModel
             {
                 TeamId = teamId,
                 MatchId = matchId,
                 Match = matchViewModel,
+                ContestedGames = matchViewModel.Sets.SelectMany(s => s.ContestedGames.Select(g => g)).ToArray()
             };
 
             var result = new ServiceResult<MatchSummaryViewModel>
@@ -558,60 +604,12 @@ namespace ProjectArcBlade.Services
             var rule = await GetRuleBySeasonAndCategoryAsync(_context, set.Match.Season.Id, set.Match.Category.Id);
             var isHomeTeam = set.Match.HomeMatchTeam.Team.Id == teamId;
             var setViewModel = GetSetViewModel(set, rule, isHomeTeam);
-            //var gameId = new int[set.Games.Count];
-            //var gameNumber = new int[set.Games.Count];
-            //var awayAwayScore = new int?[set.Games.Count];
-            //var awayHomeScore = new int?[set.Games.Count];
-            //var homeAwayScore = new int?[set.Games.Count];
-            //var homeHomeScore = new int?[set.Games.Count];
-            //var awayAwayScoreStatus = new string[set.Games.Count];
-            //var awayHomeScoreStatus = new string[set.Games.Count];
-            //var homeAwayScoreStatus = new string[set.Games.Count];
-            //var homeHomeScoreStatus = new string[set.Games.Count];
-
-            //var i = 0;
-            //foreach(var game in set.Games)
-            //{
-            //    gameId[i] = game.Id;
-            //    gameNumber[i] = game.Number;
-            //    awayAwayScore[i] = game.AwayTeamAwayTeamScore.Score;
-            //    awayHomeScore[i] = game.AwayTeamHomeTeamScore.Score;
-            //    homeAwayScore[i] = game.HomeTeamAwayTeamScore.Score;
-            //    homeHomeScore[i] = game.HomeTeamHomeTeamScore.Score;
-            //    awayAwayScoreStatus[i] = game.AwayTeamAwayTeamScore.ScoreStatus.Name;
-            //    awayHomeScoreStatus[i] = game.AwayTeamHomeTeamScore.ScoreStatus.Name;
-            //    homeAwayScoreStatus[i] = game.HomeTeamAwayTeamScore.ScoreStatus.Name;
-            //    homeHomeScoreStatus[i] = game.HomeTeamHomeTeamScore.ScoreStatus.Name;
-            //    i++;
-            //}
-
+            
             var viewModel = new GameProgressViewModel
             {
-                //SetId = setId,
                 TeamId = teamId,
                 MatchId = set.Match.Id,
                 Set = setViewModel,
-                //GameId = gameId,
-                //GameNumber = gameNumber,
-                //GameTotal = set.Games.Count,
-                //AwayAwaySore = awayAwayScore,
-                //AwayHomeSore = awayHomeScore,
-                //HomeAwaySore = homeAwayScore,
-                //HomeHomeSore = homeHomeScore,
-                //SetAwayResult = set.SetAwayResult.ResultType.Name,
-                //SetHomeResult = set.SetHomeResult.ResultType.Name,
-                //AwayAwaySoreStatus = awayAwayScoreStatus,
-                //AwayHomeSoreStatus = awayHomeScoreStatus,
-                //HomeAwaySoreStatus = homeAwayScoreStatus,
-                //HomeHomeSoreStatus = homeHomeScoreStatus,
-                //AwayGroup = set.AwayMatchTeamGroup.Group.Name,
-                //HomeGroup = set.HomeMatchTeamGroup.Group.Name,
-                //AwayTeamName = set.Match.AwayMatchTeam.Team.FullName,
-                //HomeTeamName = set.Match.HomeMatchTeam.Team.FullName,
-                //IsHomeTeam = set.Match.HomeMatchTeam.Team.Id == teamId,
-                //SeasonId = set.Match.Season.Id,
-                //CategoryId = set.Match.Category.Id,
-                //TeamName = set.Match.HomeMatchTeam.Team.Id == teamId ? set.Match.HomeMatchTeam.Team.FullName : set.Match.AwayMatchTeam.Team.FullName
             };
 
             return viewModel;
@@ -630,20 +628,20 @@ namespace ProjectArcBlade.Services
             var setStatuses = await _context.SetStatuses.ToListAsync();
             var matchStatusComplete = matchStatuses.Single(ms => ms.Name == Constants.MatchStatus.Complete);
             var setStatusComplete = setStatuses.Single(ss => ss.Name == Constants.SetStatus.Complete);
-            var scoreStatusAccepted = scoreStatuses.Single(ss => ss.Name == Constants.ScoreStatus.Accepted);
             var resultTypeConceded = resultTypes.Single(rt => rt.Name == Constants.ResultType.Conceded);
             var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
-            var isHomeTeam = match.HomeMatchTeam.Team.Id == teamId ? true : false;
+            var isHomeTeam = match.HomeMatchTeam.Team.Id == teamId;
 
             foreach(var set in match.Sets)
             {
-                set.Games.ToList().ForEach(g => SetGameScore(g, rule, scoreStatusAccepted, resultTypes, 0, 0, isHomeTeam));
-
+                set.Games.ToList().ForEach(g => UpdateGameScore(g, rule, scoreStatuses, 0, 0, isHomeTeam, true, true));
+                
                 if (isHomeTeam)
                 {
                     for (var i = 0; i < set.MinimumGamesToWinSet; i++)
                     {
-                        var game = SetGameScore(set.Games.ElementAt(i), rule, scoreStatusAccepted, resultTypes, matchTemplate.DefaultGameLossScore, matchTemplate.DefaultGameWinScore, isHomeTeam, true);
+                        var game = UpdateGameScore(set.Games.ElementAt(i), rule, scoreStatuses, matchTemplate.DefaultGameLossScore, matchTemplate.DefaultGameWinScore, isHomeTeam, true, true);
+                        game = UpdateGameResult(game, rule, resultTypes, isHomeTeam, true);
                     }
 
                     set.SetHomeResult.ResultType = resultTypeConceded;
@@ -653,7 +651,8 @@ namespace ProjectArcBlade.Services
                 {
                     for (var i = 0; i < set.MinimumGamesToWinSet; i++)
                     {
-                        var game = SetGameScore(set.Games.ElementAt(i), rule, scoreStatusAccepted, resultTypes, matchTemplate.DefaultGameWinScore, matchTemplate.DefaultGameLossScore, isHomeTeam, true);
+                        var game = UpdateGameScore(set.Games.ElementAt(i), rule, scoreStatuses, matchTemplate.DefaultGameWinScore, matchTemplate.DefaultGameLossScore, isHomeTeam, true, true);
+                        game = UpdateGameResult(game, rule, resultTypes, isHomeTeam, true);
                     }
                     set.SetAwayResult.ResultType = resultTypeConceded;
                     set.SetHomeResult.ResultType = resultTypeWin;
@@ -695,19 +694,18 @@ namespace ProjectArcBlade.Services
             var homeTeamName = set.Match.HomeMatchTeam.Team.FullName;            
             var resultTypeConceded = resultTypes.Single(rt => rt.Name == Constants.ResultType.Conceded);
             var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
-            var scoreStatusAccepted = scoreStatuses.Single(ss => ss.Name == Constants.ScoreStatus.Accepted);
 
             var setStatusComplete = setStatuses.Single(ss => ss.Name == Constants.SetStatus.Complete);
             
-
             //set all the games in the set to 0;
-            set.Games.ToList().ForEach(g => SetGameScore(g, rule, scoreStatusAccepted, resultTypes, 0, 0, viewModel.Set.IsHomeTeam));
+            set.Games.ToList().ForEach(g => UpdateGameScore(g, rule, scoreStatuses, 0, 0, viewModel.Set.IsHomeTeam, true, true));
             
             if ( viewModel.Set.IsHomeTeam)
             {
                 for (var i=0; i<set.MinimumGamesToWinSet; i++)
                 {
-                    var game = SetGameScore(set.Games.ElementAt(i), rule, scoreStatusAccepted, resultTypes, matchTemplate.DefaultGameLossScore, matchTemplate.DefaultGameWinScore, viewModel.Set.IsHomeTeam, true);
+                    var game = UpdateGameScore(set.Games.ElementAt(i), rule, scoreStatuses, matchTemplate.DefaultGameLossScore, matchTemplate.DefaultGameWinScore, viewModel.Set.IsHomeTeam, true, true);
+                    game = UpdateGameResult(game, rule, resultTypes, viewModel.Set.IsHomeTeam, true);
                 }
 
                 set.SetHomeResult.ResultType = resultTypeConceded;
@@ -717,8 +715,10 @@ namespace ProjectArcBlade.Services
             {
                 for (var i = 0; i < set.MinimumGamesToWinSet; i++)
                 {
-                    var game = SetGameScore(set.Games.ElementAt(i), rule, scoreStatusAccepted, resultTypes, matchTemplate.DefaultGameWinScore, matchTemplate.DefaultGameLossScore, viewModel.Set.IsHomeTeam, true);
+                    var game = UpdateGameScore(set.Games.ElementAt(i), rule, scoreStatuses, matchTemplate.DefaultGameWinScore, matchTemplate.DefaultGameLossScore, viewModel.Set.IsHomeTeam, true, true);
+                    game = UpdateGameResult(game, rule, resultTypes, viewModel.Set.IsHomeTeam, true);
                 }
+
                 set.SetAwayResult.ResultType = resultTypeConceded;
                 set.SetHomeResult.ResultType = resultTypeWin;
             }
@@ -738,23 +738,60 @@ namespace ProjectArcBlade.Services
             };
             return serviceResult;
         }
-        
-        private Game SetGameScore(Game game, Rule rule, ScoreStatus acceptedStatus, List<ResultType> resultTypes, int homeScore, int awayScore, bool isHomeTeam, bool concedeGame = false)
-        {
-            var gameViewModel = GetGameViewModel(game, rule, true);
-            game.HomeTeamAwayTeamScore.Score = awayScore;
-            game.AwayTeamAwayTeamScore.Score = awayScore;
-            game.HomeTeamHomeTeamScore.Score = homeScore;
-            game.AwayTeamHomeTeamScore.Score = homeScore;
 
-            game.HomeTeamAwayTeamScore.ScoreStatus = acceptedStatus;
-            game.AwayTeamAwayTeamScore.ScoreStatus = acceptedStatus;
-            game.HomeTeamHomeTeamScore.ScoreStatus = acceptedStatus;
-            game.AwayTeamHomeTeamScore.ScoreStatus = acceptedStatus;
+        /// <summary>
+        /// Accepts a game model and updates the home and away scores and then returns the updated game model.
+        /// </summary>
+        /// <param name="game">The game model to operate on</param>
+        /// <param name="rule">The rules used to determine if the scores are valid</param>
+        /// <param name="scoreStatuses">A list of scores statuses which can be applied</param>
+        /// <param name="homeScore">The home score</param>
+        /// <param name="awayScore">The away score</param>
+        /// <param name="isHomeTeam">true if the currently active team is the home team</param>
+        /// <param name="forHomeTeam">true if the home and away scores should be submitted on behalf of the home team</param>
+        /// <param name="forAwayTeam">true if the home and away scores should be submitted on behalf of the away team</param>
+        /// <returns>The updated game model</returns>
+        private Game UpdateGameScore(Game game, Rule rule, List<ScoreStatus> scoreStatuses, int homeScore, int awayScore, bool isHomeTeam, bool forHomeTeam, bool forAwayTeam)
+        {            
+            if(forHomeTeam)
+            {
+                game.HomeTeamHomeTeamScore.Score = homeScore;
+                game.HomeTeamAwayTeamScore.Score = awayScore;
+            }
+            
+            if(forAwayTeam)
+            {
+                game.AwayTeamHomeTeamScore.Score = homeScore;
+                game.AwayTeamAwayTeamScore.Score = awayScore;
+            }
+
+            //get the gameviewmodel after updating the store to get the correct results!
+            var gameViewModel = GetGameViewModel(game, rule, isHomeTeam);
+
+            game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatuses.Single(ss => ss.Name == (game.HomeTeamAwayTeamScore.Score == null ? Constants.ScoreStatus.NoEntry : gameViewModel.AggregatedAwayScoreStatus) );
+            game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatuses.Single(ss => ss.Name == (game.HomeTeamHomeTeamScore.Score == null ? Constants.ScoreStatus.NoEntry : gameViewModel.AggregatedHomeScoreStatus) );
+            game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatuses.Single(ss => ss.Name == (game.AwayTeamAwayTeamScore.Score == null ? Constants.ScoreStatus.NoEntry : gameViewModel.AggregatedAwayScoreStatus) );            
+            game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatuses.Single(ss => ss.Name == (game.AwayTeamHomeTeamScore.Score == null ? Constants.ScoreStatus.NoEntry : gameViewModel.AggregatedHomeScoreStatus) );
+            
+            return game;
+        }
+
+        /// <summary>
+        /// Accepts a game model and updates the results for the game and then returns the model.
+        /// </summary>
+        /// <param name="game">The game model to operate on</param>
+        /// <param name="rule">The rules used to determine if the scores are valid</param>
+        /// <param name="resultTypes">A list of the result types which can be applied</param>
+        /// <param name="isHomeTeam">true if the currently active team is the home team</param>
+        /// <param name="concedeGame">true if the game should be marked as conceded for teh active team</param>
+        /// <returns>The updated game model</returns>
+        private Game UpdateGameResult(Game game, Rule rule, List<ResultType> resultTypes, bool isHomeTeam, bool concedeGame)
+        {
+            var gameViewModel = GetGameViewModel(game, rule, isHomeTeam);
 
             if (concedeGame)
             {
-                if(isHomeTeam)
+                if (isHomeTeam)
                 {
                     game.GameHomeResult.ResultType = resultTypes.Single(rt => rt.Name == Constants.ResultType.Conceded);
                     game.GameAwayResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.AggregatedAwayResult);
@@ -769,18 +806,20 @@ namespace ProjectArcBlade.Services
             {
                 game.GameHomeResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.AggregatedHomeResult);
                 game.GameAwayResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.AggregatedAwayResult);
-            }            
-
+            }
             return game;
         }
 
-        public async Task<ServiceResult<GameProgressViewModel>> UpdateSetAsync(ApplicationDbContext context, GameProgressViewModel viewModel)
+        public async Task<ServiceResult<SetViewModel>> UpdateSetAsync(ApplicationDbContext context, GameProgressViewModel viewModel)
         {
             if (_context == null) _context = context;
 
             var set = await GetSetByIdAsync(_context, viewModel.Set.Id);
-            var scoreStatusContested = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Contested);
-            var scoreStatusAccepted = await GetScoreStatusAsync(_context, Constants.ScoreStatus.Accepted);
+
+            var scoreStatuses = await _context.ScoreStatuses.ToListAsync();
+            var scoreStatusContested = scoreStatuses.Single(ss => ss.Name == Constants.ScoreStatus.Contested);
+            var scoreStatusAccepted = scoreStatuses.Single(ss => ss.Name == Constants.ScoreStatus.Accepted);
+            var scoreStatusNoEntry = scoreStatuses.Single(ss => ss.Name == Constants.ScoreStatus.NoEntry);
 
             var resultTypes = await _context.ResultTypes.ToListAsync();
             var resultTypePending = resultTypes.Single(rt => rt.Name == Constants.ResultType.Pending);
@@ -802,12 +841,22 @@ namespace ProjectArcBlade.Services
                         {
                             if(game.HomeTeamAwayTeamScore.Score == null) game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.HomeTeamAwayTeamScore.Score = viewModel.Set.Games[i].HomeAwayScore.Value;
-                            
                         }
+                        else
+                        {
+                            game.HomeTeamAwayTeamScore.ScoreStatus = scoreStatusNoEntry;
+                            game.HomeTeamAwayTeamScore.Score = null;
+                        }
+
                         if (viewModel.Set.Games[i].HomeHomeScore != null)
                         {
                             if(game.HomeTeamHomeTeamScore.Score == null) game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.HomeTeamHomeTeamScore.Score = viewModel.Set.Games[i].HomeHomeScore.Value;
+                        }
+                        else
+                        {
+                            game.HomeTeamHomeTeamScore.ScoreStatus = scoreStatusNoEntry;
+                            game.HomeTeamHomeTeamScore.Score = null;
                         }
                     }
                     else
@@ -818,10 +867,21 @@ namespace ProjectArcBlade.Services
                             if(game.AwayTeamAwayTeamScore.Score == null) game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.AwayTeamAwayTeamScore.Score = viewModel.Set.Games[i].AwayAwayScore.Value;
                         }
+                        else
+                        {
+                            game.AwayTeamAwayTeamScore.ScoreStatus = scoreStatusNoEntry;
+                            game.AwayTeamAwayTeamScore.Score = null;
+                        }
+
                         if (viewModel.Set.Games[i].AwayHomeScore != null)
                         {
                             if(game.AwayTeamHomeTeamScore.Score == null) game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusAccepted;
                             game.AwayTeamHomeTeamScore.Score = viewModel.Set.Games[i].AwayHomeScore.Value;
+                        }
+                        else
+                        {
+                            game.AwayTeamHomeTeamScore.ScoreStatus = scoreStatusNoEntry;
+                            game.AwayTeamHomeTeamScore.Score = null;
                         }
                     }
 
@@ -860,163 +920,24 @@ namespace ProjectArcBlade.Services
 
             _context.Sets.Update(set);
             await _context.SaveChangesAsync();
-
-            //Update the match results
-            var match = await UpdateMatchResultsAsync(viewModel.MatchId, viewModel.TeamId);
-
+                        
             var rule = await GetRuleBySeasonAndCategoryAsync(_context, set.Match.Season.Id, set.Match.Category.Id);
-            var matchViewModel = GetMatchViewModel(match, rule, viewModel.TeamId, true, true );
-
-            //update the viewmodel with the set result so that the controller can determine which view to redirect to
-            //if the set it completed - redirect to the match progress screen, otherwise stay on the game progress screen.
-            viewModel.Set.AwayResult = matchViewModel.Sets.Where(s => s.Id == set.Id).Select(s => s.AggregatedAwayResult).Single();
-            viewModel.Set.HomeResult = matchViewModel.Sets.Where(s => s.Id == set.Id).Select(s => s.AggregatedHomeResult).Single();
+            var setViewModel = GetSetViewModel(set, rule, viewModel.Set.IsHomeTeam);
             
-            var serviceResult = new ServiceResult<GameProgressViewModel>()
+            var serviceResult = new ServiceResult<SetViewModel>()
             {
                 Success = true,
-                ReturnValue = viewModel
+                ReturnValue = setViewModel
             };
             return serviceResult;
         }
 
-        private async Task<Match> UpdateMatchResultsAsync(int matchId, int matchTeamId)
-        {
-            var match = await GetMatchByIdAsync(matchId);
-            var resultTypes = await _context.ResultTypes.ToListAsync();
-            var setStatuses = await _context.SetStatuses.ToListAsync();
-            var matchStatuses = await _context.MatchStatuses.ToListAsync();
-            var rule = await GetRuleBySeasonAndCategoryAsync(_context, match.Season.Id, match.Category.Id);
-
-            var resultTypePending = resultTypes.Single(rt => rt.Name == Constants.ResultType.Pending);
-            var resultTypeDraw = resultTypes.Single(rt => rt.Name == Constants.ResultType.Draw);
-            var resultTypeWin = resultTypes.Single(rt => rt.Name == Constants.ResultType.Win);
-            var resultTypeLoss = resultTypes.Single(rt => rt.Name == Constants.ResultType.Loss);
-            var resultTypeInvalid = resultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid);
-
-            var setStatusCompleted = setStatuses.Single(ss => ss.Name == Constants.SetStatus.Complete);
-            var setStatusInProgress = setStatuses.Single(ss => ss.Name == Constants.SetStatus.InProgress);
-
-            var matchStatusCompleted = matchStatuses.Single(ms => ms.Name == Constants.MatchStatus.Complete);
-            var matchStatusInProgress = matchStatuses.Single(ms => ms.Name == Constants.MatchStatus.InProgress);
-            
-            foreach (var set in match.Sets)
-            {
-                foreach(var game in set.Games)
-                {
-                    var gameViewModel = GetGameViewModel(game, rule, true);
-
-                    game.GameHomeResult.ResultType = resultTypePending;
-                    game.GameAwayResult.ResultType = resultTypePending;
-
-                    if ((game.HomeTeamHomeTeamScoreAccepted && game.HomeTeamAwayTeamScoreAccepted)
-                        || (game.AwayTeamHomeTeamScoreAccepted && game.AwayTeamAwayTeamScoreAccepted))
-                    {
-
-                        if (game.HomeTeamHomeTeamScoreAccepted && game.HomeTeamAwayTeamScoreAccepted)
-                        {
-                            game.GameHomeResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.GetResultType(rule, Convert.ToInt32(game.HomeTeamHomeTeamScore.Score), Convert.ToInt32(game.HomeTeamAwayTeamScore.Score)));
-                            game.GameAwayResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.GetResultType(rule, Convert.ToInt32(game.HomeTeamAwayTeamScore.Score), Convert.ToInt32(game.HomeTeamHomeTeamScore.Score)));
-                        }
-
-                        if (game.AwayTeamHomeTeamScoreAccepted && game.AwayTeamAwayTeamScoreAccepted)
-                        {
-                            game.GameHomeResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.GetResultType(rule, Convert.ToInt32(game.AwayTeamHomeTeamScore.Score), Convert.ToInt32(game.AwayTeamAwayTeamScore.Score)));
-                            game.GameAwayResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.GetResultType(rule, Convert.ToInt32(game.AwayTeamAwayTeamScore.Score), Convert.ToInt32(game.AwayTeamHomeTeamScore.Score)));
-                        }
-                    }
-                }
-
-                //if any games have a score which is Accepted then the set is in progress.
-                var setInProgress = set.Games.Where(g =>
-                    g.AwayTeamAwayTeamScoreAccepted ||
-                    g.AwayTeamHomeTeamScoreAccepted ||
-                    g.HomeTeamAwayTeamScoreAccepted ||
-                    g.HomeTeamHomeTeamScoreAccepted
-                ).Any();
-
-                if (set.SetStatus.Name != Constants.SetStatus.InProgress && setInProgress)
-                {
-                    set.SetStatus = setStatusInProgress;
-                }
-
-                // set result type to pending...
-                set.SetHomeResult.ResultType = resultTypePending;
-                set.SetAwayResult.ResultType = resultTypePending;
-
-                // determine if the set can be marked as complete!
-                var homeWinCount = set.Games.Where(g => g.GameHomeResult.ResultType.Name == Constants.ResultType.Win).Count();
-                var awayWinCount = set.Games.Where(g => g.GameAwayResult.ResultType.Name == Constants.ResultType.Win).Count();
-
-                if (homeWinCount >= set.MinimumGamesToWinSet || awayWinCount >= set.MinimumGamesToWinSet)
-                {
-                    set.SetStatus = setStatusCompleted;
-
-                    if (homeWinCount >= set.MinimumGamesToWinSet)
-                    {
-                        set.SetHomeResult.ResultType = resultTypeWin;
-                        set.SetAwayResult.ResultType = resultTypeLoss;
-                    }
-
-                    if (awayWinCount >= set.MinimumGamesToWinSet)
-                    {
-                        set.SetAwayResult.ResultType = resultTypeWin;
-                        set.SetHomeResult.ResultType = resultTypeLoss;
-                    }
-                }
-            }
-
-            int homeSetWinCount = match.Sets.Where(s => s.SetHomeResult.ResultType.Name == Constants.ResultType.Win).Count();
-            int awaySetWinCount = match.Sets.Where(s => s.SetAwayResult.ResultType.Name == Constants.ResultType.Win).Count();
-            bool allSetsCompleted = match.Sets.Where(s => s.SetStatus.Name == Constants.SetStatus.Complete).Count() == match.Sets.Count();
-            bool homeWin = homeSetWinCount > match.MinimumSetsToWinMatch;
-            bool awayWin = awaySetWinCount > match.MinimumSetsToWinMatch;
-            bool matchDrawn = (allSetsCompleted && !homeWin && !awayWin) ? true : false;
-
-            match.MatchHomeResult.ResultType = resultTypePending;
-            match.MatchAwayResult.ResultType = resultTypePending;
-
-            if( (homeWin || awayWin) || allSetsCompleted)
-            {
-                if(matchDrawn)
-                {
-                    match.MatchAwayResult.ResultType = resultTypeDraw;
-                    match.MatchHomeResult.ResultType = resultTypeDraw;
-                }
-                if(homeWin)
-                {
-                    match.MatchHomeResult.ResultType = resultTypeWin;
-                    match.MatchAwayResult.ResultType = resultTypeLoss;
-                }
-                if(awayWin)
-                {
-                    match.MatchAwayResult.ResultType = resultTypeWin;
-                    match.MatchHomeResult.ResultType = resultTypeLoss;
-                }                
-            }
-
-            _context.Matches.Update(match);
-            await _context.SaveChangesAsync();
-
-            return match;
-        }
-        
         public async Task<ServiceResult<MatchSummaryViewModel>> CompleteMatchAsync(ApplicationDbContext context, MatchSummaryViewModel viewModel)
         {
             if (_context == null) _context = context;
 
-            var matchStatuses = await _context.MatchStatuses.ToListAsync();
-            var matchStatusComplete = matchStatuses.Single(ms => ms.Name == Constants.SetStatus.Complete);
-            var resultTypes = await _context.ResultTypes.ToListAsync();
-
-            var match = await GetMatchByIdAsync(viewModel.MatchId);
-
-            match.MatchStatus = matchStatusComplete;
-            match.MatchHomeResult.ResultType = resultTypes.Single(rt => rt.Name == viewModel.Match.AggregatedHomeResult);
-            match.MatchAwayResult.ResultType = resultTypes.Single(rt => rt.Name == viewModel.Match.AggregatedAwayResult);
-
-            _context.Matches.Update(match);
-            await _context.SaveChangesAsync();
+            //Update the match results
+            await UpdateMatchResultsAsync(viewModel.MatchId, viewModel.TeamId);
 
             var serviceResult = new ServiceResult<MatchSummaryViewModel>()
             {
@@ -1025,5 +946,120 @@ namespace ProjectArcBlade.Services
             };
             return serviceResult;
         }
+
+        public async Task<ServiceResult<MatchSummaryViewModel>> UpdateContestedGamesAsync(ApplicationDbContext context, MatchSummaryViewModel viewModel, bool useOppostionScores)
+        {
+            if (_context == null) _context = context;
+
+            var rule = await GetRuleBySeasonAndCategoryAsync(_context, viewModel.Match.SeasonId, viewModel.Match.CategoryId);
+            var scoreStatuses = await _context.ScoreStatuses.ToListAsync();
+
+            GameViewModel[] contestedGames = viewModel.Match.Sets.SelectMany(s => s.ContestedGames).ToArray();
+            
+
+            foreach(var contestedGame in contestedGames)
+            {
+                //get game.
+                var game = await GetGameByIdAsync(_context, contestedGame.Id);
+                int? homeScore = null, awayScore = null;
+
+                //work out home and away score to use for update...
+                if(viewModel.Match.IsHomeTeam)
+                {
+                    if (useOppostionScores)
+                    {
+                        homeScore = contestedGame.AwayHomeScore;
+                        awayScore = contestedGame.AwayAwayScore;
+                    }
+                    else
+                    {
+                        homeScore = contestedGame.HomeHomeScore;
+                        awayScore = contestedGame.HomeAwayScore;
+                    }
+                    
+                    //Only update game if score has changed!
+                    if(game.HomeTeamHomeTeamScore.Score != homeScore || game.HomeTeamAwayTeamScore.Score != awayScore )
+                    {
+                        game = UpdateGameScore(game, rule, scoreStatuses, homeScore.Value, awayScore.Value, viewModel.Match.IsHomeTeam, true, false);
+                        _context.Games.Update(game);
+                        await _context.SaveChangesAsync();
+                    }                    
+                }
+                else
+                {
+                    if (useOppostionScores)
+                    {
+                        homeScore = contestedGame.HomeHomeScore;
+                        awayScore = contestedGame.HomeAwayScore;                        
+                    }
+                    else
+                    {
+                        homeScore = contestedGame.AwayHomeScore;
+                        awayScore = contestedGame.AwayAwayScore;
+                    }
+                    //Only update game if score has changed!
+                    if (game.AwayTeamHomeTeamScore.Score != homeScore || game.AwayTeamAwayTeamScore.Score != awayScore)
+                    {
+                        UpdateGameScore(game, rule, scoreStatuses, homeScore.Value, awayScore.Value, viewModel.Match.IsHomeTeam, false, true);
+                        _context.Games.Update(game);
+                        await _context.SaveChangesAsync();
+                    }
+                }                
+            }
+            
+            var serviceResult = new ServiceResult<MatchSummaryViewModel>()
+            {
+                Success = true,
+                ReturnValue = viewModel
+            };
+            return serviceResult;
+        }
+
+
+        private async Task UpdateMatchResultsAsync(int matchId, int teamId)
+        {
+            var match = await GetMatchByIdAsync(matchId);
+            var rule = await GetRuleBySeasonAndCategoryAsync(_context, match.Season.Id, match.Category.Id);
+            var resultTypes = await _context.ResultTypes.ToListAsync();
+            var setStatuses = await _context.SetStatuses.ToListAsync();
+            var matchStatuses = await _context.MatchStatuses.ToListAsync();
+
+            var matchStatusComplete = matchStatuses.Single(ms => ms.Name == Constants.SetStatus.Complete);
+            var setStatusCompleted = setStatuses.Single(ss => ss.Name == Constants.SetStatus.Complete);
+
+            var setStatusInProgress = setStatuses.Single(ss => ss.Name == Constants.SetStatus.InProgress);
+            var matchStatusInProgress = matchStatuses.Single(ms => ms.Name == Constants.MatchStatus.InProgress);
+
+            var matchViewModel = GetMatchViewModel(match, rule, teamId, true, true);
+            match.MatchStatus = matchStatusInProgress;
+
+            foreach (var set in match.Sets)
+            {
+                var setViewModel = matchViewModel.Sets.Where(s => s.Id == set.Id).Single();
+                set.SetStatus = setStatusInProgress;
+
+                foreach (var game in set.Games)
+                {
+                    var gameViewModel = setViewModel.Games.Where(g => g.Id == game.Id).Single();
+
+                    game.GameHomeResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.AggregatedHomeResult);
+                    game.GameAwayResult.ResultType = resultTypes.Single(rt => rt.Name == gameViewModel.AggregatedAwayResult);
+                }
+
+                if (setViewModel.SetIsComplete) set.SetStatus = setStatusCompleted;
+                set.SetHomeResult.ResultType = resultTypes.Single(rt => rt.Name == setViewModel.AggregatedHomeResult);
+                set.SetAwayResult.ResultType = resultTypes.Single(rt => rt.Name == setViewModel.AggregatedAwayResult);
+            }
+
+            if (matchViewModel.MatchIsComplete) match.MatchStatus = matchStatusComplete;
+            match.MatchHomeResult.ResultType = resultTypes.Single(rt => rt.Name == matchViewModel.AggregatedHomeResult); ;
+            match.MatchAwayResult.ResultType = resultTypes.Single(rt => rt.Name == matchViewModel.AggregatedAwayResult); ;
+
+            _context.Matches.Update(match);
+            await _context.SaveChangesAsync();
+                        
+        }
+
+        
     }
 }

@@ -24,7 +24,10 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public string HomeHomeScoreStatus { get; set; }
         public string AwayAwayScoreStatus { get; set; }        
         public string AwayHomeScoreStatus { get; set; }
-                
+        
+        public bool IsHomeTeam { get; set; }
+        public Rule Rule { get; set; }
+
         public bool HomeAwayScoreEntered { get { return HomeAwayScoreStatus != Constants.ScoreStatus.NoEntry; } }
         public bool HomeHomeScoreEntered { get { return HomeHomeScoreStatus != Constants.ScoreStatus.NoEntry; } }
         public bool AwayAwayScoreEntered { get { return AwayAwayScoreStatus != Constants.ScoreStatus.NoEntry; } }        
@@ -35,14 +38,15 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public bool AwayAwayScoreContested { get { return AwayAwayScoreStatus == Constants.ScoreStatus.Contested; } }       
         public bool AwayHomeScoreContested { get { return AwayHomeScoreStatus == Constants.ScoreStatus.Contested; } }
 
-        public bool IsHomeTeam { get; set; }
-        public Rule Rule { get; set; }
+        public bool IsContestedGame { get { return (HomeAwayScoreContested || HomeHomeScoreContested || AwayAwayScoreContested || AwayHomeScoreContested); } }
 
         public int? AggregatedHomeScore { get { return IsHomeTeam ? (HomeHomeScoreEntered ? HomeHomeScore : AwayHomeScoreEntered ? AwayHomeScore : null) : (AwayHomeScoreEntered ? AwayHomeScore : HomeHomeScoreEntered ? HomeHomeScore : null); } }
         public int? AggregatedAwayScore { get { return IsHomeTeam ? (HomeAwayScoreEntered ? HomeAwayScore : AwayAwayScoreEntered ? AwayAwayScore : null) : (AwayAwayScoreEntered ? AwayAwayScore : HomeAwayScoreEntered ? HomeAwayScore : null); } }
 
         public int AggregatedHomeScoreWithDefault { get { return AggregatedHomeScore == null ? 0 : AggregatedHomeScore.Value; } }
         public int AggregatedAwayScoreWithDefault { get { return AggregatedAwayScore == null ? 0 : AggregatedAwayScore.Value; } }
+
+        public string HomeVsAwayGameScoreDisplay { get { return AggregatedHomeScoreWithDefault == 0 && AggregatedAwayScoreWithDefault == 0 ? "-- / --" : String.Format("{0} / {1}", AggregatedHomeScoreWithDefault, AggregatedAwayScoreWithDefault); } }
 
         public string AggregatedHomeResult
         {
@@ -64,7 +68,27 @@ namespace ProjectArcBlade.Models.MatchViewModels
                 return Constants.ResultType.Pending;
             }
         }
-                
+
+        public string AggregatedHomeScoreStatus
+        {
+            get
+            {
+                if (HomeHomeScore == null && AwayHomeScore == null) return Constants.ScoreStatus.NoEntry;
+                if (HomeHomeScore != null && AwayHomeScore != null && HomeHomeScore != AwayHomeScore) return Constants.ScoreStatus.Contested;
+                return Constants.ScoreStatus.Accepted;
+            }
+        }
+
+        public string AggregatedAwayScoreStatus
+        {
+            get
+            {
+                if (HomeAwayScore == null && AwayAwayScore == null) return Constants.ScoreStatus.NoEntry;
+                if (HomeAwayScore != null && AwayAwayScore != null && HomeAwayScore != AwayAwayScore) return Constants.ScoreStatus.Contested;
+                return Constants.ScoreStatus.Accepted;
+            }
+        }
+
         /// <summary>
         /// Returns a result type for score1 based on score2.
         /// Uses the ResltRules attached to a matchTemplate as the conditions.

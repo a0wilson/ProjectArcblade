@@ -4,69 +4,73 @@
         <h2>Match Details</h2>
     </div>
     <div class="panel-body">
-        @*<table class="table table-bordered table-responsive table-condensed text-center">
+        <table class="table table-bordered table-responsive table-condensed text-center">
             <tr>
                 <td></td>
-                <td class="active" colspan="@(Model.AwayGroups.Count())">
-                    <strong>Away Team @Html.Partial("DisplayResultTypeLabelPartial", Model.AwayResult)</strong>
+                <td class="active" colspan="@(Model.Match.AwayGroups.Count())">
+                    <strong>Away Team @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedAwayResult)</strong>
                     <br />@Model.Match.AwayTeamName
                 </td>
             </tr>
             <tr>
                 <td class="active">
-                    <strong>Home Team @Html.Partial("DisplayResultTypeLabelPartial", Model.HomeResult)</strong>
+                    <strong>Home Team @Html.Partial("DisplayResultTypeLabelPartial", Model.Match.AggregatedHomeResult)</strong>
                     <br />@Model.Match.HomeTeamName
                 </td>
-                @foreach (var awayGroup in Model.AwayGroups)
+                @foreach (var awayGroup in Model.Match.AwayGroups)
                 {
                     <td class="active">
-                        <strong>@awayGroup Pair</strong>
-                        @foreach (var awayPlayer in Model.AwayPlayers)
+                        <strong>@awayGroup.Name Pair</strong>
+                        @foreach (var awayPlayer in awayGroup.Players)
                         {
-                            if (awayPlayer.GroupName == awayGroup)
-                            {
-                                <br />@awayPlayer.FullName
-                            }
+                            <br />@awayPlayer.FullName
                         }
                     </td>
                 }
                 </tr>
-                @foreach (var homeGroup in Model.HomeGroups)
-            {
+                @foreach (var homeGroup in Model.Match.HomeGroups)
+                {
                     <tr>
                         <td class="active">
-                            <strong>@homeGroup Pair</strong>
-                            @foreach (var homePlayer in Model.HomePlayers)
+                            <strong>@homeGroup.Name Pair</strong>
+                            @foreach (var homePlayer in homeGroup.Players)
                             {
-                                if (homePlayer.GroupName == homeGroup)
-                                {
-                                    <br />@homePlayer.FullName
-                                }
+                                <br />@homePlayer.FullName
                             }
                         </td>
-                        @foreach (var awayGroup in Model.AwayGroups)
+                        @foreach (var awayGroup in Model.Match.AwayGroups)
                         {
-                            foreach (var set in Model.Sets)
+                            foreach (var set in Model.Match.Sets)
                             {
-                                if (set.AwayGroup == awayGroup && set.HomeGroup == homeGroup)
+                                if (set.AwayGroup == awayGroup.Name && set.HomeGroup == homeGroup.Name)
                                 {
                                     <td>
                                         @{ var i = 0;}
-                                        @foreach (var game in Model.Games)
+                                        @foreach (var game in set.Games)
                                         {
-                                            if (game.SetId == set.Id)
-                                            {
-                                                if (Model.Match.IsHomeTeam)
-                                                {
-                                                    if (i != 0){<br />}<span>@game.HomeHomeScore / @game.HomeAwayScore</span>
-                                                    
-                                                }
-                                                else
-                                                {
-                                                    if (i != 0){<br />}<span>@game.AwayHomeScore / @game.AwayAwayScore</span>
-                                                }
-                                                i++;
-                                            }
+                                            <div class="row">
+                                                <div class="col-md-4 text-left">
+                                                    @if(i == 0)
+                                                    {
+                                                        <strong>@game.SetNumber@(".")</strong>
+                                                    }
+                                                </div>
+                                                <div class="col-md-4">@game.HomeVsAwayGameScoreDisplay</div>
+                                                <div class="col-md-4 text-right">
+                                                    @if(i == set.MinimumGamesToWinSet)
+                                                    {
+                                                        @if(game.IsHomeTeam)
+                                                        {
+                                                            @Html.Partial("DisplayResultTypeLabelPartial", @set.AggregatedHomeResult)
+                                                        }
+                                                        else
+                                                        {
+                                                            @Html.Partial("DisplayResultTypeLabelPartial", @set.AggregatedAwayResult)
+                                                        }
+                                                    }
+                                                </div>
+                                            </div>
+                                            i++;
                                         }
                                     </td>
                                 }
@@ -74,6 +78,6 @@
                         }
                     </tr>
                 }
-            </table>*@
+            </table>
     </div>
 </div>

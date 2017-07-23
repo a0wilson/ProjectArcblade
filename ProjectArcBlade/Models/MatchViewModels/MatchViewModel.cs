@@ -8,11 +8,12 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public int TeamId { get; set; }
         public string MatchStatus { get; set; }
         public int MatchId { get; set; }
-        public int MinimumSetsToWin { get; set; }
+        public int SeasonId { get; set; }
+        public int CategoryId { get; set; }
         public string Category { get; set; }
         public string Division { get; set; }
         public string Season { get; set; }
-                
+                        
         public SetViewModel[] Sets { get; set; }
         public HomeGroupViewModel[] HomeGroups { get; set; }
         public AwayGroupViewModel[] AwayGroups { get; set; }
@@ -32,7 +33,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public string VenueName { get; set; }
         public string StartDate { get; set; }
         
-        public bool IsHomeTeam { get { return HomeTeamId == TeamId ? true : false; } }
+        public bool IsHomeTeam { get { return HomeTeamId == TeamId; } }
         public string Opponent { get { return IsHomeTeam ? AwayTeamName : HomeTeamName; } }
         public Constants.TeamType TeamType { get { return IsHomeTeam ? Constants.TeamType.Home : Constants.TeamType.Away; } }
         public string TeamStatus { get { return IsHomeTeam ? HomeTeamStatus : AwayTeamStatus; } }
@@ -44,6 +45,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public bool AllSetsCompleted { get { return (AggregatedHomeScore + AggregatedAwayScore) == Sets.Count(); } }
         public bool MatchStatusInProgress { get { return MatchStatus == Constants.MatchStatus.InProgress; } }
         public bool MatchStatusComplete { get { return MatchStatus == Constants.MatchStatus.Complete; } }
+        public bool MatchIsComplete { get { return HomeWin || AwayWin || AllSetsCompleted; } }
 
         public int AggregatedHomeScore { get { return Sets == null ? 0 : Sets.Where(s => s.AggregatedHomeResult == Constants.ResultType.Win).Count(); } }
         public int AggregatedAwayScore { get { return Sets == null ? 0 : Sets.Where(s => s.AggregatedAwayResult == Constants.ResultType.Win).Count(); } }
@@ -79,6 +81,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public int AwayGameWinTotal { get { return Sets.Sum(s => s.Games.Where(g => g.AggregatedAwayResult == Constants.ResultType.Win).Count()); } }
         public int HomePointsTotal { get { return Sets.Sum(s => s.Games.Sum(g => g.AggregatedHomeScoreWithDefault)); } }
         public int AwayPointsTotal { get { return Sets.Sum(s => s.Games.Sum(g => g.AggregatedAwayScoreWithDefault)); } }
+
+        public int ContestedGamesTotal { get { return Sets.Sum(s => s.ContestedGames.Count()); } }
 
         public int MinimumSetsToWinMatch
         {

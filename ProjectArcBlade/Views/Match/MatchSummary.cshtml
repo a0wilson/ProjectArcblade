@@ -20,20 +20,128 @@
         <div class="panel-body">
         
             <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#matchscoresheet">Match Scoresheet</a></li>
-                <li class=""><a data-toggle="tab" href="#matchdetails">Match Details</a></li>                
-                <li><a data-toggle="tab" href="#contestedscores">Contested Scores <span class="badge">0</span></a></li>
+                <li class="@(Model.NoContestedGames? "active":"")"><a data-toggle="tab" href="#matchscoresheet">Match Scoresheet</a></li>
+                <li><a data-toggle="tab" href="#matchdetails">Match Details</a></li>                
+                <li class="@(!Model.NoContestedGames? "active":"")"><a data-toggle="tab" href="#contestedgames">Contested Games <span class="badge">@Model.Match.ContestedGamesTotal</span></a></li>
             </ul>
 
             <div class="tab-content">
-                <div id="matchscoresheet" class="tab-pane fade in active">
+                <div id="matchscoresheet" class="tab-pane fade @(Model.NoContestedGames? " in active":"")">
                     @Html.Partial("MatchScoresheetPartial", Model)
                 </div>
                 <div id="matchdetails" class="tab-pane fade">
                     @Html.Partial("MatchDetailsPartial", Model)
                 </div>                
-                <div id="contestedscores" class="tab-pane fade">
-                    @Html.Partial("ContestedScoresPartial", Model)
+                <div id="contestedgames" class="tab-pane fade @(!Model.NoContestedGames? " in active":"")">
+
+                    <!-- Contested Games section start -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h2>Contested Games</h2>
+                        </div>
+                        <div class="panel-body">
+                            @if (Model.Match.ContestedGamesTotal != 0)
+                            {
+                                <table class="table table-condensed table-hover table-responsive text-center">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="4">&nbsp;</th>
+                                            <th colspan="2" class="text-center active"><h3>Home Team<br /><small>@Model.Match.HomeTeamName</small></h3></th>
+                                            <th></th>
+                                            <th colspan="2" class="text-center active"><h3>Away Team<br /><small>@Model.Match.AwayTeamName</small></h3></th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center col-md-1">Set #</th>
+                                            <th class="text-center col-md-1">Game #</th>
+                                            <th class="text-center col-md-1">Home Pair</th>
+                                            <th class="text-center col-md-1">Away Pair</th>
+                                            <th class="text-center active col-md-2">Home Score</th>
+                                            <th class="text-center active col-md-2">Away Score</th>
+                                            <th></th>
+                                            <th class="text-center active col-md-2">Home Score</th>
+                                            <th class="text-center active col-md-2">Away Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{var setIndex = 0;}
+                                        @foreach (var set in Model.Match.Sets)
+                                        {
+                                            var gameIndex = 0;
+                                            foreach (var game in set.Games)
+                                            {
+                                                if (game.IsContestedGame)
+                                                {
+                                                    <tr>
+                                                        <td>@set.Number</td>
+                                                        <td>
+                                                            @game.GameNumber
+                                                            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].Id" />
+                                                            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].IsContestedGame" />
+                                                        </td>
+                                                        <td>@game.HomeGroup</td>
+                                                        <td>@game.AwayGroup</td>
+
+                                                        @if (game.IsHomeTeam)
+                                                        {
+                                                            <td class="active">
+                                                                <div class="form-group-sm">
+                                                                    <input class="form-control" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeHomeScore" />
+                                                                </div>
+                                                            </td>
+                                                            <td class="active">
+                                                                <div class="form-group-sm">
+                                                                    <input class="form-control" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeAwayScore" />
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="active">@game.HomeHomeScore</td>
+                                                            <td class="active">@game.HomeAwayScore</td>
+                                                        }
+                                                        <td>&nbsp;</td>
+                                                        @if (game.IsHomeTeam)
+                                                        {
+                                                            <td class="active">@game.AwayHomeScore</td>
+                                                            <td class="active">@game.AwayAwayScore</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td class="active">
+                                                                <div class="form-group-sm">
+                                                                    <input class="form-control" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayHomeScore" />
+                                                                </div>
+                                                            </td>
+                                                            <td class="active">
+                                                                <div class="form-group-sm">
+                                                                    <input class="form-control" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayAwayScore" />
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                }
+                                                gameIndex++;
+                                            }
+                                            setIndex++;
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>There are no contested games to review.</p>
+                            }
+                        </div>
+                        <div class="panel-footer text-center">
+                            <button type="submit" name="btnUpdateResults" class="btn btn-lg" title="Update Results" value="Update Results" @(Model.Match.ContestedGamesTotal == 0 ? "disabled='disabled'" : "")>
+                                <span class="glyphicon glyphicon-save" aria-hidden="true"></span>&nbsp;Update Results
+                            </button>
+                            <button type="button" name="btnAcceptResultsConfirmation" class="btn btn-lg btn-primary" title="Accept Results Confirmation" value="Accept Results" data-toggle="modal" data-target="#myAcceptResultsModal" @(Model.Match.ContestedGamesTotal == 0 ? "disabled='disabled'" : "")>
+                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp; Accept Results
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Contested Games section end -->
                 </div>
             </div>
         </div>
@@ -41,7 +149,7 @@
             <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
             </button>
-            <button type="button" name="btnCompleteConfirmation" class="btn btn-lg btn-success" title="Complete" value="Complete" data-toggle="modal" data-target="#myModal">
+            <button type="button" name="btnCompleteConfirmation" class="btn btn-lg btn-success" title="Complete" @(Model.AllowCompleteMatch?"": "disabled='disabled'") value="Complete" data-toggle="modal" data-target="#myModal">
                 <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
             </button>
 
@@ -66,39 +174,85 @@
                 </div>
             </div>
             <!-- Modal End -->
+
+            <!-- Modal -->
+            <div class="modal fade" id="myAcceptResultsModal" tabindex="-1" role="dialog" aria-labelledby="myAcceptResultsModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Accept Match Result Confirmation</strong></h4>
+                        </div>
+                        <div class="modal-body">
+                            If you proceed with this action you are agreeing to accept the scores entered by the opposing team.
+                            <br /><br />
+                            Are you sure you want to continue? This action cannot be undone!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="submit" name="btnAcceptResults" class="btn btn-success" title="Accept Results" value="Accept Results">
+                                <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Accept Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal End -->
+
         </div>
     </div>
 
     <input type="hidden" asp-for="@Model.MatchId" />
+    <input type="hidden" asp-for="@Model.Match.SeasonId" />
+    <input type="hidden" asp-for="@Model.Match.CategoryId" />
     <input type="hidden" asp-for="@Model.TeamId" />
     <input type="hidden" asp-for="@Model.Match.TeamId" />
-    <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
     <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
-
+        
     @for (var setIndex = 0; setIndex < Model.Match.Sets.Count(); setIndex++)
     {
         <input type="hidden" asp-for="@Model.Match.Sets[setIndex].HomeResult" />
         <input type="hidden" asp-for="@Model.Match.Sets[setIndex].AwayResult" />
         <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Status" />
-
-        @for (var gameIndex = 0; gameIndex < Model.Match.Sets[gameIndex].Games.Count(); gameIndex++)
+       
+        @for (var gameIndex = 0; gameIndex < Model.Match.Sets[setIndex].Games.Count(); gameIndex++)
         {
             <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeResult" />
             <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayResult" />
+
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayHomeScoreStatus" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayAwayScoreStatus" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeHomeScoreStatus" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeAwayScoreStatus" />
+
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayHomeScore" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].AwayAwayScore" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeHomeScore" />
+            <input type="hidden" asp-for="@Model.Match.Sets[setIndex].Games[gameIndex].HomeAwayScore" />
         }
     }
 
-    @for (var i= 0; i < Model.Match.AwayGroups.Count(); i++)
+    @for (var groupIndex = 0; groupIndex < Model.Match.AwayGroups.Count(); groupIndex++)
     {
-        <input type="hidden" asp-for="@Model.Match.AwayGroups[i].Name" />
+        <input type="hidden" asp-for="@Model.Match.AwayGroups[groupIndex].Name" />
+        @for (var setIndex = 0; setIndex < Model.Match.AwayGroups[groupIndex].Sets.Count(); setIndex++)
+        {
+            <input type="hidden" asp-for="@Model.Match.AwayGroups[groupIndex].Sets[setIndex].AggregatedAwayResult" />
+            <input type="hidden" asp-for="@Model.Match.AwayGroups[groupIndex].Sets[setIndex].AggregatedHomeResult" />
+        }
     }
 
-    @for (var i = 0; i < Model.Match.HomeGroups.Count(); i++)
+    @for (var groupIndex = 0; groupIndex < Model.Match.HomeGroups.Count(); groupIndex++)
     {
-        <input type="hidden" asp-for="@Model.Match.HomeGroups[i].Name" />
+        <input type="hidden" asp-for="@Model.Match.HomeGroups[groupIndex].Name" />
+        @for (var setIndex = 0; setIndex < Model.Match.HomeGroups[groupIndex].Sets.Count(); setIndex++)
+        {
+            <input type="hidden" asp-for="@Model.Match.HomeGroups[groupIndex].Sets[setIndex].AggregatedAwayResult" />
+            <input type="hidden" asp-for="@Model.Match.HomeGroups[groupIndex].Sets[setIndex].AggregatedHomeResult" />
+        }
     }
 </form>
 

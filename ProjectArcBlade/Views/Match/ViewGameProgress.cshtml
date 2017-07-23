@@ -80,6 +80,14 @@
             <input type="hidden" asp-for="@Model.Set.SeasonId" />
             <input type="hidden" asp-for="@Model.TeamId" />
             <input type="hidden" asp-for="@Model.Set.Id" />
+            @for (var i = 0; i < Model.Set.Games.Count(); i++)
+            {
+                <input type="hidden" asp-for="@Model.Set.Games[i].AwayAwayScore" />
+                <input type="hidden" asp-for="@Model.Set.Games[i].AwayHomeScore" />
+                <input type="hidden" asp-for="@Model.Set.Games[i].HomeAwayScore" />
+                <input type="hidden" asp-for="@Model.Set.Games[i].HomeHomeScore" />
+            }
+
         </div>
 
     </div>

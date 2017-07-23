@@ -12,13 +12,14 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public int TeamId { get; set; }
         
         public MatchViewModel Match { get; set; }
-        
+        public GameViewModel[] ContestedGames { get; set; }
+
         public string TeamName { get { return Match.IsHomeTeam ? Match.HomeTeamName : Match.AwayTeamName; } }
         public int MatchTeamId { get { return Match.IsHomeTeam ? Match.HomeMatchTeamId : Match.AwayMatchTeamId; } }
-        
-        public bool AllowMatchSummary { get { return (Match.MatchStatusInProgress ? ((Match.HomeWin || Match.AwayWin) || Match.AllSetsCompleted ? true : false) : false); } }
-        public bool AllowConcedeMatch { get { return Match.MatchStatusComplete ? false : (Match.HomeWin || Match.AwayWin) ? false : true; } }
-        
+
+        public bool NoContestedGames { get { return Match.ContestedGamesTotal == 0; } }
+        public bool AllowCompleteMatch { get { return !Match.MatchStatusComplete && NoContestedGames; } }
+
         public MatchScoresheetLineViewModel[] ScoresheetLines
         {
             get
@@ -37,25 +38,5 @@ namespace ProjectArcBlade.Models.MatchViewModels
                 ).ToArray();
             }
         }
-
-        //public string[] AwayGroups { get { return AwayPlayers.Select(ap => ap.GroupName).Distinct().ToArray(); } }
-        //public string[] HomeGroups { get { return HomePlayers.Select(hp => hp.GroupName).Distinct().ToArray(); } }
-
-        //public int HomeHomePoints { get { return Games.Sum(g => g.HomeHomeScore); } } 
-        //public int HomeAwayPoints { get { return Games.Sum(g => g.HomeAwayScore); } }
-        //public int AwayHomePoints { get { return Games.Sum(g => g.AwayHomeScore); } }
-        //public int AwayAwayPoints { get { return Games.Sum(g => g.AwayAwayScore); } }
-        
-        //methods
-        //public int GetHomeSetWinCount(string groupName) { return Sets.Where(s => s.HomeGroup == groupName && s.HomeResult == Constants.ResultType.Win).Count(); }
-        //public int GetAwaySetWinCount(string groupName) { return Sets.Where(s => s.AwayGroup == groupName && s.AwayResult == Constants.ResultType.Win).Count(); }
-        //public int GetHomeGameWinCount(string groupName) { return Games.Where(g => g.HomeGroup == groupName && g.HomeResult == Constants.ResultType.Win).Count(); }
-        //public int GetAwayGameWinCount(string groupName) { return Games.Where(g => g.AwayGroup == groupName && g.AwayResult == Constants.ResultType.Win).Count(); }
-        //public int GetHomeHomePoints(string groupName) { return Games.Where(g => g.HomeGroup == groupName).Sum(g => g.HomeHomeScore); }
-        //public int GetHomeAwayPoints(string groupName) { return Games.Where(g => g.HomeGroup == groupName).Sum(g => g.HomeAwayScore); }
-        //public int GetAwayHomePoints(string groupName) { return Games.Where(g => g.AwayGroup == groupName).Sum(g => g.AwayHomeScore); }
-        //public int GetAwayAwayPoints(string groupName) { return Games.Where(g => g.AwayGroup == groupName).Sum(g => g.AwayAwayScore); }
-
-        
     }
 }

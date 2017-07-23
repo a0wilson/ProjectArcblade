@@ -49,7 +49,7 @@
                                 }
                                 else
                                 {
-                                    @set.AwayGroup
+                                    @set.HomeGroup
                                 }                                
                             </td>
                             <td class="active">@Html.Partial("DisplayResultTypeLabelPartial", set.AggregatedHomeResult)</td>
@@ -64,7 +64,7 @@
                                 }
                                 else
                                 {
-                                    <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@set.Id">@set.HomeGroup</a>
+                                    <a asp-action="GameProgress" asp-controller="Match" asp-route-teamId="@Model.TeamId" asp-route-setId="@set.Id">@set.AwayGroup</a>
                                 }
                             </td>                            
                         </tr>
@@ -110,10 +110,10 @@
     </div>
 
     <!-- Hidden Fields -->
+    
     <input type="hidden" asp-for="@Model.MatchId" />
     <input type="hidden" asp-for="@Model.TeamId" />
     <input type="hidden" asp-for="@Model.Match.TeamId" />
-    <input type="hidden" asp-for="@Model.Match.MinimumSetsToWin" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamId" />
     <input type="hidden" asp-for="@Model.Match.HomeTeamId" />
     <input type="hidden" asp-for="@Model.Match.AwayTeamName" />
@@ -128,11 +128,12 @@
         for (var j = 0; j < Model.Match.Sets[i].Games.Count(); j++)
         {
             <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedAwayResult" />
-                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeResult" />
-                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedAwayScore" />
-                    <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeScore" />
+            <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeResult" />
+            <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedAwayScore" />
+            <input type="hidden" asp-for="@Model.Match.Sets[i].Games[j].AggregatedHomeScore" />
         }
     }
+    
     <!-- End hidden Feilds-->
 </form>
 

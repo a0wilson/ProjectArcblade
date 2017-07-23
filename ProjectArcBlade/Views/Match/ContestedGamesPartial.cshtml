@@ -1,0 +1,127 @@
+@model ProjectArcBlade.Models.MatchViewModels.MatchSummaryViewModel
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h2>Contested Games</h2>
+    </div>
+    <div class="panel-body">
+        @if (Model.Match.ContestedGamesTotal != 0)
+        {
+            <table class="table table-condensed table-hover table-responsive text-center">
+                <thead>
+                    <tr>
+                        <th colspan="4">&nbsp;</th>
+                        <th colspan="2" class="text-center active"><h3>Home Team<br /><small>@Model.Match.HomeTeamName</small></h3></th>
+                        <th></th>
+                        <th colspan="2" class="text-center active"><h3>Away Team<br /><small>@Model.Match.AwayTeamName</small></h3></th>
+                    </tr>
+                    <tr>
+                        <th class="text-center col-md-1">Set #</th>
+                        <th class="text-center col-md-1">Game #</th>
+                        <th class="text-center col-md-1">Home Pair</th>
+                        <th class="text-center col-md-1">Away Pair</th>
+                        <th class="text-center active col-md-2">Home Score</th>
+                        <th class="text-center active col-md-2">Away Score</th>
+                        <th></th>
+                        <th class="text-center active col-md-2">Home Score</th>
+                        <th class="text-center active col-md-2">Away Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{var setIndex = 0;}
+                    @foreach(var set in Model.Match.Sets)
+                    {
+                        var gameIndex = 0;
+                        foreach(var game in set.ContestedGames)
+                        {   
+                            <tr>
+                                <td>@set.Number</td>
+                                <td>
+                                    @game.GameNumber
+                                    <input type="hidden" asp-for="@Model.Match.Sets[setIndex].ContestedGames[gameIndex].Id" />
+                                </td>
+                                <td>@game.HomeGroup</td>
+                                <td>@game.AwayGroup</td>
+                                
+                                @if (game.IsHomeTeam)
+                                {
+                                    <td class="active">
+                                        <div class="form-group-sm">
+                                            <input class="form-control" asp-for="@Model.Match.Sets[setIndex].ContestedGames[gameIndex].HomeHomeScore" />
+                                        </div>
+                                    </td>
+                                    <td class="active">
+                                        <div class="form-group-sm">
+                                            <input class="form-control" asp-for="@Model.Match.Sets[setIndex].ContestedGames[gameIndex].HomeAwayScore" />
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="active">@game.HomeHomeScore</td>
+                                    <td class="active">@game.HomeAwayScore</td>
+                                }
+                                <td>&nbsp;</td>
+                                @if (game.IsHomeTeam)
+                                {
+                                    <td class="active">@game.AwayHomeScore</td>
+                                    <td class="active">@game.AwayAwayScore</td>
+                                }
+                                else
+                                {
+                                    <td class="active">
+                                        <div class="form-group-sm">
+                                            <input class="form-control" asp-for="@Model.Match.Sets[setIndex].ContestedGames[gameIndex].AwayHomeScore" />
+                                        </div>
+                                    </td>
+                                    <td class="active">
+                                        <div class="form-group-sm">
+                                            <input class="form-control" asp-for="@Model.Match.Sets[setIndex].ContestedGames[gameIndex].AwayAwayScore" />
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                            gameIndex++;
+                        }
+                        setIndex++;
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>There are no contested games to review.</p>
+        }
+    </div>
+    <div class="panel-footer text-center">
+        <button type="submit" name="btnUpdateResults" class="btn btn-lg" title="Update Results" value="Update Results" @(Model.Match.ContestedGamesTotal==0?"disabled='disabled'":"")>
+            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>&nbsp;Update Results
+        </button>
+        <button type="button" name="btnAcceptResultsConfirmation" class="btn btn-lg btn-primary" title="Accept Results Confirmation" value="Accept Results" data-toggle="modal" data-target="#myAcceptResultsModal" @(Model.Match.ContestedGamesTotal==0?"disabled='disabled'":"")>
+            <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>&nbsp; Accept Results
+        </button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myAcceptResultsModal" tabindex="-1" role="dialog" aria-labelledby="myAcceptResultsModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><strong>Accept Match Result Confirmation</strong></h4>
+            </div>
+            <div class="modal-body">
+                If you proceed with this action you are agreeing to accept the scores entered by the opposing team.
+                <br /><br />
+                Are you sure you want to continue? This action cannot be undone!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" name="btnAcceptResults" class="btn btn-success" title="Accept Results" value="Accept Results">
+                    <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Accept Results
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->

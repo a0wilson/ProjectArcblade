@@ -2,6 +2,8 @@
 {
     public static class Constants
     {
+        public const string NotApplicable = "-- n/a --";
+
         public enum MatchScheduleRange
         {
             Initial,
