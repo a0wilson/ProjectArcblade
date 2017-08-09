@@ -149,8 +149,8 @@
             <button type="submit" name="btnBack" class="btn btn-lg" title="Back" value="Back">
                 <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
             </button>
-            <button type="button" name="btnCompleteConfirmation" class="btn btn-lg btn-success" title="Complete" @(Model.AllowCompleteMatch?"": "disabled='disabled'") value="Complete" data-toggle="modal" data-target="#myModal">
-                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
+            <button type="button" name="btnCompleteConfirmation" class="btn btn-lg btn-success" title="Complete" @(Model.AllowMatchSignOff?"":"disabled='disabled'") value="Complete" data-toggle="modal" data-target="#myModal">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Sign-Off Match
             </button>
 
             <!-- Modal -->
@@ -159,15 +159,15 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="myModalLabel"><strong>Complete Match Confirmation</strong></h4>
+                            <h4 class="modal-title" id="myModalLabel"><strong>Sign-Off Match Confirmation</strong></h4>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to complete this match? This action cannot be undone!
+                            Are you sure you want to sign-off this match? This action cannot be undone!
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="submit" name="btnComplete" class="btn btn-success" title="Complete" value="Complete">
-                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Complete Match
+                                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Sign-Off Match
                             </button>
                         </div>
                     </div>

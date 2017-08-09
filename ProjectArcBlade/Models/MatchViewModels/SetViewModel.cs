@@ -22,7 +22,8 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public bool IsHomeTeam { get; set; }
         public int CategoryId { get; set; }
         public int SeasonId { get; set; }
-
+        public bool MatchSignOff { get; set; }
+        
         public GameViewModel[] Games { get; set; }
 
         public GameViewModel[] ContestedGames{ get { return Games == null ? null : Games.Where(g => g.IsContestedGame).ToArray(); } }
@@ -59,6 +60,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public bool AwayWin { get { return AggregatedAwayResult == Constants.ResultType.Win; } }
         public bool HomeWin { get { return AggregatedHomeResult == Constants.ResultType.Win; } }
         public bool SetDrawn { get { return AggregatedAwayResult == Constants.ResultType.Draw; } }
+        public bool SetConceded { get { return HomeResult == Constants.ResultType.Conceded || AwayResult == Constants.ResultType.Conceded; } }
         public bool AllGamesCompleted { get { return Games == null ? false : AggregatedHomeScore + AggregatedAwayScore == Games.Count(); } }
         public bool SetIsComplete { get { return Games == null ? false : HomeWin || AwayWin || AllGamesCompleted; } }
 

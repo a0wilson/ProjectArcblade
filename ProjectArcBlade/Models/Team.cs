@@ -18,6 +18,7 @@ namespace ProjectArcBlade.Models
         public Season Season { get; set; }
         public TeamStatus TeamStatus {get; set; }
         public TeamCaptain TeamCaptain { get; set; }
+        public Rank Rank { get; set; }
 
         [NotMapped]
         public string FullName { get { return String.Format("{0} - {1}", LeagueClub.Club.Name, Name); } }

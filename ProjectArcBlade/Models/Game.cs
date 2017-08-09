@@ -8,6 +8,7 @@ namespace ProjectArcBlade.Models
         public int Id { get; set; }        
         public int Number { get; set; }
         public Set Set { get; set; }
+        public Rule Rule { get; set; }
         public GameAwayResult GameAwayResult { get; set; }
         public GameHomeResult GameHomeResult { get; set; }
         public HomeTeamAwayTeamScore HomeTeamAwayTeamScore { get; set; }

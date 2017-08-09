@@ -7,6 +7,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
 {
     public class MatchScoresheetLineViewModel
     {
+        public int GroupId { get; set; }
         public string Heading { get; set; }
         public int HomeSetWinTotal { get; set; }
         public int AwaySetWinTotal { get; set; }

@@ -23,12 +23,14 @@ namespace ProjectArcBlade.Models.MatchViewModels
         public string AwayTeamName { get; set; }
         public string AwayResult { get; set; }
         public string AwayTeamStatus { get; set; }
+        public bool AwayTeamSignOff { get; set; }
         
         public int HomeTeamId { get; set; }
         public int HomeMatchTeamId { get; set; }
         public string HomeTeamName { get; set; }
         public string HomeResult { get; set; }
         public string HomeTeamStatus { get; set; }
+        public bool HomeTeamSignOff { get; set; }
 
         public string VenueName { get; set; }
         public string StartDate { get; set; }
@@ -62,6 +64,7 @@ namespace ProjectArcBlade.Models.MatchViewModels
                 return Constants.ResultType.Pending;
             }
         }
+
         public string AggregatedAwayResult
         {
             get
@@ -75,14 +78,39 @@ namespace ProjectArcBlade.Models.MatchViewModels
             }
         }
 
-        public int HomeSetWinTotal { get { return Sets.Where(s => s.AggregatedHomeResult == Constants.ResultType.Win).Count(); } }
-        public int AwaySetWinTotal { get { return Sets.Where(s => s.AggregatedAwayResult == Constants.ResultType.Win).Count(); } }
-        public int HomeGameWinTotal { get { return Sets.Sum(s => s.Games.Where(g => g.AggregatedHomeResult == Constants.ResultType.Win).Count()); } }
-        public int AwayGameWinTotal { get { return Sets.Sum(s => s.Games.Where(g => g.AggregatedAwayResult == Constants.ResultType.Win).Count()); } }
-        public int HomePointsTotal { get { return Sets.Sum(s => s.Games.Sum(g => g.AggregatedHomeScoreWithDefault)); } }
-        public int AwayPointsTotal { get { return Sets.Sum(s => s.Games.Sum(g => g.AggregatedAwayScoreWithDefault)); } }
+        public int HomeSetWinTotal { get { return Sets == null ? 0 : Sets.Where(s => s.AggregatedHomeResult == Constants.ResultType.Win).Count(); } }
+        public int AwaySetWinTotal { get { return Sets == null ? 0 : Sets.Where(s => s.AggregatedAwayResult == Constants.ResultType.Win).Count(); } }
+        public int HomeGameWinTotal { get { return Sets == null ? 0 : Sets.Sum(s => s.Games.Where(g => g.AggregatedHomeResult == Constants.ResultType.Win).Count()); } }
+        public int AwayGameWinTotal { get { return Sets == null ? 0 : Sets.Sum(s => s.Games.Where(g => g.AggregatedAwayResult == Constants.ResultType.Win).Count()); } }
+        public int HomePointsTotal { get { return Sets == null ? 0 : Sets.Sum(s => s.Games.Sum(g => g.AggregatedHomeScoreWithDefault)); } }
+        public int AwayPointsTotal { get { return Sets == null ? 0 : Sets.Sum(s => s.Games.Sum(g => g.AggregatedAwayScoreWithDefault)); } }
 
-        public int ContestedGamesTotal { get { return Sets.Sum(s => s.ContestedGames.Count()); } }
+        public int ContestedGamesTotal { get { return Sets == null ? 0 : Sets.Sum(s => s.ContestedGames.Count()); } }
+
+        public bool SignedOff { get { return IsHomeTeam ? HomeTeamSignOff : AwayTeamSignOff; } }
+        public bool SignedOffByOpponent { get { return IsHomeTeam ? AwayTeamSignOff : HomeTeamSignOff; } }
+
+        public MatchScoresheetLineViewModel[] ScoresheetLines
+        {
+            get
+            {
+                if (HomeGroups == null || AwayGroups == null || AwayGroups.Any(ag => ag.Id == 0) || HomeGroups.Any(hg => hg.Id == 0)) return null;
+
+                return HomeGroups.Select(g =>
+                    new MatchScoresheetLineViewModel
+                    {
+                        GroupId = g.GroupId,
+                        Heading = g.Name,
+                        AwaySetWinTotal = AwayGroups.Where(ag => ag.Id == g.Id).Select(ag => ag.SetWinTotal).Single(),
+                        HomeSetWinTotal = HomeGroups.Where(hg => hg.Id == g.Id).Select(hg => hg.SetWinTotal).Single(),
+                        AwayGameWinTotal = AwayGroups.Where(ag => ag.Id == g.Id).Select(ag => ag.GameWinTotal).Single(),
+                        HomeGameWinTotal = HomeGroups.Where(hg => hg.Id == g.Id).Select(hg => hg.GameWinTotal).Single(),
+                        AwayPointsTotal = AwayGroups.Where(ag => ag.Id == g.Id).Select(ag => ag.PointsTotal).Single(),
+                        HomePointsTotal = HomeGroups.Where(hg => hg.Id == g.Id).Select(hg => hg.PointsTotal).Single(),
+                    }
+                ).ToArray();
+            }
+        }
 
         public int MinimumSetsToWinMatch
         {

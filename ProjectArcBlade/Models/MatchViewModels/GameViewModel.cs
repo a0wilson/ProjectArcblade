@@ -127,12 +127,29 @@ namespace ProjectArcBlade.Models.MatchViewModels
 
         private bool ValidateResultRule(List<ResultRule> resultRules, int score1, int score2)
         {
+            //the rule result is an array of booleans indicating the outcome of each result rule.
             var ruleResult = new bool[resultRules.Count];
-            string joinCondition = Constants.JoinCondition.And; //default to and.
 
+            string joinCondition = Constants.JoinCondition.And; //default to and.
+            
             var i = 0;
             foreach (var rule in resultRules)
             {
+
+                //first determine if the current rule is the target rule of any exceptions.
+                if( rule.TargetRules.Count() > 0)
+                {
+                    //get the exceptions rules.
+                    var exceptionRules = rule.TargetRules.Select(er => er.ExceptionRule).ToList();
+                    //if the the exception rule is true...
+                    if (ValidateResultRule(exceptionRules, score1, score2))
+                    {
+                        //ignore the previous rule (set it true) and then continue, otherwise it will be processed as normal.
+                        ruleResult[i] = true;
+                        continue;
+                    }
+                }                
+
                 var ruleOperand = 0;
 
                 joinCondition = rule.JoinCondition.Name;

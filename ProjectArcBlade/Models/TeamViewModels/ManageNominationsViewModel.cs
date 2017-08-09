@@ -17,7 +17,7 @@ namespace ProjectArcBlade.Models.TeamViewModels
         public int[] NominatedClubPlayerIds { get; set; }
         public int[] NominatedPlayerGroupIds { get; set; }
         public int[] NominatedPlayerRankIds { get; set; }
-        public int[] NomintatedPLayerIds { get; set; }
+        public int[] NomintatedPlayerIds { get; set; }
         public int CaptainId { get; set; }
         public int TeamId { get; set; }
         public List<NameValuePair> Warnings { get; set; }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
@@ -20,5 +21,8 @@ namespace ProjectArcBlade.Models
         [Required]
         public int Value { get; set; }
         public bool UseOperator { get { return ScoreOne && ScoreTwo; } }
+
+        public ICollection<ResultRuleException> TargetRules { get; set; }
+        public ICollection<ResultRuleException> ExceptionRules { get; set; }
     }
 }

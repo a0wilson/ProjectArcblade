@@ -7,12 +7,13 @@
         @if (Model.InProgressMatches.Count() != 0)
         {
             <table class="table table-hover table-condensed table-responsive lead">
-                <thead>
+                <thead>                    
                     <tr>
                         <th>Opponent</th>
                         <th></th>
                         <th>Venue</th>
                         <th>Match Date</th>
+                        <th class="text-center">Signed-Off</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,8 +22,8 @@
                         <tr>
                             <td>
                                 <a title="Update" asp-action="MatchProgress" asp-controller="Match" asp-route-matchId="@item.MatchId" asp-route-teamId="@Model.TeamId">
-                                    @item.Opponent
-                                </a>
+                                    @item.Opponent 
+                                </a>                               
                             </td>
                             <td>
                                 @if (item.IsHomeTeam)
@@ -32,6 +33,25 @@
                             </td>
                             <td>@item.VenueName</td>
                             <td>@item.StartDate</td>
+                            <td class="text-center">
+                                @if (item.HomeTeamSignOff)
+                                {
+                                    <span class="label label-success">Home</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-danger">Home</span>
+                                }
+                                |
+                                @if (item.AwayTeamSignOff)
+                                {
+                                    <span class="label label-success">Away</span>
+                                }
+                                else
+                                {
+                                    <span class="label label-danger">Away</span>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>

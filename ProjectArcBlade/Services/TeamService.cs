@@ -128,12 +128,14 @@ namespace ProjectArcBlade.Services
             return team;
         }
 
-        private async Task<List<ClubPlayer>> GetClubPlayersByClubAndCategoryAsync(int clubId, int categoryId)
+        private async Task<List<ClubPlayer>> GetClubPlayersAvailableForNomination(int clubId, int categoryId, int seasonId, int teamId)
         {
+            List<ClubPlayer> clubPlayers = new List<ClubPlayer>();
+
             //return all clubplayers if category is mixed
             if (categoryId == Constants.Category.Mixed)
             {
-                return await _context.ClubPlayers
+                clubPlayers = await _context.ClubPlayers
                     .Include(cp => cp.PlayerDetail)
                     .Where(cp => cp.Club.Id == clubId && cp.IsActive)
                     .OrderBy(cp => cp.PlayerDetail.FirstName)
@@ -142,11 +144,51 @@ namespace ProjectArcBlade.Services
 
             // return just men / women otherwise.
             var genderFilterId = categoryId == Constants.Category.Mens ? Constants.Gender.Male : Constants.Gender.Female;
-            return await _context.ClubPlayers
+            clubPlayers = await _context.ClubPlayers
                 .Include(cp => cp.PlayerDetail)
                 .Where(cp => cp.Club.Id == clubId && cp.IsActive && cp.PlayerDetail.Gender.Id == genderFilterId)
                 .OrderBy(cp => cp.PlayerDetail.FirstName)
                 .ToListAsync();
+
+            foreach (var clubPlayer in clubPlayers)
+            {
+                await _context.Entry(clubPlayer)
+                    .Collection(cp => cp.TeamPlayers)
+                    .Query()
+                    .Include(tp => tp.Team).ThenInclude(t => t.Season)
+                    .Include(tp => tp.Team).ThenInclude(t => t.Category)
+                    .ToListAsync();
+            }
+
+            //further filter the list of club players to players who are not members of teams in this category for the current season.
+            clubPlayers = clubPlayers.Where(cp => cp.TeamPlayers.Count(tp => tp.Team.Season.Id == seasonId && tp.Team.Category.Id == categoryId && tp.Team.Id != teamId) == 0).ToList();
+
+            return clubPlayers;
+        }
+
+        private async Task<List<ClubPlayer>> GetClubPlayersByClubAndCategoryAsync(int clubId, int categoryId)
+        {
+            List<ClubPlayer> clubPlayers = new List<ClubPlayer>();
+
+            //return all clubplayers if category is mixed
+            if (categoryId == Constants.Category.Mixed)
+            {
+                clubPlayers = await _context.ClubPlayers
+                    .Include(cp => cp.PlayerDetail)                    
+                    .Where(cp => cp.Club.Id == clubId && cp.IsActive)
+                    .OrderBy(cp => cp.PlayerDetail.FirstName)
+                    .ToListAsync();
+            }
+
+            // return just men / women otherwise.
+            var genderFilterId = categoryId == Constants.Category.Mens ? Constants.Gender.Male : Constants.Gender.Female;
+            clubPlayers = await _context.ClubPlayers
+                .Include(cp => cp.PlayerDetail)
+                .Where(cp => cp.Club.Id == clubId && cp.IsActive && cp.PlayerDetail.Gender.Id == genderFilterId)
+                .OrderBy(cp => cp.PlayerDetail.FirstName)
+                .ToListAsync();
+            
+            return clubPlayers;
         }
 
         private async Task<List<TeamPlayer>> GetTeamPlayersByTeamAsync(int teamId)
@@ -333,6 +375,29 @@ namespace ProjectArcBlade.Services
             var teamCaptain = homeMatchTeam.HomeMatchTeamCaptain;
             var matchTemplate = await _matchService.GetMatchTemplateBySeasonAndCategoryAsync(_context, homeMatchTeam.Team.Season.Id, homeMatchTeam.Team.Category.Id);
 
+            //if no club players have been selected at for the match so far then default the match selection to the nominated team!
+            var noSelection = matchPlayers.Count() == matchPlayers.Count(mp => mp.ClubPlayer == null);
+            var nominatedTeamComplete = matchPlayers.Count() == homeMatchTeam.Team.TeamPlayers.Count(tp => tp.ClubPlayer != null);
+            if(noSelection && nominatedTeamComplete)
+            {
+                for(var i=0; i<matchPlayers.Count(); i++)
+                {
+                    matchPlayers[i].ClubPlayer = homeMatchTeam.Team.TeamPlayers.Where(tp => tp.Rank.Id == matchPlayers[i].Rank.Id).Select(tp => tp.ClubPlayer).Single();
+                }
+
+                //also set the captain if there is one!
+                if (homeMatchTeam.Team.TeamCaptain != null)
+                {
+                    teamCaptain = new HomeMatchTeamCaptain
+                    {
+                        ClubPlayer = homeMatchTeam.Team.TeamCaptain.ClubPlayer,
+                        HomeMatchTeam = homeMatchTeam
+                    };
+                }
+            }
+
+            
+
             int[] matchClubPlayerIds = new int[matchPlayers.Count];
             int[] matchPlayerGroupIds = new int[matchPlayers.Count];
             int[] matchPlayerRankIds = new int[matchPlayers.Count];
@@ -341,7 +406,12 @@ namespace ProjectArcBlade.Services
             int index = 0;
             foreach (var matchPlayer in matchPlayers)
             {
+                // if a team player has been nominated then use that player instead of no entry.
+                //var teamClubPlayerId = homeMatchTeam.Team.TeamPlayers.Where(tp => tp.Rank.Id == matchPlayer.Rank.Id).Select(tp => tp.ClubPlayer.Id).SingleOrDefault();
+                //matchClubPlayerIds[index] = matchPlayer.ClubPlayer != null ? matchPlayer.ClubPlayer.Id : teamClubPlayer != null ? teamClubPlayer.Id : 0;
+
                 matchClubPlayerIds[index] = matchPlayer.ClubPlayer != null ? matchPlayer.ClubPlayer.Id : 0;
+
                 matchPlayerGroupIds[index] = matchPlayer.HomeMatchTeamGroup.Group.Id;
                 matchPlayerRankIds[index] = matchPlayer.Rank.Id;
                 matchPlayerIds[index] = matchPlayer.Id;
@@ -355,9 +425,9 @@ namespace ProjectArcBlade.Services
                 .ToList();
 
             var teamPlayers = matchPlayers
-                .Where(np => np.ClubPlayer != null)
-                .GroupBy(np => np.ClubPlayer.Id)
-                .Select(np => new SelectListItem { Value = np.First().ClubPlayer.Id.ToString(), Text = np.First().ClubPlayer.PlayerDetail.FullName })
+                .Where(mp => mp.ClubPlayer != null)
+                .GroupBy(mp => mp.ClubPlayer.Id)
+                .Select(mp => new SelectListItem { Value = mp.First().ClubPlayer.Id.ToString(), Text = mp.First().ClubPlayer.PlayerDetail.FullName })
                 .ToList();
 
             var captainId = teamCaptain == null ? 0 : teamCaptain.ClubPlayer == null ? 0 : teamCaptain.ClubPlayer.Id;
@@ -491,19 +561,21 @@ namespace ProjectArcBlade.Services
 
             for(var i=0; i< viewModel.NominatedClubPlayerIds.Count(); i++)
             {
-                var teamPlayer = await _context.TeamPlayers
-                    .Include(tp => tp.Team)
-                    .Include(tp => tp.Group)
-                    .Include(tp => tp.Rank)
-                    .Include(tp => tp.ClubPlayer)
-                    .Where(tp => tp.Team.Id == viewModel.TeamId &&
-                        tp.Group.Id == viewModel.NominatedPlayerGroupIds[i] &&
-                        tp.Rank.Id == viewModel.NominatedPlayerRankIds[i])
-                    .SingleOrDefaultAsync();
 
-                clubPlayer = viewModel.NomintatedPLayerIds[i] == 0 ? null : await _context.ClubPlayers.FindAsync(viewModel.NominatedClubPlayerIds[i]);
+                var teamPlayer = await _context.TeamPlayers.FindAsync(viewModel.NomintatedPlayerIds[i]);
+                //var teamPlayer = await _context.TeamPlayers
+                //.Include(tp => tp.Team)
+                //.Include(tp => tp.Group)
+                //.Include(tp => tp.Rank)
+                //.Include(tp => tp.ClubPlayer)
+                //.Where(tp => tp.Team.Id == viewModel.TeamId &&
+                //    tp.Group.Id == viewModel.NominatedPlayerGroupIds[i] &&
+                //    tp.Rank.Id == viewModel.NominatedPlayerRankIds[i])
+                //.SingleAsync();
 
-                if ( teamPlayer == null)
+                clubPlayer = viewModel.NominatedClubPlayerIds[i] == 0 ? null : await _context.ClubPlayers.FindAsync(viewModel.NominatedClubPlayerIds[i]);
+
+                if (teamPlayer == null)
                 {
                     teamPlayer = new TeamPlayer
                     {
@@ -521,6 +593,8 @@ namespace ProjectArcBlade.Services
                 }
 
                 await _context.SaveChangesAsync();
+                
+                
             }
 
             //if the current captain has been removed from the list of nominated players then clear the captain id!
@@ -601,7 +675,7 @@ namespace ProjectArcBlade.Services
                 index++;
             }
 
-            var clubPlayers = await GetClubPlayersByClubAndCategoryAsync(team.LeagueClub.Club.Id, team.Category.Id);
+            var clubPlayers = await GetClubPlayersAvailableForNomination(team.LeagueClub.Club.Id, team.Category.Id, team.Season.Id, teamId);
 
             var availablePlayers = clubPlayers
                 .Select(cp => new SelectListItem { Value = cp.Id.ToString(), Text = cp.PlayerDetail.FullName })
@@ -644,7 +718,7 @@ namespace ProjectArcBlade.Services
                 NominatedClubPlayerIds = nominatedPlayerIds,
                 NominatedPlayerGroupIds = nominatedPlayerGroupIds,
                 NominatedPlayerRankIds = nominatedPlayerRankIds,
-                NomintatedPLayerIds = nominatedPlayerTeamIds,
+                NomintatedPlayerIds = nominatedPlayerTeamIds,
                 TeamPlayers = teamPlayers,
                 CaptainId = captainId,
                 Warnings = warnings,
@@ -657,9 +731,9 @@ namespace ProjectArcBlade.Services
             if (_context == null) _context = context;
 
             var team = await GetTeamByIdAsync(teamId);            
-            var rule = await matchService.GetRuleBySeasonAndCategoryAsync(_context, team.Season.Id, team.Category.Id);
+            
             var allLeagueMatches = await matchService.GetAllLeagueMatchesByTeamAsync(_context, teamId);
-            var allLeagueMatchViewModels = allLeagueMatches.Select(m => matchService.GetMatchViewModel(m, rule, teamId, false, false));
+            var allLeagueMatchViewModels = allLeagueMatches.Select(m => matchService.GetMatchViewModel(m,  teamId, false, false));
                    
             var availableTeams = (await GetAllTeamsAsync()).Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.FullName }).ToList();
             
@@ -765,6 +839,7 @@ namespace ProjectArcBlade.Services
                         .Include(hmt => hmt.Team).ThenInclude(t => t.Season)
                         .Include(hmt => hmt.Team).ThenInclude(t => t.Category)
                         .Include(hmt => hmt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                        .Include(hmt => hmt.Team).ThenInclude(t => t.TeamCaptain)
                         .Include(hmt => hmt.TeamStatus)
                         .Include(hmt => hmt.HomeMatchTeamGroups)
                         .Include(hmt => hmt.HomeMatchTeamCaptain).ThenInclude(hmtc => hmtc.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
@@ -772,7 +847,16 @@ namespace ProjectArcBlade.Services
                         .SingleOrDefaultAsync();
 
             if (homeMatchTeam != null)
-            {
+            {                
+                //get any nominated team players.
+                await _context.Entry(homeMatchTeam.Team)
+                    .Collection(t => t.TeamPlayers)
+                    .Query()
+                    .Include(tp => tp.ClubPlayer)
+                    .Include(tp => tp.Rank)
+                    .Include(tp => tp.Group)
+                    .ToListAsync();
+
                 //get all the related players.
                 foreach (var homeMatchTeamGroup in homeMatchTeam.HomeMatchTeamGroups)
                 {
@@ -797,6 +881,7 @@ namespace ProjectArcBlade.Services
                         .Include(amt => amt.Team).ThenInclude(t => t.Season)
                         .Include(amt => amt.Team).ThenInclude(t => t.Category)
                         .Include(amt => amt.Team).ThenInclude(t => t.LeagueClub).ThenInclude(lc => lc.Club)
+                        .Include(amt => amt.Team).ThenInclude(t => t.TeamCaptain)
                         .Include(amt => amt.TeamStatus)
                         .Include(amt => amt.AwayMatchTeamGroups)
                         .Include(amt => amt.AwayMatchTeamCaptain).ThenInclude(hmtc => hmtc.ClubPlayer).ThenInclude(cp => cp.PlayerDetail)
@@ -805,6 +890,15 @@ namespace ProjectArcBlade.Services
 
             if (awayMatchTeam != null)
             {
+                //get any nominated team players.
+                await _context.Entry(awayMatchTeam.Team)
+                    .Collection(t => t.TeamPlayers)
+                    .Query()
+                    .Include(tp => tp.ClubPlayer)
+                    .Include(tp => tp.Rank)
+                    .Include(tp => tp.Group)
+                    .ToListAsync();
+
                 //get all the related players.
                 foreach (var awayMatchTeamGroup in awayMatchTeam.AwayMatchTeamGroups)
                 {

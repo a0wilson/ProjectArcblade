@@ -58,11 +58,9 @@ namespace ProjectArcBlade.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ManageNominations(TeamService teamService, ManageNominationsViewModel viewModel)
         {
-            if (ModelState.IsValid)
-            {
-                await teamService.UpdateNominationsWithManageNominationsViewModelAsync(_context, viewModel);
-                TempData["successMessage"] = "Player nominations updated!";
-            }
+            await teamService.UpdateNominationsWithManageNominationsViewModelAsync(_context, viewModel);
+            TempData["successMessage"] = "Player nominations updated!";
+            
             return RedirectToAction("ManageNominations", new { id = viewModel.TeamId });
         }
         

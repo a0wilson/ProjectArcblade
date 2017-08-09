@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
@@ -14,5 +10,6 @@ namespace ProjectArcBlade.Models
 
         public ICollection<HomeMatchTeamGroupPlayer> HomeMatchTeamGroupPlayers { get; set; }
         public ICollection<Set> Sets { get; set; }
+        public ICollection<HomeScoreSheetLine> HomeScoreSheetLines { get; set; }
     }
 }

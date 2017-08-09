@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ProjectArcBlade.Models;
 using Microsoft.EntityFrameworkCore.Metadata;
+using ProjectArcBlade.Models;
 
 namespace ProjectArcBlade.Data
 {
@@ -49,14 +45,14 @@ namespace ProjectArcBlade.Data
         //rules
         public DbSet<Rule> Rules { get; set; }
         public DbSet<ResultRule> ResultRules { get; set; }
+        public DbSet<ResultRuleException> ResultRuleExceptions { get; set; }
 
         //scoresheets
-        public DbSet<ScoreSheet> ScoreSheets { get; set; }
-        public DbSet<ScoreSheetSet> ScoreSheetSets { get; set; }
-        public DbSet<ScoreSheetGame> ScoreSheetGames { get; set; }
-        public DbSet<ScoreSheetPoint> ScoreSheetPoints { get; set; }
         public DbSet<HomeScoreSheet> HomeScoreSheets { get; set; }
         public DbSet<AwayScoreSheet> AwayScoreSheets { get; set; }
+        public DbSet<ScoreSheetLine> ScoreSheetLines { get; set; }
+        public DbSet<HomeScoreSheetLine> HomeScoreSheetLines { get; set; }
+        public DbSet<AwayScoreSheetLine> AwayScoreSheetLines { get; set; }
         
         public DbSet<Audit> Audits { get; set; }        
         public DbSet<Venue> Venues { get; set; }
@@ -173,14 +169,20 @@ namespace ProjectArcBlade.Data
                 .HasOne(rr => rr.JoinCondition)
                 .WithMany(jc => jc.ResultRules)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ResultRuleException>().ToTable("ResultRuleException");
+            builder.Entity<ResultRuleException>()
+                .HasOne(rre => rre.TargetRule)
+                .WithMany(rr => rr.TargetRules);
+            builder.Entity<ResultRuleException>()
+                .HasOne(rre => rre.ExceptionRule)
+                .WithMany(rr => rr.ExceptionRules);
 
             //scoresheets
-            builder.Entity<ScoreSheet>().ToTable("ScoreSheet");
-            builder.Entity<ScoreSheetSet>().ToTable("ScoreSheetSet");
-            builder.Entity<ScoreSheetGame>().ToTable("ScoreSheetGame");
-            builder.Entity<ScoreSheetPoint>().ToTable("ScoreSheetPoint");
             builder.Entity<HomeScoreSheet>().ToTable("HomeScoreSheet");
             builder.Entity<AwayScoreSheet>().ToTable("AwayScoreSheet");
+            builder.Entity<ScoreSheetLine>().ToTable("ScoreSheetLine");
+            builder.Entity<HomeScoreSheetLine>().ToTable("HomeScoreSheetLine");
+            builder.Entity<AwayScoreSheetLine>().ToTable("AwayScoreSheetLine");            
             
             builder.Entity<Audit>().ToTable("Audit");
             builder.Entity<Venue>().ToTable("Venue");
@@ -235,7 +237,7 @@ namespace ProjectArcBlade.Data
                 .WithOne(ass => ass.Match)
                 .HasForeignKey<AwayScoreSheet>(ass => ass.MatchId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+            
             builder.Entity<Set>().ToTable("Set");
             builder.Entity<Set>()
                 .HasOne(s => s.SetAwayResult)

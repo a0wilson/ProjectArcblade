@@ -34,7 +34,6 @@
             public const string Win = "Win";
             public const string Loss = "Loss";
             public const string Draw = "Draw";
-            public const string Forfeit = "Forfeit";
             public const string Pending = "Pending";
             public const string NoEntry = "No Entry";
             public const string Conceded = "Conceded";

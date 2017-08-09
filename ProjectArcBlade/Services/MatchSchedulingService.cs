@@ -304,7 +304,16 @@ namespace ProjectArcBlade.Services
                     };
                     _context.HomeMatchTeams.Add(homeMatchTeam);
 
-                    foreach(var groupTemplate in matchTemplate.GroupTemplates)
+                    // create corresponding scoresheet for home team.
+                    var homeScoreSheet = new HomeScoreSheet
+                    {
+                        Match = match,
+                        HomeMatchTeam = homeMatchTeam,
+                        SignedOff = false
+                    };
+                    _context.HomeScoreSheets.Add(homeScoreSheet);
+
+                    foreach (var groupTemplate in matchTemplate.GroupTemplates)
                     {
                         // add home match team groups
                         var homeMatchTeamGroup = new HomeMatchTeamGroup
@@ -314,7 +323,18 @@ namespace ProjectArcBlade.Services
                         };
                         _context.HomeMatchTeamGroups.Add(homeMatchTeamGroup);
 
-                        foreach(var rankTemplate in groupTemplate.RankTemplates)
+                        //add scoresheetlines to the scoresheet for each group.
+                        var homeScoreSheetLine = new HomeScoreSheetLine
+                        {
+                            HomeScoreSheet = homeScoreSheet,
+                            HomeMatchTeamGroup = homeMatchTeamGroup,
+                            SetTotal = 0,
+                            GameTotal = 0,
+                            PointTotal = 0,
+                        };
+                        _context.HomeScoreSheetLines.Add(homeScoreSheetLine);
+
+                        foreach (var rankTemplate in groupTemplate.RankTemplates)
                         {
                             // add home match team players
                             var homeMatchTeamGroupPlayer = new HomeMatchTeamGroupPlayer
@@ -325,7 +345,19 @@ namespace ProjectArcBlade.Services
                             _context.HomeMatchTeamGroupPlayers.Add(homeMatchTeamGroupPlayer);
                         }
                     }
+
+                    //add scoresheetlines for overall totals.
+                    var homeScoreSheetLineTotal = new HomeScoreSheetLine
+                    {
+                        HomeScoreSheet = homeScoreSheet,
+                        SetTotal = 0,
+                        GameTotal = 0,
+                        PointTotal = 0,
+                    };
+                    _context.HomeScoreSheetLines.Add(homeScoreSheetLineTotal);
                     
+                    //-----------------------------------------------------------
+                    //Create away match team.
                     var awayMatchTeam = new AwayMatchTeam
                     {
                         Match = match,
@@ -333,6 +365,15 @@ namespace ProjectArcBlade.Services
                         TeamStatus = await _teamService.GetTeamStatusAsync(_context, Constants.TeamStatus.New)
                     };
                     _context.AwayMatchTeams.Add(awayMatchTeam);
+
+                    // create the awayteam scoresheet.
+                    var awayScoreSheet = new AwayScoreSheet
+                    {
+                        Match = match,
+                        AwayMatchTeam = match.AwayMatchTeam,
+                        SignedOff = false
+                    };
+                    _context.AwayScoreSheets.Add(awayScoreSheet);
 
                     foreach (var groupTemplate in matchTemplate.GroupTemplates)
                     {
@@ -343,6 +384,17 @@ namespace ProjectArcBlade.Services
                             AwayMatchTeam = awayMatchTeam
                         };
                         _context.AwayMatchTeamGroups.Add(awayMatchTeamGroup);
+
+                        //add scoresheetlines to the scoresheet for each group
+                        var awayScoreSheetLine = new AwayScoreSheetLine
+                        {
+                            AwayScoreSheet = awayScoreSheet,
+                            AwayMatchTeamGroup = awayMatchTeamGroup,
+                            SetTotal = 0,
+                            GameTotal = 0,
+                            PointTotal = 0,
+                        };
+                        _context.AwayScoreSheetLines.Add(awayScoreSheetLine);
 
                         foreach (var rankTemplate in groupTemplate.RankTemplates)
                         {
@@ -355,6 +407,17 @@ namespace ProjectArcBlade.Services
                             _context.AwayMatchTeamGroupPlayers.Add(awayMatchTeamGroupPlayer);
                         }
                     }
+
+                    //add scoresheetlines to the scoresheet for each group
+                    var awayScoreSheetLineTotal = new AwayScoreSheetLine
+                    {
+                        AwayScoreSheet = awayScoreSheet,
+                        SetTotal = 0,
+                        GameTotal = 0,
+                        PointTotal = 0,
+                    };
+                    _context.AwayScoreSheetLines.Add(awayScoreSheetLineTotal);
+
                     await _context.SaveChangesAsync();
                 }
             }
@@ -447,7 +510,8 @@ namespace ProjectArcBlade.Services
                         var game = new Game
                         {
                             Set = set,
-                            Number = gameTemplate.Number                            
+                            Number = gameTemplate.Number,
+                            Rule = gameTemplate.DefaultRule
                         };
                         _context.Games.Add(game);
 

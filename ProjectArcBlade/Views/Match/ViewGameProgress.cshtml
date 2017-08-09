@@ -44,25 +44,11 @@
                                 </div>
                             </td>
                             <td class="active">
-                                @if (Model.Set.IsHomeTeam)
-                                {
-                                    @game.HomeHomeScore
-                                }
-                                else
-                                {
-                                    @game.AwayHomeScore
-                                }
+                                @game.AggregatedHomeScore
                             </td>
                             <td>&nbsp;</td>
                             <td class="active">
-                                @if (Model.Set.IsHomeTeam)
-                                {
-                                    @game.HomeAwayScore
-                                }
-                                else
-                                {
-                                    @game.AwayAwayScore
-                                }
+                                @game.AggregatedAwayScore
                             </td>
                         </tr>
                     }

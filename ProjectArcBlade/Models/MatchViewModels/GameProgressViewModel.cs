@@ -11,5 +11,6 @@ namespace ProjectArcBlade.Models.MatchViewModels
 
         public string TeamName {  get { return Set.IsHomeTeam ? Set.HomeTeam : Set.AwayTeam; } }
         public bool AllowConcedeGame { get { return Set.AwayWin || Set.HomeWin ? false : true; } }
+        public bool ReadOnlyMode { get { return Set.MatchSignOff || Set.SetConceded; } }
     }
 }

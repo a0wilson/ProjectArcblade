@@ -114,7 +114,7 @@ namespace ProjectArcBlade.Controllers
         {
             var viewModel = await matchService.GetGameProgressViewModelAsync(_context, setId, teamId);
 
-            if (viewModel.Set.AwayResult == Constants.ResultType.Conceded || viewModel.Set.HomeResult == Constants.ResultType.Conceded)
+            if (viewModel.ReadOnlyMode)
             {
                 return View("ViewGameProgress", viewModel);
             }
@@ -200,7 +200,7 @@ namespace ProjectArcBlade.Controllers
 
             if (btnComplete != null)
             {
-                var serviceResult = await matchService.CompleteMatchAsync(_context, viewModel);
+                var serviceResult = await matchService.SignOffMatchAsync(_context, viewModel);
                 return RedirectToAction("Dashboard", "Team", new { id = viewModel.TeamId });
             }
 

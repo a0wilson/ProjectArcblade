@@ -667,6 +667,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -676,6 +677,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(2),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -685,6 +687,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -694,6 +697,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(2),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -703,6 +707,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -712,6 +717,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Womens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -721,6 +727,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -730,6 +737,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(2),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(2),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -739,6 +747,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -748,6 +757,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Mens),
                         Division = context.Divisions.Find(2),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                     new Team
@@ -757,6 +767,7 @@ namespace ProjectArcBlade.Data
                         Category = context.Categories.Find(Constants.Category.Womens),
                         Division = context.Divisions.Find(1),
                         Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(1),
                         TeamStatus = context.TeamStatuses.Find(1)
                     },
                 };
@@ -769,8 +780,8 @@ namespace ProjectArcBlade.Data
             {
                 var matchTemplates = new MatchTemplate[]
                 {
-                    new MatchTemplate { Name="Mens Match (2010)", DefaultGameWinScore=21 },
-                    new MatchTemplate { Name="Womens Match (2014)", DefaultGameWinScore=21 }
+                    new MatchTemplate { Name="Mens Match (2010)" },
+                    new MatchTemplate { Name="Womens Match (2014)" }
                 };
                 foreach (MatchTemplate mt in matchTemplates) context.MatchTemplates.Add(mt);
                 context.SaveChanges();                
@@ -780,7 +791,7 @@ namespace ProjectArcBlade.Data
             {
                 var rules = new Rule[]
                 {
-                    new Rule {Name="Badminton-Default"}
+                    new Rule {Name="Badminton-Default-No-Setting"}
                 };
                 foreach (var r in rules) context.Rules.Add(r);
                 context.SaveChanges();
@@ -790,6 +801,17 @@ namespace ProjectArcBlade.Data
             {
                 var resultRules = new ResultRule[]
                 {
+                    //Exception rules (No Entry)
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.Equal),
+                        Value = 30,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.NoEntry),
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
+                    }, //1
+
                     //Win Rules
                     new ResultRule
                     {
@@ -799,7 +821,7 @@ namespace ProjectArcBlade.Data
                         Value = 20,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    }, //2
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -808,7 +830,7 @@ namespace ProjectArcBlade.Data
                         Value = 31,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    }, //3
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -819,7 +841,7 @@ namespace ProjectArcBlade.Data
                         Value = 1,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Win),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    }, //4
 
                     //Draw rules
                     new ResultRule
@@ -830,7 +852,7 @@ namespace ProjectArcBlade.Data
                         Value = 20,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    }, //5
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -839,7 +861,7 @@ namespace ProjectArcBlade.Data
                         Value = 31,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    }, //6
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -850,7 +872,7 @@ namespace ProjectArcBlade.Data
                         Value = 0,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Draw),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    },//7
 
                     //Loss rules
                     new ResultRule
@@ -861,7 +883,7 @@ namespace ProjectArcBlade.Data
                         Value = 20,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    },//8
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -870,7 +892,7 @@ namespace ProjectArcBlade.Data
                         Value = 31,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
+                    },//9
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -881,8 +903,8 @@ namespace ProjectArcBlade.Data
                         Value = 0,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Loss),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.And)
-                    },
-
+                    },//10
+                    
                     //Invalid rules
                     new ResultRule
                     {
@@ -892,7 +914,7 @@ namespace ProjectArcBlade.Data
                         Value = 30,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
-                    },
+                    },//11
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -901,7 +923,7 @@ namespace ProjectArcBlade.Data
                         Value = 30,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
-                    },
+                    },//12
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -910,7 +932,7 @@ namespace ProjectArcBlade.Data
                         Value = -30,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
-                    },
+                    },//13
                     new ResultRule
                     {
                         Rule=context.Rules.Find(1),
@@ -919,9 +941,39 @@ namespace ProjectArcBlade.Data
                         Value = -30,
                         ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.Invalid),
                         JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
-                    }
+                    },//14
+                   
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreOne = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 20,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.NoEntry), //exception
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    }, //16
+                    new ResultRule
+                    {
+                        Rule=context.Rules.Find(1),
+                        ScoreTwo = true,
+                        Condition = context.Conditions.Single(c => c.Name == Constants.Condition.LessThan),
+                        Value = 20,
+                        ResultType = context.ResultTypes.Single(rt => rt.Name == Constants.ResultType.NoEntry), //exception
+                        JoinCondition = context.JoinConditions.Single(jc => jc.Name == Constants.JoinCondition.Or)
+                    }, //17
                 };
                 foreach (ResultRule rr in resultRules) context.ResultRules.Add(rr);
+                context.SaveChanges();
+            }
+
+            if(!context.ResultRuleExceptions.Any())
+            {
+                var resultRuleExceptions = new ResultRuleException[]
+                {
+                    //new ResultRuleException {TargetRule = context.ResultRules.Find(4), ExceptionRule = context.ResultRules.Find(1)},
+                    //new ResultRuleException {TargetRule = context.ResultRules.Find(15), ExceptionRule = context.ResultRules.Find(1)}
+                };
+                foreach (ResultRuleException rre in resultRuleExceptions) context.ResultRuleExceptions.Add(rre);
                 context.SaveChanges();
             }
 
@@ -997,53 +1049,53 @@ namespace ProjectArcBlade.Data
                 var gameTemplates = new GameTemplate[]
                 {
                     //mens
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(1) },//1
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(1) },//1
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(1) },//1
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(2) },//2
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(2) },//2
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(2) },//2
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(3) },//3
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(3) },//3
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(3) },//3
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(4) },//4
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(4) },//4
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(4) },//4
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(5) },//5
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(5) },//5
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(5) },//5
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(6) },//6
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(6) },//6
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(6) },//6
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(7) },//7
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(7) },//7
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(7) },//7
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(8) },//8
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(8) },//8
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(8) },//8
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(9) },//9
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(9) },//9
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(9) },//9
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(1), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//1
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(1), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//1
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(1), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//1
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(2), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//2
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(2), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//2
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(2), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//2
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(3), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//3
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(3), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//3
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(3), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//3
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(4), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//4
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(4), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//4
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(4), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//4
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(5), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//5
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(5), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//5
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(5), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//5
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(6), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//6
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(6), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//6
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(6), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//6
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(7), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//7
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(7), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//7
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(7), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//7
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(8), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//8
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(8), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//8
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(8), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//8
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(9), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//9
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(9), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//9
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(9), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//9
                     
                     //womens
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(10) },//10
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(10) },//10
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(10) },//10
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(11) },//11
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(11) },//11
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(11) },//11
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(12) },//12
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(12) },//12
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(12) },//12
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(13) },//13
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(13) },//13
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(13) },//13
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(14) },//14
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(14) },//14
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(14) },//14
-                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(15) },//15
-                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(15) },//15
-                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(15) },//15
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(10), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//10
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(10), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//10
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(10), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//10
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(11), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//11
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(11), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//11
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(11), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//11
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(12), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//12
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(12), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//12
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(12), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//12
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(13), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//13
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(13), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//13
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(13), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//13
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(14), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//14
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(14), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//14
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(14), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//14
+                    new GameTemplate { Number=1, SetTemplate=context.SetTemplates.Find(15), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//15
+                    new GameTemplate { Number=2, SetTemplate=context.SetTemplates.Find(15), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//15
+                    new GameTemplate { Number=3, SetTemplate=context.SetTemplates.Find(15), DefaultWinScore=21, DefaultRule=context.Rules.Find(1) },//15
                     
                 };
                 foreach (GameTemplate gt in gameTemplates) context.GameTemplates.Add(gt);
@@ -1106,9 +1158,9 @@ namespace ProjectArcBlade.Data
             {
                 var matchTemplateLinks = new MatchTemplateLink[]
                 {
-                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(1), MatchTemplate = context.MatchTemplates.Find(1), Rule = context.Rules.Find(1) },
-                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(3), MatchTemplate = context.MatchTemplates.Find(1), Rule = context.Rules.Find(1)  },
-                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(2), MatchTemplate = context.MatchTemplates.Find(2), Rule = context.Rules.Find(1)  }
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(1), MatchTemplate = context.MatchTemplates.Find(1)},
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(3), MatchTemplate = context.MatchTemplates.Find(1)},
+                    new MatchTemplateLink{ Season = context.Seasons.Find(4), Category = context.Categories.Find(2), MatchTemplate = context.MatchTemplates.Find(2)}
                 };
                 foreach (MatchTemplateLink mtl in matchTemplateLinks) context.MatchTemplateLinks.Add(mtl);
                 context.SaveChanges();

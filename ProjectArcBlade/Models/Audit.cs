@@ -13,6 +13,7 @@ namespace ProjectArcBlade.Models
 
         public ICollection<AwayTeamScore> AwayGameResultScores { get; set; }
         public ICollection<HomeTeamScore> HomeGameResultScores { get; set; }
-        public ICollection<ScoreSheet> ScoreSheets { get; set; }
+        public ICollection<AwayScoreSheet> AwayScoreSheets { get; set; }
+        public ICollection<HomeScoreSheet> HomeScoreSheets { get; set; }
     }
 }

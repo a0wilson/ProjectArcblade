@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ProjectArcBlade.Models
 {
@@ -12,6 +9,7 @@ namespace ProjectArcBlade.Models
         public int Number { get; set; }
         public HomeGroupTemplate HomeGroupTemplate { get; set; }
         public AwayGroupTemplate AwayGroupTemplate { get; set; }
+        public int NumberOfGames { get; set; }
 
         public ICollection<GameTemplate> GameTemplates { get; set; }
     }

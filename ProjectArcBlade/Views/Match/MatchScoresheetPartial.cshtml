@@ -42,7 +42,7 @@
             </thead>
             <tbody>
 
-                @foreach(var line in Model.ScoresheetLines)
+                @foreach(var line in Model.Match.ScoresheetLines)
                 {
                     <tr>
                         <th class="active">@line.Heading Pair</th>
@@ -53,7 +53,6 @@
                         <td>@line.HomePointsTotal</td>
                         <td>@line.AwayPointsTotal</td>
                     </tr>
-
                 }
             </tbody>
             <tfoot>

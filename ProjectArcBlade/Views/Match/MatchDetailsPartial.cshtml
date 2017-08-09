@@ -49,13 +49,13 @@
                                         @foreach (var game in set.Games)
                                         {
                                             <div class="row">
-                                                <div class="col-md-4 text-left">
+                                                <div class="col-md-3 text-left">
                                                     @if(i == 0)
                                                     {
                                                         <strong>@game.SetNumber@(".")</strong>
                                                     }
                                                 </div>
-                                                <div class="col-md-4">@game.HomeVsAwayGameScoreDisplay</div>
+                                                <div class="col-md-5">@game.HomeVsAwayGameScoreDisplay</div>
                                                 <div class="col-md-4 text-right">
                                                     @if(i == set.MinimumGamesToWinSet)
                                                     {

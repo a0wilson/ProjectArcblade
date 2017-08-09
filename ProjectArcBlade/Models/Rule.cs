@@ -8,7 +8,8 @@ namespace ProjectArcBlade.Models
         public string Name { get; set; }
 
         public ICollection<ResultRule> ResultRules { get; set; }
-        public ICollection<MatchTemplateLink> MatchTemplateLinks { get; set; }
+        public ICollection<GameTemplate> GameTemplates { get; set; }
+        public ICollection<Game> Games { get; set; }
         
     }
 }

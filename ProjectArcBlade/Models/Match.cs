@@ -25,13 +25,13 @@ namespace ProjectArcBlade.Models
         public HomeMatchTeam HomeMatchTeam { get; set; }
         public AwayScoreSheet AwayScoreSheet { get; set; }
         public HomeScoreSheet HomeScoreSheet { get; set; }
-        
+                
         //Navigation properties
         public ICollection<RescheduledStartDate> RescheduledStartDates { get; set; }
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
         public ICollection<Set> Sets { get; set; }
-        
+                
         public int MinimumSetsToWinMatch
         {
             get

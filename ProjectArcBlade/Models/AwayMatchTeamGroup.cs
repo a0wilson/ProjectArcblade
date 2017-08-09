@@ -13,5 +13,7 @@ namespace ProjectArcBlade.Models
 
         public ICollection<AwayMatchTeamGroupPlayer> AwayMatchTeamGroupPlayers { get; set; }
         public ICollection<Set> Sets { get; set; }
+        public ICollection<AwayScoreSheetLine> AwayScoreSheetLines { get; set; }
+
     }
 }
