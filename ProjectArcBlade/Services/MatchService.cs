@@ -391,6 +391,8 @@ namespace ProjectArcBlade.Services
             await UpdateHomeTeamScoreSheetAsync(match, match.HomeMatchTeam.Team.Id, false);
             await UpdateAwayTeamScoreSheetAsync(match, match.AwayMatchTeam.Team.Id, false);
 
+            await UpdatePromotionMatchesAsync(match); //if any players are playing up then record it. 
+
             var resultTypePending = await GetResultTypeAsync(_context, Constants.ResultType.Pending);
             var matchStatusInProgress = await GetMatchStatusAsync(_context, Constants.MatchStatus.InProgress);
 
@@ -401,7 +403,71 @@ namespace ProjectArcBlade.Services
             _context.Matches.Update(match);
             await _context.SaveChangesAsync();
         }
-                
+        
+        private async Task UpdatePromotionMatchesAsync(Match match)
+        {
+            foreach(var hmtg in match.HomeMatchTeam.HomeMatchTeamGroups)
+            {
+                foreach(var hmtgp in hmtg.HomeMatchTeamGroupPlayers)
+                {
+                    var createNewPromotionMatchEntry = await _context.ClubPlayers
+                        .Include(cp => cp.TeamPlayers)
+                        .AnyAsync(cp => cp.TeamPlayers.Count(tp =>
+                           tp.ClubPlayer.Id == hmtgp.ClubPlayer.Id &&
+                           tp.Team.Season.Id == match.Season.Id &&
+                           tp.Team.Category.Id == match.Category.Id &&
+                           tp.Team.Rank.Number > match.HomeMatchTeam.Team.Rank.Number
+                        ) > 0);
+
+                    if(createNewPromotionMatchEntry)
+                    {
+                        //if no entry exists then create one.
+                        if(!await _context.PromotionMatches.AnyAsync(pm => pm.ClubPlayer.Id == hmtgp.ClubPlayer.Id && pm.Match.Id == match.Id) )
+                        {
+                            var promotionMatch = new PromotionMatch
+                            {
+                                ClubPlayer = hmtgp.ClubPlayer,
+                                Match = match,
+                                Season = match.Season
+                            };
+                            _context.PromotionMatches.Add(promotionMatch);
+                        }
+                    }
+                }
+            }
+
+            foreach (var amtg in match.AwayMatchTeam.AwayMatchTeamGroups)
+            {
+                foreach (var amtgp in amtg.AwayMatchTeamGroupPlayers)
+                {
+                    var createNewPromotionMatchEntry = await _context.ClubPlayers
+                        .AnyAsync(cp => cp.TeamPlayers.Count(tp =>
+                           tp.ClubPlayer.Id == amtgp.ClubPlayer.Id &&
+                           tp.Team.Season.Id == match.Season.Id &&
+                           tp.Team.Category.Id == match.Category.Id &&
+                           tp.Team.Rank.Number > match.AwayMatchTeam.Team.Rank.Number
+                        ) > 0);
+
+                    if (createNewPromotionMatchEntry)
+                    {
+                        //if no entry exists then create one.
+                        if (!await _context.PromotionMatches.AnyAsync(pm => pm.ClubPlayer.Id == amtgp.ClubPlayer.Id && pm.Match.Id == match.Id))
+                        {
+                            var promotionMatch = new PromotionMatch
+                            {
+                                ClubPlayer = amtgp.ClubPlayer,
+                                Match = match,
+                                Season = match.Season
+                            };
+                            _context.PromotionMatches.Add(promotionMatch);
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         private async Task<Match> GetMatchByIdAsync(int matchId)
         {
             //get game rules... will take too long to get individually!

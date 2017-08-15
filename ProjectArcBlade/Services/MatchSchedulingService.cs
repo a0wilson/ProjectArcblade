@@ -214,8 +214,18 @@ namespace ProjectArcBlade.Services
                             if(!homeTeamExclusionDates.Contains(_availableDates[a]))
                             {
                                 //check if there is currently a game being played there on this date.
-                                var matchCount = _matchSchedules.Where(ms => ms.ScheduledDate == _availableDates[a] && ms.HomeClubId == homeTeamClubId).Count();
-                                if (matchCount == pass)
+                                var matchCount = _matchSchedules.Where
+                                    (ms => 
+                                        ms.ScheduledDate == _availableDates[a] && ms.HomeClubId == homeTeamClubId
+                                    ).Count();
+                                var teamMatchCount = _matchSchedules.Where
+                                    (ms =>
+                                        ms.ScheduledDate == _availableDates[a] &&
+                                        ((ms.HomeTeamId == homeTeamId || ms.AwayTeamId == homeTeamId) || (ms.AwayTeamId == awayTeamId || ms.HomeTeamId == awayTeamId))
+                                    ).Count();
+                                //if (matchCount == pass)
+                                //if there is still space for more than 1 match... and both teams are not playing in matches on that day...
+                                if (matchCount < homeTeamMaxMatches && teamMatchCount == 0) 
                                 {
                                     return _availableDates[a]; //return match date
                                 }

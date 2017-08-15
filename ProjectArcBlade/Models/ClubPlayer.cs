@@ -18,6 +18,7 @@ namespace ProjectArcBlade.Models
         [Display(Name = "Active")]
         public bool IsActive { get; set; }
         public Club Club { get; set; }
+        public string AffiliationNumber { get; set; }
         public PlayerDetail PlayerDetail { get; set; }
 
         public ICollection<TeamPlayer> TeamPlayers { get; set; }
@@ -30,6 +31,7 @@ namespace ProjectArcBlade.Models
         public ICollection<HomeMatchTeamCaptain> HomeMatchTeamCaptaincies { get; set; }
         public ICollection<AwayMatchTeamCaptain> AwayMatchTeamCaptaincies { get; set; }
         public ICollection<TeamCaptain> TeamCaptaincies { get; set; }
+        public ICollection<PromotionMatch> PromotionMatches { get; set; }
 
     }
 }

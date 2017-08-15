@@ -682,6 +682,16 @@ namespace ProjectArcBlade.Data
                     },
                     new Team
                     {
+                        Name = "Mens C",
+                        LeagueClub = context.LeagueClubs.Find(1),
+                        Category = context.Categories.Find(Constants.Category.Mens),
+                        Division = context.Divisions.Find(1),
+                        Season = context.Seasons.Find(4),
+                        Rank = context.Ranks.Find(3),
+                        TeamStatus = context.TeamStatuses.Find(1)
+                    },
+                    new Team
+                    {
                         Name = "Mens A",
                         LeagueClub = context.LeagueClubs.Find(2),
                         Category = context.Categories.Find(Constants.Category.Mens),

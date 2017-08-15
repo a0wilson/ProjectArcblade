@@ -31,7 +31,8 @@ namespace ProjectArcBlade.Models
         public ICollection<CupMatch> CupMatches { get; set; }
         public ICollection<AwardNominee> AwardNominees { get; set; }
         public ICollection<Set> Sets { get; set; }
-                
+        public ICollection<PromotionMatch> PromotionMatches { get; set; }
+
         public int MinimumSetsToWinMatch
         {
             get

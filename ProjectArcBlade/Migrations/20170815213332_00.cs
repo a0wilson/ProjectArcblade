@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Metadata;
+using System;
+using System.Collections.Generic;
 
 namespace ProjectArcBlade.Migrations
 {
@@ -13,10 +13,10 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(maxLength: 256, nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -24,27 +24,13 @@ namespace ProjectArcBlade.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUserTokens",
-                columns: table => new
-                {
-                    UserId = table.Column<string>(nullable: false),
-                    LoginProvider = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    Value = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Award",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -55,9 +41,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Category",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,9 +54,9 @@ namespace ProjectArcBlade.Migrations
                 name: "DayOfTheWeek",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,9 +67,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Division",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -94,9 +80,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Gender",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -107,9 +93,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Group",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,10 +106,10 @@ namespace ProjectArcBlade.Migrations
                 name: "Lookup",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,11 +120,11 @@ namespace ProjectArcBlade.Migrations
                 name: "MatchTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
-                    NumberOfGroups = table.Column<int>(nullable: false),
-                    NumberOfSets = table.Column<int>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfGroups = table.Column<int>(type: "int", nullable: false),
+                    NumberOfSets = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -149,9 +135,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Rank",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Number = table.Column<int>(nullable: false)
+                    Number = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -162,9 +148,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Rule",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -175,9 +161,9 @@ namespace ProjectArcBlade.Migrations
                 name: "Sport",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -188,10 +174,10 @@ namespace ProjectArcBlade.Migrations
                 name: "Status",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -202,10 +188,10 @@ namespace ProjectArcBlade.Migrations
                 name: "Type",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -216,14 +202,14 @@ namespace ProjectArcBlade.Migrations
                 name: "Venue",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AddressLine1 = table.Column<string>(nullable: true),
-                    AddressLine2 = table.Column<string>(nullable: true),
-                    Country = table.Column<string>(nullable: true),
-                    County = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    Postcode = table.Column<string>(nullable: false)
+                    AddressLine1 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AddressLine2 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    County = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Postcode = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -234,11 +220,11 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    RoleId = table.Column<string>(nullable: false)
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -255,15 +241,15 @@ namespace ProjectArcBlade.Migrations
                 name: "PlayerDetail",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    DateOfBirth = table.Column<DateTime>(nullable: false),
-                    EmailAddress = table.Column<string>(nullable: true),
-                    FirstName = table.Column<string>(nullable: false),
-                    GenderId = table.Column<int>(nullable: false),
-                    LastName = table.Column<string>(nullable: false),
-                    MobileNumber = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true)
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EmailAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GenderId = table.Column<int>(type: "int", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -280,10 +266,10 @@ namespace ProjectArcBlade.Migrations
                 name: "GroupTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(nullable: true),
-                    MatchTemplateId = table.Column<int>(nullable: true)
+                    GroupId = table.Column<int>(type: "int", nullable: true),
+                    MatchTemplateId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -306,11 +292,11 @@ namespace ProjectArcBlade.Migrations
                 name: "SetTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    MatchTemplateId = table.Column<int>(nullable: true),
-                    Number = table.Column<int>(nullable: false),
-                    NumberOfGames = table.Column<int>(nullable: false)
+                    MatchTemplateId = table.Column<int>(type: "int", nullable: true),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    NumberOfGames = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -327,10 +313,10 @@ namespace ProjectArcBlade.Migrations
                 name: "League",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: false),
-                    SportId = table.Column<int>(nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SportId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -347,16 +333,16 @@ namespace ProjectArcBlade.Migrations
                 name: "ResultRule",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ConditionId = table.Column<int>(nullable: false),
-                    JoinConditionId = table.Column<int>(nullable: false),
-                    OperatorId = table.Column<int>(nullable: true),
-                    ResultTypeId = table.Column<int>(nullable: false),
-                    RuleId = table.Column<int>(nullable: false),
-                    ScoreOne = table.Column<bool>(nullable: false),
-                    ScoreTwo = table.Column<bool>(nullable: false),
-                    Value = table.Column<int>(nullable: false)
+                    ConditionId = table.Column<int>(type: "int", nullable: false),
+                    JoinConditionId = table.Column<int>(type: "int", nullable: false),
+                    OperatorId = table.Column<int>(type: "int", nullable: true),
+                    ResultTypeId = table.Column<int>(type: "int", nullable: false),
+                    RuleId = table.Column<int>(type: "int", nullable: false),
+                    ScoreOne = table.Column<bool>(type: "bit", nullable: false),
+                    ScoreTwo = table.Column<bool>(type: "bit", nullable: false),
+                    Value = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -397,12 +383,12 @@ namespace ProjectArcBlade.Migrations
                 name: "Club",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    VenueId = table.Column<int>(nullable: true)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VenueId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -419,22 +405,22 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false),
-                    ConcurrencyStamp = table.Column<string>(nullable: true),
-                    Email = table.Column<string>(maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(nullable: false),
-                    LockoutEnabled = table.Column<bool>(nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
-                    NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(maxLength: 256, nullable: true),
-                    PasswordHash = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(nullable: false),
-                    PlayerDetailId = table.Column<int>(nullable: true),
-                    SecurityStamp = table.Column<string>(nullable: true),
-                    TwoFactorEnabled = table.Column<bool>(nullable: false),
-                    UserName = table.Column<string>(maxLength: 256, nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PlayerDetailId = table.Column<int>(type: "int", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -451,10 +437,10 @@ namespace ProjectArcBlade.Migrations
                 name: "RankTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupTemplateId = table.Column<int>(nullable: true),
-                    RankId = table.Column<int>(nullable: true)
+                    GroupTemplateId = table.Column<int>(type: "int", nullable: true),
+                    RankId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -477,10 +463,10 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayGroupTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupTemplateId = table.Column<int>(nullable: true),
-                    SetTemplateId = table.Column<int>(nullable: false)
+                    GroupTemplateId = table.Column<int>(type: "int", nullable: true),
+                    SetTemplateId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -503,13 +489,13 @@ namespace ProjectArcBlade.Migrations
                 name: "GameTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    DefaultLossScore = table.Column<int>(nullable: false),
-                    DefaultRuleId = table.Column<int>(nullable: true),
-                    DefaultWinScore = table.Column<int>(nullable: false),
-                    Number = table.Column<int>(nullable: false),
-                    SetTemplateId = table.Column<int>(nullable: true)
+                    DefaultLossScore = table.Column<int>(type: "int", nullable: false),
+                    DefaultRuleId = table.Column<int>(type: "int", nullable: true),
+                    DefaultWinScore = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    SetTemplateId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -532,10 +518,10 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeGroupTemplate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupTemplateId = table.Column<int>(nullable: true),
-                    SetTemplateId = table.Column<int>(nullable: false)
+                    GroupTemplateId = table.Column<int>(type: "int", nullable: true),
+                    SetTemplateId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -558,11 +544,11 @@ namespace ProjectArcBlade.Migrations
                 name: "Cup",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Description = table.Column<string>(nullable: true),
-                    LeagueId = table.Column<int>(nullable: true),
-                    Name = table.Column<string>(nullable: false)
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LeagueId = table.Column<int>(type: "int", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -579,13 +565,13 @@ namespace ProjectArcBlade.Migrations
                 name: "Season",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    EndDate = table.Column<DateTime>(nullable: false),
-                    IsActive = table.Column<bool>(nullable: false),
-                    LeagueId = table.Column<int>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    StartDate = table.Column<DateTime>(nullable: false)
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    LeagueId = table.Column<int>(type: "int", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -602,10 +588,10 @@ namespace ProjectArcBlade.Migrations
                 name: "ResultRuleException",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ExceptionRuleId = table.Column<int>(nullable: true),
-                    TargetRuleId = table.Column<int>(nullable: true)
+                    ExceptionRuleId = table.Column<int>(type: "int", nullable: true),
+                    TargetRuleId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -628,14 +614,15 @@ namespace ProjectArcBlade.Migrations
                 name: "ClubPlayer",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: true),
-                    ClubPlayerStatusId = table.Column<int>(nullable: true),
-                    IsActive = table.Column<bool>(nullable: false),
-                    MembershipNumber = table.Column<string>(nullable: true),
-                    MembershipTypeId = table.Column<int>(nullable: true),
-                    PlayerDetailId = table.Column<int>(nullable: true)
+                    AffiliationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClubId = table.Column<int>(type: "int", nullable: true),
+                    ClubPlayerStatusId = table.Column<int>(type: "int", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    MembershipNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MembershipTypeId = table.Column<int>(type: "int", nullable: true),
+                    PlayerDetailId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -670,14 +657,14 @@ namespace ProjectArcBlade.Migrations
                 name: "ClubVenue",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: true),
-                    DayOfTheWeekId = table.Column<int>(nullable: true),
-                    EndTime = table.Column<DateTime>(nullable: false),
-                    MaxMatches = table.Column<int>(nullable: false),
-                    StartTime = table.Column<DateTime>(nullable: false),
-                    VenueId = table.Column<int>(nullable: true)
+                    ClubId = table.Column<int>(type: "int", nullable: true),
+                    DayOfTheWeekId = table.Column<int>(type: "int", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MaxMatches = table.Column<int>(type: "int", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VenueId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -706,10 +693,10 @@ namespace ProjectArcBlade.Migrations
                 name: "LeagueClub",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubId = table.Column<int>(nullable: true),
-                    LeagueId = table.Column<int>(nullable: true)
+                    ClubId = table.Column<int>(type: "int", nullable: true),
+                    LeagueId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -732,11 +719,11 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClaimType = table.Column<string>(nullable: true),
-                    ClaimValue = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false)
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -753,10 +740,10 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(nullable: false),
-                    ProviderKey = table.Column<string>(nullable: false),
-                    ProviderDisplayName = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -773,8 +760,8 @@ namespace ProjectArcBlade.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(nullable: false),
-                    RoleId = table.Column<string>(nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -794,13 +781,33 @@ namespace ProjectArcBlade.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Audit",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ApplicationUserId = table.Column<string>(nullable: true),
-                    DateTime = table.Column<DateTime>(nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -817,12 +824,12 @@ namespace ProjectArcBlade.Migrations
                 name: "ClubSubscription",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Amount = table.Column<decimal>(nullable: false),
-                    ClubId = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
-                    SeasonId = table.Column<int>(nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18, 2)", nullable: false),
+                    ClubId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SeasonId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -845,16 +852,16 @@ namespace ProjectArcBlade.Migrations
                 name: "Match",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CategoryId = table.Column<int>(nullable: true),
-                    DivisionId = table.Column<int>(nullable: true),
-                    MatchStatusId = table.Column<int>(nullable: true),
-                    MatchTypeId = table.Column<int>(nullable: true),
-                    SeasonId = table.Column<int>(nullable: true),
-                    StartDate = table.Column<DateTime>(nullable: true),
-                    StartTime = table.Column<DateTime>(nullable: true),
-                    VenueId = table.Column<int>(nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    DivisionId = table.Column<int>(type: "int", nullable: true),
+                    MatchStatusId = table.Column<int>(type: "int", nullable: true),
+                    MatchTypeId = table.Column<int>(type: "int", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StartTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    VenueId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -901,11 +908,11 @@ namespace ProjectArcBlade.Migrations
                 name: "MatchTemplateLink",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CategoryId = table.Column<int>(nullable: true),
-                    MatchTemplateId = table.Column<int>(nullable: true),
-                    SeasonId = table.Column<int>(nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    MatchTemplateId = table.Column<int>(type: "int", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -934,11 +941,11 @@ namespace ProjectArcBlade.Migrations
                 name: "PointScore",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    PointValue = table.Column<int>(nullable: false),
-                    ResultTypeId = table.Column<int>(nullable: true),
-                    SeasonId = table.Column<int>(nullable: true)
+                    PointValue = table.Column<int>(type: "int", nullable: false),
+                    ResultTypeId = table.Column<int>(type: "int", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -961,12 +968,12 @@ namespace ProjectArcBlade.Migrations
                 name: "ExclusionDate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    DateToExclude = table.Column<DateTime>(nullable: false),
-                    LeagueClubId = table.Column<int>(nullable: true),
-                    Reason = table.Column<string>(nullable: true),
-                    SeasonId = table.Column<int>(nullable: true)
+                    DateToExclude = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LeagueClubId = table.Column<int>(type: "int", nullable: true),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -989,15 +996,15 @@ namespace ProjectArcBlade.Migrations
                 name: "Team",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CategoryId = table.Column<int>(nullable: true),
-                    DivisionId = table.Column<int>(nullable: true),
-                    LeagueClubId = table.Column<int>(nullable: true),
-                    Name = table.Column<string>(nullable: false),
-                    RankId = table.Column<int>(nullable: true),
-                    SeasonId = table.Column<int>(nullable: true),
-                    TeamStatusId = table.Column<int>(nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: true),
+                    DivisionId = table.Column<int>(type: "int", nullable: true),
+                    LeagueClubId = table.Column<int>(type: "int", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RankId = table.Column<int>(type: "int", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true),
+                    TeamStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1044,13 +1051,13 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayTeamScore",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AuditId = table.Column<int>(nullable: true),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    Discriminator = table.Column<string>(nullable: false),
-                    Score = table.Column<int>(nullable: true),
-                    ScoreStatusId = table.Column<int>(nullable: true)
+                    AuditId = table.Column<int>(type: "int", nullable: true),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: true),
+                    ScoreStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1079,13 +1086,13 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeTeamScore",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AuditId = table.Column<int>(nullable: true),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    Discriminator = table.Column<string>(nullable: false),
-                    Score = table.Column<int>(nullable: true),
-                    ScoreStatusId = table.Column<int>(nullable: true)
+                    AuditId = table.Column<int>(type: "int", nullable: true),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Score = table.Column<int>(type: "int", nullable: true),
+                    ScoreStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1114,10 +1121,10 @@ namespace ProjectArcBlade.Migrations
                 name: "ClubSubscriber",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    ClubSubscriptionId = table.Column<int>(nullable: true)
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    ClubSubscriptionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1140,11 +1147,11 @@ namespace ProjectArcBlade.Migrations
                 name: "AwardNominee",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwardId = table.Column<int>(nullable: true),
-                    ClubPlayerId = table.Column<int>(nullable: false),
-                    MatchId = table.Column<int>(nullable: true)
+                    AwardId = table.Column<int>(type: "int", nullable: true),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: false),
+                    MatchId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1173,10 +1180,10 @@ namespace ProjectArcBlade.Migrations
                 name: "CupMatch",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CupId = table.Column<int>(nullable: false),
-                    MatchId = table.Column<int>(nullable: false)
+                    CupId = table.Column<int>(type: "int", nullable: false),
+                    MatchId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1196,13 +1203,46 @@ namespace ProjectArcBlade.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PromotionMatch",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    MatchId = table.Column<int>(type: "int", nullable: true),
+                    SeasonId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PromotionMatch", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PromotionMatch_ClubPlayer_ClubPlayerId",
+                        column: x => x.ClubPlayerId,
+                        principalTable: "ClubPlayer",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PromotionMatch_Match_MatchId",
+                        column: x => x.MatchId,
+                        principalTable: "Match",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PromotionMatch_Season_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Season",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RescheduledStartDate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    MatchId = table.Column<int>(nullable: true),
-                    StartDate = table.Column<DateTime>(nullable: false)
+                    MatchId = table.Column<int>(type: "int", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1219,11 +1259,11 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayMatchTeam",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    MatchId = table.Column<int>(nullable: false),
-                    TeamId = table.Column<int>(nullable: true),
-                    TeamStatusId = table.Column<int>(nullable: true)
+                    MatchId = table.Column<int>(type: "int", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: true),
+                    TeamStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1252,11 +1292,11 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeMatchTeam",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    MatchId = table.Column<int>(nullable: false),
-                    TeamId = table.Column<int>(nullable: true),
-                    TeamStatusId = table.Column<int>(nullable: true)
+                    MatchId = table.Column<int>(type: "int", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: true),
+                    TeamStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1285,10 +1325,10 @@ namespace ProjectArcBlade.Migrations
                 name: "TeamCaptain",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    TeamId = table.Column<int>(nullable: false)
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    TeamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1311,12 +1351,12 @@ namespace ProjectArcBlade.Migrations
                 name: "TeamPlayer",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    GroupId = table.Column<int>(nullable: true),
-                    RankId = table.Column<int>(nullable: true),
-                    TeamId = table.Column<int>(nullable: true)
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    GroupId = table.Column<int>(type: "int", nullable: true),
+                    RankId = table.Column<int>(type: "int", nullable: true),
+                    TeamId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1351,11 +1391,11 @@ namespace ProjectArcBlade.Migrations
                 name: "CupMatchHandicap",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    CupMatchId = table.Column<int>(nullable: false),
-                    Handicap = table.Column<int>(nullable: false),
-                    TeamId = table.Column<int>(nullable: false)
+                    CupMatchId = table.Column<int>(type: "int", nullable: false),
+                    Handicap = table.Column<int>(type: "int", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1378,10 +1418,10 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayMatchTeamCaptain",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwayMatchTeamId = table.Column<int>(nullable: false),
-                    ClubPlayerId = table.Column<int>(nullable: true)
+                    AwayMatchTeamId = table.Column<int>(type: "int", nullable: false),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1404,10 +1444,10 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayMatchTeamGroup",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwayMatchTeamId = table.Column<int>(nullable: true),
-                    GroupId = table.Column<int>(nullable: true)
+                    AwayMatchTeamId = table.Column<int>(type: "int", nullable: true),
+                    GroupId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1430,12 +1470,12 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayScoreSheet",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AuditId = table.Column<int>(nullable: true),
-                    AwayMatchTeamId = table.Column<int>(nullable: false),
-                    MatchId = table.Column<int>(nullable: false),
-                    SignedOff = table.Column<bool>(nullable: false)
+                    AuditId = table.Column<int>(type: "int", nullable: true),
+                    AwayMatchTeamId = table.Column<int>(type: "int", nullable: false),
+                    MatchId = table.Column<int>(type: "int", nullable: false),
+                    SignedOff = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1464,10 +1504,10 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeMatchTeamCaptain",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    HomeMatchTeamId = table.Column<int>(nullable: false)
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1490,10 +1530,10 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeMatchTeamGroup",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    GroupId = table.Column<int>(nullable: true),
-                    HomeMatchTeamId = table.Column<int>(nullable: true)
+                    GroupId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1516,12 +1556,12 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeScoreSheet",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AuditId = table.Column<int>(nullable: true),
-                    HomeMatchTeamId = table.Column<int>(nullable: false),
-                    MatchId = table.Column<int>(nullable: false),
-                    SignedOff = table.Column<bool>(nullable: false)
+                    AuditId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamId = table.Column<int>(type: "int", nullable: false),
+                    MatchId = table.Column<int>(type: "int", nullable: false),
+                    SignedOff = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1550,11 +1590,11 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayMatchTeamGroupPlayer",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwayMatchTeamGroupId = table.Column<int>(nullable: true),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    RankId = table.Column<int>(nullable: true)
+                    AwayMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    RankId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1583,11 +1623,11 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeMatchTeamGroupPlayer",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ClubPlayerId = table.Column<int>(nullable: true),
-                    HomeMatchTeamGroupId = table.Column<int>(nullable: true),
-                    RankId = table.Column<int>(nullable: true)
+                    ClubPlayerId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    RankId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1616,13 +1656,13 @@ namespace ProjectArcBlade.Migrations
                 name: "Set",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwayMatchTeamGroupId = table.Column<int>(nullable: true),
-                    HomeMatchTeamGroupId = table.Column<int>(nullable: true),
-                    MatchId = table.Column<int>(nullable: true),
-                    Number = table.Column<int>(nullable: false),
-                    SetStatusId = table.Column<int>(nullable: true)
+                    AwayMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    MatchId = table.Column<int>(type: "int", nullable: true),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    SetStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1657,16 +1697,16 @@ namespace ProjectArcBlade.Migrations
                 name: "ScoreSheetLine",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    AwayMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    AwayScoreSheetId = table.Column<int>(type: "int", nullable: true),
+                    HomeMatchTeamGroupId = table.Column<int>(type: "int", nullable: true),
+                    HomeScoreSheetId = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    GameTotal = table.Column<int>(nullable: false),
-                    PointTotal = table.Column<int>(nullable: false),
-                    SetTotal = table.Column<int>(nullable: false),
-                    AwayMatchTeamGroupId = table.Column<int>(nullable: true),
-                    AwayScoreSheetId = table.Column<int>(nullable: true),
-                    HomeMatchTeamGroupId = table.Column<int>(nullable: true),
-                    HomeScoreSheetId = table.Column<int>(nullable: true)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GameTotal = table.Column<int>(type: "int", nullable: false),
+                    PointTotal = table.Column<int>(type: "int", nullable: false),
+                    SetTotal = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1701,15 +1741,15 @@ namespace ProjectArcBlade.Migrations
                 name: "Game",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AwayTeamAwayTeamScoreId = table.Column<int>(nullable: false),
-                    AwayTeamHomeTeamScoreId = table.Column<int>(nullable: false),
-                    HomeTeamAwayTeamScoreId = table.Column<int>(nullable: false),
-                    HomeTeamHomeTeamScoreId = table.Column<int>(nullable: false),
-                    Number = table.Column<int>(nullable: false),
-                    RuleId = table.Column<int>(nullable: true),
-                    SetId = table.Column<int>(nullable: true)
+                    AwayTeamAwayTeamScoreId = table.Column<int>(type: "int", nullable: false),
+                    AwayTeamHomeTeamScoreId = table.Column<int>(type: "int", nullable: false),
+                    HomeTeamAwayTeamScoreId = table.Column<int>(type: "int", nullable: false),
+                    HomeTeamHomeTeamScoreId = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<int>(type: "int", nullable: false),
+                    RuleId = table.Column<int>(type: "int", nullable: true),
+                    SetId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1756,13 +1796,13 @@ namespace ProjectArcBlade.Migrations
                 name: "AwayResult",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    ResultTypeId = table.Column<int>(nullable: true),
-                    GameId = table.Column<int>(nullable: true),
-                    MatchId = table.Column<int>(nullable: true),
-                    SetId = table.Column<int>(nullable: true)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResultTypeId = table.Column<int>(type: "int", nullable: true),
+                    GameId = table.Column<int>(type: "int", nullable: true),
+                    MatchId = table.Column<int>(type: "int", nullable: true),
+                    SetId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1797,29 +1837,29 @@ namespace ProjectArcBlade.Migrations
                 name: "HomeResult",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    GameId = table.Column<int>(type: "int", nullable: true),
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Discriminator = table.Column<string>(nullable: false),
-                    ResultTypeId = table.Column<int>(nullable: true),
-                    GameId = table.Column<int>(nullable: true),
-                    MatchId = table.Column<int>(nullable: true),
-                    SetId = table.Column<int>(nullable: true)
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResultTypeId = table.Column<int>(type: "int", nullable: true),
+                    MatchId = table.Column<int>(type: "int", nullable: true),
+                    SetId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HomeResult", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_HomeResult_Type_ResultTypeId",
-                        column: x => x.ResultTypeId,
-                        principalTable: "Type",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_HomeResult_Game_GameId",
                         column: x => x.GameId,
                         principalTable: "Game",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HomeResult_Type_ResultTypeId",
+                        column: x => x.ResultTypeId,
+                        principalTable: "Type",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_HomeResult_Match_MatchId",
                         column: x => x.MatchId,
@@ -1835,15 +1875,16 @@ namespace ProjectArcBlade.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "RoleNameIndex",
-                table: "AspNetRoles",
-                column: "NormalizedName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -1869,7 +1910,8 @@ namespace ProjectArcBlade.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_PlayerDetailId",
@@ -1968,19 +2010,22 @@ namespace ProjectArcBlade.Migrations
                 name: "IX_AwayResult_GameId",
                 table: "AwayResult",
                 column: "GameId",
-                unique: true);
+                unique: true,
+                filter: "[GameId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AwayResult_MatchId",
                 table: "AwayResult",
                 column: "MatchId",
-                unique: true);
+                unique: true,
+                filter: "[MatchId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AwayResult_SetId",
                 table: "AwayResult",
                 column: "SetId",
-                unique: true);
+                unique: true,
+                filter: "[SetId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AwayScoreSheet_AuditId",
@@ -2227,27 +2272,30 @@ namespace ProjectArcBlade.Migrations
                 column: "RankId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_HomeResult_GameId",
+                table: "HomeResult",
+                column: "GameId",
+                unique: true,
+                filter: "[GameId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HomeResult_ResultTypeId",
                 table: "HomeResult",
                 column: "ResultTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_HomeResult_GameId",
-                table: "HomeResult",
-                column: "GameId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_HomeResult_MatchId",
                 table: "HomeResult",
                 column: "MatchId",
-                unique: true);
+                unique: true,
+                filter: "[MatchId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HomeResult_SetId",
                 table: "HomeResult",
                 column: "SetId",
-                unique: true);
+                unique: true,
+                filter: "[SetId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HomeScoreSheet_AuditId",
@@ -2354,6 +2402,21 @@ namespace ProjectArcBlade.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_PointScore_SeasonId",
                 table: "PointScore",
+                column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PromotionMatch_ClubPlayerId",
+                table: "PromotionMatch",
+                column: "ClubPlayerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PromotionMatch_MatchId",
+                table: "PromotionMatch",
+                column: "MatchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PromotionMatch_SeasonId",
+                table: "PromotionMatch",
                 column: "SeasonId");
 
             migrationBuilder.CreateIndex(
@@ -2582,6 +2645,9 @@ namespace ProjectArcBlade.Migrations
 
             migrationBuilder.DropTable(
                 name: "PointScore");
+
+            migrationBuilder.DropTable(
+                name: "PromotionMatch");
 
             migrationBuilder.DropTable(
                 name: "RankTemplate");

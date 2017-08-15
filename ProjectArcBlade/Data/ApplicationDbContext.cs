@@ -11,7 +11,7 @@ namespace ProjectArcBlade.Data
             : base(options)
         {
         }
-        
+
         //Templates
         public DbSet<MatchTemplate> MatchTemplates { get; set; }
         public DbSet<MatchTemplateLink> MatchTemplateLinks { get; set; }
@@ -21,7 +21,7 @@ namespace ProjectArcBlade.Data
         public DbSet<SetTemplate> SetTemplates { get; set; }
         public DbSet<HomeGroupTemplate> HomeGroupTemplates { get; set; }
         public DbSet<AwayGroupTemplate> AwayGroupTemplates { get; set; }
-        
+
         //Statuses
         public DbSet<Status> Statuses { get; set; }
         public DbSet<MatchStatus> MatchStatuses { get; set; }
@@ -53,8 +53,8 @@ namespace ProjectArcBlade.Data
         public DbSet<ScoreSheetLine> ScoreSheetLines { get; set; }
         public DbSet<HomeScoreSheetLine> HomeScoreSheetLines { get; set; }
         public DbSet<AwayScoreSheetLine> AwayScoreSheetLines { get; set; }
-        
-        public DbSet<Audit> Audits { get; set; }        
+
+        public DbSet<Audit> Audits { get; set; }
         public DbSet<Venue> Venues { get; set; }
         public DbSet<Rank> Ranks { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -70,17 +70,18 @@ namespace ProjectArcBlade.Data
         public DbSet<ClubSubscription> ClubSubscriptions { get; set; }
         public DbSet<ClubVenue> ClubVenues { get; set; }
         public DbSet<ClubPlayer> ClubPlayers { get; set; }
-        
+
         public DbSet<Cup> Cups { get; set; }
         public DbSet<CupMatch> CupMatches { get; set; }
         public DbSet<CupMatchHandicap> CupMatchHandicaps { get; set; }
-                
+
         public DbSet<League> Leagues { get; set; }
         public DbSet<LeagueClub> LeagueClubs { get; set; }
         public DbSet<RescheduledStartDate> RescheduledStartDates { get; set; }
         public DbSet<Match> Matches { get; set; }
         public DbSet<Set> Sets { get; set; }
         public DbSet<Game> Games { get; set; }
+        public DbSet<PromotionMatch> PromotionMatches { get; set; }
 
         public DbSet<HomeMatchTeam> HomeMatchTeams { get; set; }
         public DbSet<HomeMatchTeamCaptain> HomeMatchTeamCaptains { get; set; }
@@ -208,7 +209,8 @@ namespace ProjectArcBlade.Data
             builder.Entity<League>().ToTable("League");
             builder.Entity<LeagueClub>().ToTable("LeagueClub");
             builder.Entity<RescheduledStartDate>().ToTable("RescheduledStartDate");
-
+            builder.Entity<PromotionMatch>().ToTable("PromotionMatch");
+                        
             //specify 1 to 1 relationships for match and teams
             builder.Entity<Match>().ToTable("Match");
             builder.Entity<Match>()
@@ -247,7 +249,7 @@ namespace ProjectArcBlade.Data
                .HasOne(s => s.SetHomeResult)
                .WithOne(sar => sar.Set)
                .HasForeignKey<SetHomeResult>(sar => sar.SetId);
-
+            
             builder.Entity<Game>().ToTable("Game");
             builder.Entity<Game>()
                 .HasOne(g => g.GameAwayResult)
@@ -258,6 +260,8 @@ namespace ProjectArcBlade.Data
                 .WithOne(gar => gar.Game)
                 .HasForeignKey<GameHomeResult>(gar => gar.GameId);
             
+
+
             builder.Entity<HomeMatchTeam>().ToTable("HomeMatchTeam");
             builder.Entity<HomeMatchTeam>()
                 .HasOne(hmt => hmt.HomeMatchTeamCaptain)

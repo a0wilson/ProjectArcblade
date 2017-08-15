@@ -28,6 +28,7 @@ namespace ProjectArcBlade.Models
         public ICollection<PointScore> PointScores { get; set; }
         public ICollection<ExclusionDate> ExclusionDates { get; set; }
         public ICollection<MatchTemplateLink> MatchTemplateLinks { get; set; }
+        public ICollection<PromotionMatch> PromotionMatches { get; set; }
 
     }
 }
